@@ -1,664 +1,387 @@
-# TripWise Mobile - Project Overview
+# TripWise Mobile — Project Overview
 
-## 🎯 Project Purpose
+## Project Purpose
 
-TripWise Mobile is a comprehensive travel planning and expense management application designed to simplify group travel coordination, budget tracking, and expense splitting among friends and family. The application bridges the gap between planning unforgettable trips and managing the financial complexities that come with group travel.
+TripWise is a greenfield React Native + Supabase travel collaboration platform. The goal is to replace the fragmented experience of using 8+ apps (WhatsApp, Google Photos, Splitwise, Google Maps, etc.) with a single intelligent platform that covers every phase of a trip — planning, during, and after.
 
-### Core Mission
-To provide travelers with a seamless, intuitive platform that eliminates the stress of managing shared expenses, tracking budgets, and coordinating group trips, allowing them to focus on creating memorable experiences together.
-
----
-
-## 🌟 Key Problems Solved
-
-1. **Complex Expense Splitting**: Eliminates the manual calculation of who owes whom after group trips
-2. **Budget Tracking**: Real-time visibility into trip expenses and remaining budget
-3. **Trip Coordination**: Centralized platform for managing trip details, itineraries, and group activities
-4. **Payment Transparency**: Clear record of all expenses and settlements among group members
-5. **Multi-Currency Support**: Handles different currencies for international travel
-6. **Passwordless Authentication**: Simple, secure OTP-based login system
+**Status:** Not started. No code exists. This document defines what we are building before the first line of code is written.
 
 ---
 
-## 🚀 Current Features (Implemented)
+## Core Problems We Solve
 
-### 1. Authentication & Onboarding
-
-#### Welcome Screen
-- **Purpose**: First impression and brand introduction
-- **Features**:
-  - Animated brand logo and illustrations
-  - Theme toggle (Light/Dark mode)
-  - Terms of Service & Privacy Policy quick access
-  - Get Started and Login options
-  - Responsive design for all screen sizes
-
-#### Passwordless Login System
-- **Purpose**: Secure, hassle-free authentication
-- **Features**:
-  - Email or Mobile number login
-  - Auto-detection of input type (email vs phone)
-  - Visual feedback with dynamic icons
-  - OTP-based verification (no password required)
-  - API connectivity test button
-  - Cross-platform support (iOS, Android, Web)
-
-#### OTP Verification
-- **Purpose**: Secure identity verification
-- **Features**:
-  - 6-digit OTP input with auto-focus
-  - 30-second countdown timer
-  - Resend OTP functionality
-  - Visual error states
-  - Auto-submission on completion
-  - Mock OTP hints for testing (111111 for existing, 222222 for new users)
-
-#### Complete Profile Setup
-- **Purpose**: Personalize user experience and preferences
-- **Features**:
-  - Avatar selection (emoji-based or initials)
-  - Personal information (name, DOB, gender)
-  - Contact details (email, phone - pre-filled if used for login)
-  - Location preferences (city, country)
-  - Travel preferences (style, profession)
-  - Currency selection for expense tracking
-  - Interest tags (Beach, Mountains, Food, Photography, etc.)
-  - Comprehensive validation
-  - Success confirmation dialog
-
-### 2. User Dashboard
-
-#### Profile Overview
-- **Purpose**: View and manage personal travel profile
-- **Features**:
-  - Profile card with avatar/initials
-  - Display name, profession, travel style
-  - Detailed account information:
-    - Email address
-    - Phone number
-    - Location (city, country)
-    - Preferred currency
-    - Date of birth
-  - Travel interests as pills/badges
-  - Theme toggle
-  - Logout functionality with confirmation
-
-### 3. Trip Management
-
-#### Trip Dashboard
-- **Purpose**: Central hub for all trip-related activities
-- **Features**:
-  - **Quick Statistics**:
-    - Total trips count
-    - Upcoming trips counter
-    - Completed trips counter
-  - **Search Functionality**: Find trips by name or destination
-  - **Trip List Display**:
-    - Trip name and destination
-    - Date range (start to end)
-    - Status badges (Upcoming, Completed, Cancelled)
-    - Member count
-    - Total expenses
-    - Cover images (when available)
-  - **Empty State**: Encouragement to create first trip
-  - **Floating Action Button**: Quick access to create new trip
-  - **Pull-to-Refresh**: Update trip data
-  - **Bottom Navigation**: Switch between views
-
-#### Create Trip
-- **Purpose**: Initialize new travel plans
-- **Features**:
-  - Trip name input
-  - Destination selection
-  - Start date picker (YYYY-MM-DD format)
-  - End date picker (YYYY-MM-DD format)
-  - Validation for required fields
-  - Cross-platform alerts (Snackbar on web, Alert on mobile)
-  - Auto-calculation of date defaults if not provided
-  - Loading states during creation
-  - Success confirmation with auto-redirect
-  - API error handling with detailed logging
-
-#### Trip Details
-- **Purpose**: View and manage individual trip information
-- **Features**:
-  - Trip header with cover image
-  - Trip name, destination, dates display
-  - Status indicator
-  - Member management section
-  - Expense tracking overview
-  - Back navigation
-  - Future: Itinerary, documents, group chat
-
-### 4. Expense Management (Prepared)
-
-#### Add Expense
-- **Purpose**: Record trip-related costs
-- **Features** (Prepared for implementation):
-  - Expense title/description
-  - Amount input
-  - Category selection
-  - Date picker
-  - Payer selection (who paid)
-  - Split method (equal, custom, percentage)
-  - Participant selection
-  - Receipt photo upload
-  - Currency selection
-  - Notes/description
-
-#### Expense List & Summary
-- **Features** (Prepared):
-  - All expenses list view
-  - Filter by category, date, payer
-  - Individual expense details
-  - Edit/Delete functionality
-  - Total calculations
-  - Balance sheet (who owes whom)
-  - Settlement tracking
+1. **Fragmented tools** — travelers juggle 8+ apps for one trip
+2. **Lost memories** — photos scattered across devices with no trip context
+3. **Expense nightmares** — manual splits, awkward money conversations, unresolved debts
+4. **Poor planning** — generic recommendations, no personalized itineraries
+5. **Collaboration chaos** — group decisions buried in endless message threads
+6. **Storage costs** — users already pay for Google Drive; we should leverage it
 
 ---
 
-## 🎨 Design & User Experience
+## What We Are Building
 
-### Theme System
-- **Light Mode**: Clean, modern interface with high contrast
-- **Dark Mode**: Eye-friendly with reduced brightness
-- **System Integration**: Respects device preferences
-- **Consistent Theming**: All components follow theme system
+### Platform
+- React Native app (iOS + Android + Web via Expo)
+- Supabase backend (PostgreSQL + Auth + Storage + Realtime + Edge Functions)
+- Single codebase, three platforms
 
-### Responsive Design
-- **Mobile-First**: Optimized for iOS and Android
-- **Web Support**: Full functionality in modern browsers
-- **Adaptive Layouts**: Adjusts to screen sizes
-- **Touch-Friendly**: Large tap targets, gesture support
+### Core Modules (in build order)
 
-### Visual Elements
-- **Custom Illustrations**: Welcome, Login, OTP screens
-- **Icon System**: Lucide React Native icons throughout
-- **Smooth Animations**: Fade-in, slide effects
-- **Loading States**: Spinners, skeleton screens
-- **Empty States**: Encouraging messages and actions
-
-### Accessibility
-- **Color Contrast**: WCAG compliance
-- **Font Scaling**: Supports system font sizes
-- **Screen Reader Support**: Semantic HTML/components
-- **Keyboard Navigation**: Web accessibility
-- **Focus States**: Clear visual indicators
+| # | Module | What it does |
+|---|--------|-------------|
+| 1 | Auth | OTP (email/phone), Google, Apple login — no passwords |
+| 2 | User Profile | Rich profile with preferences, travel interests, emergency contacts |
+| 3 | Trip Management | Create trips, invite members, role-based access |
+| 4 | Expense Management | Log expenses, smart splitting, settlement optimization |
+| 5 | Shared Memories | Photo/video uploads, trip albums, cloud storage integration |
+| 6 | Chat & Collaboration | Real-time trip chat, polls, announcements |
+| 7 | Timeline & Documents | Day-by-day trip story, document storage with expiry reminders |
+| 8 | Maps & Places | Interactive trip maps, nearby recommendations |
+| 9 | AI Assistant | Itinerary generation, recommendations, packing lists (OpenAI) |
+| 10 | Analytics | Spending trends, budget vs actual, travel stats |
 
 ---
 
-## 🛠️ Technical Architecture
+## Tech Stack
 
-### Frontend Stack
-- **Framework**: React Native (Expo SDK 54)
-- **Language**: TypeScript
-- **UI Library**: React Native (cross-platform)
-- **Navigation**: React Navigation (Stack Navigator)
-- **State Management**: React Context API
-- **Forms**: React Hook Form + Zod validation
-- **Icons**: Lucide React Native
-- **Storage**: AsyncStorage (cross-platform)
+### Frontend
+- **Framework:** React Native 0.81+ with Expo SDK 54+
+- **Language:** TypeScript (strict mode)
+- **Navigation:** React Navigation 7 (Stack + Bottom Tabs + Drawer where needed)
+- **State:** Zustand (global) + React Context (auth session only)
+- **Forms:** React Hook Form + Zod validation
+- **UI:** Custom component library (no third-party UI kit — full design control)
+- **Icons:** Lucide React Native
+- **Animations:** React Native Reanimated 3 + Moti (gesture-driven micro-interactions)
+- **Storage (local):** AsyncStorage 2.2.0+ (session), expo-sqlite (offline queue)
+- **Image handling:** expo-image (fast, cached rendering) + expo-image-picker + expo-image-manipulator
 
-### Backend Integration
-- **Authentication**: Supabase Auth with OTP
-- **Database**: Supabase (PostgreSQL)
-- **API**: Supabase Functions (Edge Functions)
-- **Real-time**: Supabase Realtime (prepared for future)
-- **File Storage**: Supabase Storage (for photos/receipts)
+### Backend
+- **Database:** Supabase PostgreSQL 15
+- **Auth:** Supabase Auth (Email OTP, Phone OTP, Google OAuth, Apple Sign In)
+- **Storage:** Supabase Storage (S3-compatible)
+- **Realtime:** Supabase Realtime (WebSockets)
+- **Functions:** Supabase Edge Functions (Deno)
+- **Extensions:** uuid-ossp, pgcrypto, pg_trgm, postgis, pgvector, pg_cron, pgjwt
 
-### Platform Support
-- **iOS**: Native app support
-- **Android**: Native app support
-- **Web**: Progressive Web App (PWA) ready
-- **Responsive**: All screen sizes
+### AI & Integrations
+- **LLM:** OpenAI GPT-4o (recommendations, itineraries, chat)
+- **Vision:** OpenAI GPT-4o Vision (receipt OCR)
+- **Maps:** Google Maps API + Google Places API
+- **Payments:** Razorpay (India), Stripe (international)
+- **Email:** Resend (transactional) + React Email (templates)
+- **SMS:** Twilio
+- **Push:** Expo Push Notifications
+- **Deep Linking:** expo-linking + expo-router (universal links)
 
-### Key Technical Features
-- **Cross-Platform Compatibility**: Single codebase, multiple platforms
-- **Offline Support**: AsyncStorage for local data
-- **Secure Authentication**: JWT tokens, OTP verification
-- **API Error Handling**: Comprehensive logging and user feedback
-- **Type Safety**: Full TypeScript implementation
-- **Code Quality**: ESLint, Prettier configuration
-
----
-
-## 📱 User Journey Flow
-
-### First-Time User
-1. **Welcome Screen** → View app introduction and features
-2. **Get Started** → Navigate to login
-3. **Enter Email/Phone** → Input credentials
-4. **Verify OTP** → 6-digit verification code
-5. **Complete Profile** → Set up personal information and preferences
-6. **Dashboard** → Land on user profile overview
-7. **Explore Trips** → View empty state, create first trip
-8. **Create Trip** → Add trip details
-9. **Trip Dashboard** → See trip summary
-10. **Manage Trip** → Add expenses, members (future)
-
-### Returning User
-1. **Welcome Screen** → Quick access to login
-2. **Enter Email/Phone** → Recognized user flow
-3. **Verify OTP** → Fast verification
-4. **Trip Dashboard** → Direct access to trips
-5. **Continue Planning** → Manage existing trips
-6. **Add Expenses** → Track spending
-7. **View Balances** → Check settlements
+### DevOps & Quality
+- **Hosting:** Supabase + Vercel (web) + Expo EAS (mobile builds + OTA updates)
+- **CI/CD:** GitHub Actions (lint, typecheck, test on PR; EAS build on merge)
+- **Error tracking:** Sentry (sentry-expo)
+- **Analytics:** PostHog (product analytics + feature flags + session replay)
+- **Testing:** Jest + React Native Testing Library (unit/integration) + Maestro (E2E mobile)
+- **Linting:** ESLint + Prettier + lint-staged + husky (pre-commit)
+- **Type generation:** supabase gen types (auto-generated DB types from schema)
 
 ---
 
-## 🚧 Future Features & Enhancements
+## Project Folder Structure
 
-### Phase 1: Core Enhancements (Near-term)
-
-#### Expense Management
-- **Advanced Split Options**:
-  - Custom split amounts per person
-  - Percentage-based splitting
-  - Unequal distribution rules
-  - Multi-currency expense handling
-- **Receipt Management**:
-  - Photo capture integration
-  - OCR for automatic expense extraction
-  - Receipt gallery view
-  - Export receipts as PDF
-- **Settlement System**:
-  - Simplified debt calculation algorithm
-  - Payment tracking (mark as paid)
-  - Payment reminders
-  - Integration with UPI, PayPal, Venmo
-  - QR code generation for payments
-
-#### Trip Enhancements
-- **Itinerary Builder**:
-  - Day-wise activity planning
-  - Time slot management
-  - Location mapping
-  - Booking confirmations storage
-- **Collaborative Features**:
-  - Real-time updates using Supabase Realtime
-  - Member invitations via email/phone
-  - Role management (admin, member, viewer)
-  - Group voting on activities
-- **Document Management**:
-  - Store tickets, reservations, visas
-  - Shared photo gallery
-  - Important contacts
-  - Emergency information
-
-#### Notifications & Reminders
-- **Push Notifications**:
-  - New expense added
-  - Payment received
-  - Trip starting soon
-  - Settlement reminders
-- **In-App Notifications**:
-  - Activity feed
-  - Member actions
-  - Payment status updates
-
-### Phase 2: Advanced Features (Mid-term)
-
-#### Budget Planning & Insights
-- **Budget Management**:
-  - Set trip budget by category
-  - Budget vs actual comparison
-  - Spending alerts and warnings
-  - Category-wise breakdown
-- **Analytics & Reports**:
-  - Spending trends
-  - Category-wise expense charts
-  - Member contribution statistics
-  - Trip comparison reports
-  - Exportable reports (PDF, CSV)
-
-#### Social Features
-- **Trip Feed**:
-  - Activity timeline
-  - Photo sharing
-  - Check-ins at locations
-  - Trip highlights
-- **Group Chat**:
-  - In-app messaging
-  - Trip-specific channels
-  - File sharing
-  - Quick polls for decisions
-
-#### Travel Recommendations
-- **AI-Powered Suggestions**:
-  - Destination recommendations based on interests
-  - Activity suggestions
-  - Budget optimization tips
-  - Best time to visit
-- **Integration with Travel APIs**:
-  - Flight price monitoring
-  - Hotel comparisons
-  - Local attraction information
-  - Weather forecasts
-
-### Phase 3: Premium Features (Long-term)
-
-#### Advanced Planning Tools
-- **Multi-Trip Planning**:
-  - Plan multiple legs of journey
-  - Compare trip options
-  - Merge/split trips
-  - Template trips for reuse
-- **Packing Lists**:
-  - Smart packing suggestions based on destination
-  - Shared checklist with group
-  - Weather-based recommendations
-  - Custom categories
-
-#### Financial Features
-- **Currency Exchange**:
-  - Real-time exchange rates
-  - Multi-currency transactions
-  - Conversion history
-  - Rate alerts
-- **Expense Forecasting**:
-  - Predict trip costs
-  - Daily spending limits
-  - Budget recommendations
-  - Cost saving suggestions
-
-#### Integration & Automation
-- **Bank Integration**:
-  - Auto-import transactions
-  - Credit card expense sync
-  - Bank account linking
-- **Calendar Integration**:
-  - Sync with Google/Apple Calendar
-  - Automatic reminders
-  - Travel schedule blocking
-- **Booking Platforms**:
-  - Link with Booking.com, Airbnb
-  - Auto-import reservations
-  - Price tracking
-
-#### Premium Subscription
-- **Free Tier**:
-  - Up to 3 active trips
-  - Basic expense splitting
-  - Up to 10 members per trip
-- **Premium Tier**:
-  - Unlimited trips
-  - Advanced analytics
-  - Priority support
-  - Custom categories
-  - Export capabilities
-  - Remove ads (if implemented)
-
-### Phase 4: Enterprise & Community (Future)
-
-#### Business Travel
-- **Corporate Features**:
-  - Company expense policies
-  - Approval workflows
-  - Receipt compliance
-  - Tax documentation
-  - Mileage tracking
-  - Per diem management
-
-#### Community Features
-- **Trip Templates**:
-  - Share trip plans publicly
-  - Discover popular destinations
-  - Clone and customize trips
-  - Rate and review templates
-- **Travel Community**:
-  - User profiles and achievements
-  - Trip stories and blogs
-  - Tips and recommendations
-  - Q&A forums
-
-#### Gamification
-- **Badges & Achievements**:
-  - Trip milestones
-  - Budget management goals
-  - Early payment rewards
-  - Travel explorer levels
-- **Leaderboards**:
-  - Most organized planner
-  - Budget optimization expert
-  - Frequent traveler
-  - Best trip organizer
+```
+tripwise/
+├── app.json                        # Expo config (reads from .env via extra)
+├── babel.config.js
+├── metro.config.js
+├── .env                            # Never committed
+├── .env.example                    # Committed, no real values
+├── .gitignore
+├── package.json
+├── tsconfig.json
+├── eas.json                        # EAS Build profiles (dev/preview/prod)
+├── supabase/
+│   ├── config.toml
+│   ├── seed.sql                    # Dev seed data (categories, test users)
+│   ├── migrations/
+│   │   ├── 001_extensions.sql
+│   │   ├── 002_schema.sql
+│   │   ├── 003_rls.sql
+│   │   ├── 004_storage.sql
+│   │   └── 005_functions.sql       # Postgres functions (settlements, balances)
+│   └── functions/
+│       ├── _shared/                # Shared utilities across functions
+│       │   ├── supabase-client.ts
+│       │   └── cors.ts
+│       ├── send-invite/
+│       ├── send-push/
+│       ├── calculate-settlements/
+│       ├── ai-chat/
+│       ├── ai-itinerary/
+│       ├── receipt-ocr/
+│       └── cloud-upload/
+├── docs/                           # This folder — project documentation
+│   ├── PRD.md
+│   ├── PROJECT_OVERVIEW.md
+│   ├── DEVELOPMENT_PHASES.md
+│   ├── SCREEN_INVENTORY.md
+│   ├── SUPABASE_FEASIBILITY.md
+│   └── API_CONTRACTS.md            # Request/response contracts per endpoint
+└── src/
+    ├── app/                        # Entry point (if using expo-router in future)
+    ├── lib/
+    │   ├── supabase.ts             # Supabase client (reads from env, NO service-role key)
+    │   ├── env.ts                  # Typed env reader via expo-constants
+    │   └── queryClient.ts          # React Query client config (optional, see below)
+    ├── navigation/
+    │   ├── AppNavigator.tsx        # Root: AuthStack vs MainStack
+    │   ├── AuthStack.tsx
+    │   ├── MainTabs.tsx            # Bottom tab navigator
+    │   ├── TripStack.tsx           # Trip detail sub-navigator
+    │   ├── SettingsStack.tsx
+    │   └── types.ts                # Navigation param types
+    ├── screens/                    # One folder per module
+    │   ├── auth/
+    │   ├── profile/
+    │   ├── trips/
+    │   ├── expenses/
+    │   ├── media/
+    │   ├── chat/
+    │   ├── timeline/
+    │   ├── documents/
+    │   ├── maps/
+    │   ├── ai/
+    │   ├── analytics/
+    │   ├── settings/
+    │   ├── notifications/
+    │   ├── community/
+    │   └── errors/
+    ├── components/                 # Reusable UI primitives
+    │   ├── ui/                     # Button, TextField, Dropdown, etc.
+    │   ├── trip/                   # TripCard, StatsCard, etc.
+    │   ├── expense/                # ExpenseRow, SplitPreview, etc.
+    │   ├── media/                  # MediaGrid, Lightbox, etc.
+    │   ├── chat/                   # MessageBubble, TypingIndicator, etc.
+    │   └── shared/                 # LoadingIndicator, EmptyState, ErrorBoundary
+    ├── stores/                     # Zustand stores
+    │   ├── authStore.ts
+    │   ├── tripStore.ts
+    │   ├── expenseStore.ts
+    │   ├── chatStore.ts
+    │   └── uiStore.ts
+    ├── services/                   # Supabase query functions (thin data layer)
+    │   ├── auth.ts
+    │   ├── trips.ts
+    │   ├── expenses.ts
+    │   ├── media.ts
+    │   ├── messages.ts
+    │   ├── documents.ts
+    │   └── ai.ts
+    ├── schemas/                    # Zod validation schemas
+    │   ├── auth.ts
+    │   ├── trip.ts
+    │   ├── expense.ts
+    │   └── common.ts
+    ├── hooks/                      # Custom React hooks
+    │   ├── useTrips.ts
+    │   ├── useExpenses.ts
+    │   ├── useRealtime.ts
+    │   ├── useOfflineQueue.ts
+    │   └── useLocation.ts
+    ├── utils/
+    │   ├── currency.ts             # Format, convert, symbol lookup
+    │   ├── date.ts                 # date-fns wrappers, relative time
+    │   ├── settlements.ts          # Debt simplification algorithm
+    │   ├── permissions.ts          # Role-based UI guards
+    │   ├── deepLink.ts             # Deep link parser
+    │   ├── webAlert.ts             # Cross-platform Alert wrapper
+    │   └── webStyles.ts            # Web-specific style helpers
+    ├── theme/
+    │   ├── colors.ts               # Light + dark palette
+    │   ├── typography.ts           # Font families, sizes, weights
+    │   ├── spacing.ts              # 4px grid scale
+    │   ├── shadows.ts              # Elevation tokens
+    │   ├── breakpoints.ts          # Responsive breakpoints (tablet/web)
+    │   └── index.ts                # Unified export
+    ├── i18n/
+    │   ├── index.ts                # i18next config
+    │   ├── en.json                 # English (default)
+    │   └── hi.json                 # Hindi (second priority)
+    ├── constants/
+    │   ├── categories.ts           # Expense categories with icons/colors
+    │   ├── tripTypes.ts            # Trip type definitions
+    │   └── config.ts               # Feature flags, limits, API URLs
+    └── types/
+        ├── database.ts             # Auto-generated Supabase types (supabase gen types)
+        ├── models.ts               # App-level model types
+        └── navigation.ts           # Screen param types
+```
 
 ---
 
-## 💡 Innovation & Differentiation
+## Conventions
 
-### What Makes TripWise Unique
+### Naming
+- **Files:** PascalCase for screens/components (`TripDetailScreen.tsx`), camelCase for everything else
+- **Stores:** `useXxxStore` (Zustand)
+- **Hooks:** `useXxx`
+- **Services:** plain functions, no classes (`createTrip`, `getTripList`)
+- **Types:** PascalCase interfaces, no `I` prefix
+- **Constants:** UPPER_SNAKE_CASE for true constants, camelCase for config objects
 
-1. **Simplicity First**: Intuitive UI that doesn't require tutorials
-2. **No Password Hassle**: OTP-based authentication
-3. **Cross-Platform**: Single experience across mobile and web
-4. **Real-Time Collaboration**: Supabase Realtime for instant updates
-5. **Smart Splitting**: Intelligent algorithms for fair expense distribution
-6. **Visual Appeal**: Custom illustrations and modern design
-7. **Privacy Focused**: User data security and transparency
+### State Management Rules
+- **Zustand** for all server-fetched data (trips, expenses, messages)
+- **React Context** only for auth session (Supabase session object)
+- **Local component state** for UI-only state (modal open, input focus)
+- No Redux, no MobX
+- Consider TanStack Query (React Query) if data fetching patterns get complex — decision point at Phase 3
 
-### Competitive Advantages
+### Data Fetching Pattern
+- Services return `{ data, error }` (mirrors Supabase pattern)
+- Zustand stores call services and cache results
+- Screens read from stores, trigger fetches via store actions
+- Optimistic updates for writes (expense add, message send, reaction)
+- Background re-validation on screen focus for stale data
 
-- **Passwordless Authentication**: Faster, more secure than traditional login
-- **Unified Platform**: Trip planning + expense management in one app
-- **Modern Tech Stack**: Built with latest React Native and Expo
-- **Scalable Architecture**: Supabase backend can handle growth
-- **Open Source Ready**: Clean codebase, well-documented
+### Error Handling
+- Every service function returns `{ data, error }` — never throws
+- Screens handle errors via Snackbar (non-blocking) or full-screen error state (blocking)
+- Never swallow errors silently — always log to Sentry + show user feedback
+- Global error boundary catches unhandled crashes → `ServerErrorScreen`
+- Network errors → `NoInternetScreen` (with retry + offline mode fallback)
 
----
+### Loading States
+- Every list screen must define: loading skeleton, empty state, error state
+- Use shimmer/skeleton placeholders (not spinners) for content-heavy screens
+- Use `LoadingIndicator` component only for full-screen blocking operations
+- Use inline skeleton rows for list refreshes and pagination
 
-## 🎯 Target Audience
+### Cross-Platform
+- All `Alert.alert` calls go through `src/utils/webAlert.ts`
+- All fixed/floating elements use `src/utils/webStyles.ts` helpers
+- Every scrollable screen uses `webScrollViewStyle` + `webScrollContentStyle`
+- Test on iOS, Android, and web before marking any screen done
+- Use `Platform.select` sparingly — prefer responsive design over platform branching
 
-### Primary Users
-- **Young Travelers** (18-35): Tech-savvy, frequent group travelers
-- **Friend Groups**: Weekend getaways, adventure trips
-- **Families**: Vacation planning with relatives
-- **Couples**: Shared trip expenses and planning
+### Security Rules
+- Service-role key **never** in client code — Edge Functions only
+- All Supabase queries go through the anon client with RLS as the gate
+- No hard-coded credentials anywhere in `src/`
+- `.env` is git-ignored; `.env.example` is committed with placeholder values
+- All user inputs validated with Zod before sending to backend
+- Sanitize any user-generated content rendered in the UI (XSS prevention)
 
-### Secondary Users
-- **Corporate Travelers**: Business trip expense tracking
-- **Travel Communities**: Trip planning groups
-- **Event Organizers**: Bachelor parties, reunions, conferences
+### Performance Guidelines
+- Virtualize all lists (FlatList/FlashList) — never render unbounded arrays
+- Lazy-load heavy screens with React.lazy + Suspense
+- Images: use `expo-image` with caching, serve WebP thumbnails where possible
+- Bundle size: monitor with `npx expo export --dump-sourcemap`, keep under 5MB JS
+- Avoid re-renders: memoize expensive components, use `useCallback`/`useMemo` judiciously
 
-### User Personas
-
-**1. Adventure Amy (25, Digital Marketer)**
-- Travels frequently with friends
-- Needs quick expense splitting
-- Values modern, beautiful apps
-- Uses mobile-first
-
-**2. Family-Focused Frank (38, Project Manager)**
-- Plans annual family vacations
-- Manages budget carefully
-- Needs clear expense tracking
-- Uses both mobile and web
-
-**3. Budget-Conscious Ben (22, Student)**
-- Weekend trips with roommates
-- Limited budget, needs fairness
-- Quick settlements important
-- Mobile-only user
-
----
-
-## 📊 Success Metrics & Outcomes
-
-### Key Performance Indicators (KPIs)
-
-#### User Engagement
-- Daily Active Users (DAU)
-- Monthly Active Users (MAU)
-- Session duration
-- Trip creation rate
-- Expense logging frequency
-
-#### Business Metrics
-- User retention rate (30-day, 90-day)
-- Trip completion rate
-- Average expenses per trip
-- Settlement completion rate
-- Referral rate
-
-#### Technical Metrics
-- App crash rate < 1%
-- API response time < 500ms
-- Login success rate > 99%
-- Cross-platform parity
-
-### Expected Outcomes
-
-#### Short-term (3-6 months)
-- ✅ **Launch MVP**: Core features live
-- 📱 **Cross-Platform**: iOS, Android, Web support
-- 👥 **User Base**: 1,000+ early adopters
-- 💰 **Trip Creation**: 500+ trips created
-- ⭐ **Satisfaction**: 4.5+ app store rating
-
-#### Mid-term (6-12 months)
-- 🚀 **Growth**: 10,000+ active users
-- 💵 **Expense Tracking**: $100,000+ in tracked expenses
-- 🤝 **Collaboration**: Real-time features adopted
-- 📊 **Analytics**: Advanced insights launched
-- 💳 **Payments**: Payment integration complete
-
-#### Long-term (1-2 years)
-- 🌍 **Scale**: 100,000+ users globally
-- 💎 **Premium**: Subscription model launched
-- 🏢 **Enterprise**: Corporate tier available
-- 🤖 **AI Features**: Smart recommendations live
-- 🏆 **Market Position**: Top 3 travel expense apps
+### Accessibility (a11y)
+- Every interactive element has an `accessibilityLabel`
+- Every image has `accessibilityLabel` (meaningful) or `accessibilityElementsHidden` (decorative)
+- Touch targets minimum 44×44pt
+- Color contrast ratio ≥ 4.5:1 for text
+- Screen reader tested on iOS VoiceOver and Android TalkBack per phase
+- Support dynamic type / font scaling
 
 ---
 
-## 🔒 Security & Privacy
+## Revenue Model
 
-### Data Protection
-- **Encryption**: All data encrypted in transit (HTTPS) and at rest
-- **Authentication**: JWT tokens with expiration
-- **OTP Security**: Time-limited, single-use codes
-- **Authorization**: Role-based access control
-
-### Privacy Commitments
-- **No Data Selling**: User data never sold to third parties
-- **Minimal Collection**: Only essential data collected
-- **User Control**: Users can export/delete their data
-- **Transparency**: Clear privacy policy and terms
-
-### Compliance
-- **GDPR Ready**: European data protection standards
-- **CCPA Compliant**: California privacy requirements
-- **Data Retention**: Clear policies on data storage
-- **Audit Logs**: Track data access and changes
+**Freemium:**
+- **Free:** 5 active trips, 10 members/trip, 2GB storage, standard AI, ads (non-intrusive)
+- **Premium ($4.99/mo or $49.99/yr):** Unlimited trips/members, 50GB storage, priority AI, offline maps, exports, ad-free
+- **Family ($9.99/mo):** 6 accounts, all premium features, shared family budget
+- **Corporate ($29.99/mo/team):** Expense policies, approval workflows, SSO, API access, admin dashboard
 
 ---
 
-## 🌐 Accessibility & Inclusivity
+## Target Users
 
-### Accessibility Features
-- **Screen Reader Support**: ARIA labels, semantic HTML
-- **Keyboard Navigation**: Full keyboard support on web
-- **Color Contrast**: WCAG AA compliance
-- **Font Scaling**: Respects system font preferences
-- **Reduced Motion**: Option for users with motion sensitivity
-
-### Inclusivity
-- **Multi-Language Support** (Future): English, Spanish, French, Hindi, etc.
-- **Currency Support**: 150+ currencies
-- **Cultural Sensitivity**: Inclusive design and imagery
-- **Gender Options**: Inclusive gender choices in profile
+1. **Young travelers (22-35)** — group trips, expense splitting, social sharing (60% of base)
+2. **Families (35-50)** — vacation planning, document storage, budget tracking (25%)
+3. **Couples (25-45)** — memory preservation, simple splits (10%)
+4. **Corporate travelers** — expense compliance, reporting (5%)
 
 ---
 
-## 📈 Roadmap Summary
+## Success Metrics
 
-### Q1 2025 - Foundation
-- ✅ Core authentication system
-- ✅ User profile management
-- ✅ Basic trip creation
-- ✅ Web platform support
-
-### Q2 2025 - Enhancement
-- 🔄 Full expense management
-- 🔄 Settlement system
-- 🔄 Member invitations
-- 🔄 Push notifications
-
-### Q3 2025 - Growth
-- 📅 Itinerary builder
-- 📊 Analytics dashboard
-- 💳 Payment integrations
-- 🤝 Real-time collaboration
-
-### Q4 2025 - Expansion
-- 🤖 AI recommendations
-- 🏢 Corporate features
-- 💎 Premium subscription
-- 🌍 Multi-language support
+| Metric | MVP (Month 3) | Phase 2 (Month 6) | Phase 3 (Month 9) | Phase 4 (Month 12) |
+|--------|---------------|-------------------|-------------------|---------------------|
+| Active Users | 5K | 50K | 200K | 1M |
+| Trips Created | 2K | 25K | 100K | 500K |
+| Premium Users | 100 | 2.5K | 20K | 100K |
+| MRR | $500 | $12K | $50K | $200K |
+| App Rating | 4.3 | 4.5 | 4.6 | 4.7 |
+| 30-day Retention | 40% | 60% | 70% | 75% |
 
 ---
 
-## 🤝 Contributing & Feedback
+## What's Missing from Original Thinking (Additions)
 
-### For Users
-- Report bugs via in-app feedback
-- Suggest features in community forums
-- Rate the app on app stores
-- Share your travel stories
+The following items were not in the original documentation but are critical for a production app:
 
-### For Developers
-- GitHub: https://github.com/maheshjagzap123/TripWiseMobile
-- Technology Stack: React Native, TypeScript, Expo, Supabase
-- Contribution Guidelines: Check CONTRIBUTING.md
-- Code of Conduct: Respectful, inclusive community
+### 1. Onboarding & Activation
+- **Progressive onboarding** — don't ask for everything upfront. Collect name + avatar on signup, ask for travel interests only when they create their first trip.
+- **Empty state storytelling** — every empty screen should teach the user what to do, not just say "nothing here."
+- **Invite virality loop** — when a user invites friends to a trip, those friends should have a zero-friction join experience (no signup wall before seeing the trip preview).
+
+### 2. Offline-First Architecture
+- Not just "offline mode" as a late phase — design the data layer from day one to work offline.
+- Use expo-sqlite as a local cache. Sync on reconnect.
+- Queue writes (expenses, messages, photos) locally and flush in order.
+- Show a subtle sync indicator, not a blocking "you're offline" wall.
+
+### 3. Performance & UX Polish
+- **FlashList** instead of FlatList for large lists (expenses, media, messages) — significantly better performance.
+- **Skeleton screens** for every data-fetching state (not blank screens with spinners).
+- **Haptic feedback** on key actions (expense added, settle up confirmed).
+- **Pull-to-refresh** on every list screen.
+- **Infinite scroll / pagination** — never load all data at once.
+
+### 4. Security Additions
+- **Biometric lock** — optional Face ID / fingerprint to open the app (sensitive financial data).
+- **Session management** — show active devices, allow remote logout.
+- **Rate limiting** on all write operations client-side (debounce) and server-side (RLS + Edge Function guards).
+- **Input sanitization** — prevent XSS in chat messages and notes.
+
+### 5. Testing Strategy
+- **Unit tests** for settlement algorithm, currency conversion, date utilities — these are pure logic.
+- **Integration tests** for Zustand stores + services (mock Supabase client).
+- **E2E tests** (Maestro) for critical flows: signup → create trip → add expense → settle up.
+- **Supabase local dev** (`supabase start`) for testing RLS policies and migrations.
+
+### 6. Monitoring & Observability
+- **Sentry** for crash reporting + performance monitoring from day one.
+- **PostHog** for product analytics — funnel tracking (signup → first trip → first expense → invite friend).
+- **Custom events** for business metrics (expense_added, settlement_completed, photo_uploaded).
+- **Supabase Dashboard** for DB performance, slow queries, storage usage.
+
+### 7. Legal & Compliance
+- **GDPR / India's DPDP Act** — data export, account deletion, consent management.
+- **App Store / Play Store** guidelines compliance from the start (privacy labels, data safety forms).
+- **Terms of Service + Privacy Policy** — must exist before any public beta.
+
+### 8. Growth & Retention Mechanics
+- **Push notification strategy** — not just "send everything." Smart timing, batching, quiet hours.
+- **Trip reminders** — "Your Goa trip starts in 3 days! Have you packed?"
+- **Settlement nudges** — "Rahul still owes you ₹450. Send a friendly reminder?"
+- **Memory triggers** — "1 year ago today, you were in Manali 🏔️" (drives re-engagement).
+- **Referral system** — "Invite 3 friends, get 1 month premium free."
+
+### 9. Design System
+- Build a **proper design system** before coding screens — tokens (colors, spacing, typography, shadows), components (Button variants, Card, Badge, Avatar, Chip), patterns (forms, lists, modals, sheets).
+- Use **Figma** for design source of truth. Export tokens as code-ready JSON.
+- Dark mode from day one — not retrofitted later.
+
+### 10. Deployment & Release Strategy
+- **Feature flags** (PostHog or custom) — ship code hidden behind flags, enable per user/percentage.
+- **OTA updates** via EAS Update for JS-only changes (instant fixes without app store review).
+- **Staged rollouts** — 10% → 50% → 100% for risky features.
+- **Beta channels** — TestFlight (iOS) + Play Console internal track (Android) for early feedback.
 
 ---
 
-## 📞 Support & Contact
-
-### Get Help
-- **In-App Support**: Settings → Help & Support
-- **FAQ**: Check documentation
-- **Email Support**: support@tripwise.app (example)
-- **Community Forum**: Ask questions and share tips
-
-### Stay Connected
-- **Website**: www.tripwise.app (example)
-- **Twitter**: @TripWiseApp (example)
-- **Instagram**: @tripwiseapp (example)
-- **Blog**: Medium or dev.to articles
-
----
-
-## 🙏 Acknowledgments
-
-Built with modern technologies:
-- React Native & Expo team
-- Supabase for backend infrastructure
-- React Navigation for routing
-- Lucide for beautiful icons
-- Open source community
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 🎉 Conclusion
-
-TripWise Mobile aims to revolutionize how people plan and manage group travel by combining intuitive design, powerful features, and seamless collaboration. From the first login to settling the last expense, TripWise is your trusted companion for unforgettable journeys.
-
-**Current Status**: ✅ MVP Phase Complete - Core features operational  
-**Next Milestone**: 🚀 Full expense management and settlement system  
-**Vision**: 🌟 The world's most loved travel planning and expense management app
-
----
-
-*Last Updated: January 2025*  
-*Version: 1.0.0*  
-*Platform: iOS, Android, Web*
+*Last updated: July 2026 — Project not yet started. All features are planned, none are built.*

@@ -3,9 +3,9 @@
 
 ---
 
-**Document Version:** 2.0  
-**Date:** January 2025  
-**Status:** Draft for Review  
+**Document Version:** 3.0  
+**Date:** July 2026  
+**Status:** Approved — Greenfield Build  
 **Author:** Product Team  
 **Stakeholders:** Engineering, Design, Marketing, Executive Leadership
 
@@ -44,30 +44,26 @@
 
 ### 1.1 Overview
 
-TripWise is transforming from a simple travel expense management app into a **comprehensive intelligent travel collaboration platform**. The application aims to be the single source of truth for every aspect of travel - before, during, and after the journey.
+TripWise is a **greenfield intelligent travel collaboration platform** being built from scratch. The application aims to be the single source of truth for every aspect of travel — before, during, and after the journey.
 
+**Project Status:** Not started. No code exists yet. This PRD defines the full product before the first line is written.
 
 ### 1.2 Current State
 
-**Existing Features:**
-- ✅ OTP-based authentication (Email/Phone)
-- ✅ User profile management
-- ✅ Basic trip creation
-- ✅ Trip dashboard with statistics
-- ✅ Basic expense tracking
-- ✅ Cross-platform support (iOS, Android, Web)
+**Nothing is built yet.** This is a fresh start.
 
-**Limitations:**
-- Limited to expense management only
-- No collaborative features
-- No memory storage or photo management
-- No AI-powered recommendations
-- No integrated communication
-- Manual expense splitting
+- ❌ No codebase exists
+- ❌ No Supabase project configured
+- ❌ No screens built
+- ❌ No backend schema
+- ❌ No CI/CD pipeline
+- ❌ No design assets
 
-### 1.3 Future Vision
+All features described in this document are **planned**, not implemented.
 
-**TripWise 2.0 will replace:**
+### 1.3 Vision
+
+**TripWise will replace:**
 - 💬 WhatsApp (for trip communication)
 - 📸 Google Photos (for trip memories)
 - 📁 Google Drive (for travel documents)
@@ -77,7 +73,7 @@ TripWise is transforming from a simple travel expense management app into a **co
 - 📅 Calendar (for trip planning)
 - 🏨 Booking apps (recommendations)
 
-**Single Platform, Complete Journey** ™
+**Single Platform, Complete Journey**
 
 ### 1.4 Key Differentiators
 
@@ -1043,17 +1039,17 @@ POST   /ai/translate
 
 **Goal:** Launch core features with basic trip and expense management
 
-**Features:**
-- ✅ OTP Authentication (Email/Phone)
-- ✅ Google/Apple Login
-- ✅ User Profile Management
-- ✅ Create/Edit Trips
-- ✅ Invite Members
-- ✅ Basic Expense Tracking
-- ✅ Equal Split Calculation
-- ✅ Trip Dashboard
-- ✅ Expense Analytics
-- ✅ Cross-platform (iOS, Android, Web)
+**Features to build:**
+- 🔲 OTP Authentication (Email/Phone)
+- 🔲 Google/Apple Login
+- 🔲 User Profile Management
+- 🔲 Create/Edit Trips
+- 🔲 Invite Members
+- 🔲 Basic Expense Tracking
+- 🔲 Equal Split Calculation
+- 🔲 Trip Dashboard
+- 🔲 Expense Analytics
+- 🔲 Cross-platform (iOS, Android, Web)
 
 **Deliverables:**
 - Beta app on TestFlight & Google Play Beta
@@ -1352,14 +1348,15 @@ POST   /ai/translate
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | Jan 2025 | Product Team | Initial PRD for existing MVP |
-| 2.0 | Jan 2025 | Product Team | Complete redesign as collaboration platform |
+| 1.0 | Jan 2025 | Product Team | Initial PRD draft |
+| 2.0 | Jan 2025 | Product Team | Expanded to full collaboration platform vision |
+| 3.0 | Jul 2026 | Product Team | Corrected to greenfield status — no prior code exists |
 
 ---
 
 ## Conclusion
 
-TripWise 2.0 represents a fundamental shift from a simple expense tracker to a comprehensive intelligent travel collaboration platform. By consolidating trip planning, memory preservation, expense management, and AI-powered recommendations into a single application, we aim to become the indispensable companion for every traveler.
+TripWise represents a greenfield build of a comprehensive intelligent travel collaboration platform. By consolidating trip planning, memory preservation, expense management, and AI-powered recommendations into a single application, we aim to become the indispensable companion for every traveler.
 
 **Key Success Factors:**
 1. **User-Centric Design**: Simple, beautiful, intuitive
@@ -1370,11 +1367,11 @@ TripWise 2.0 represents a fundamental shift from a simple expense tracker to a c
 6. **Continuous Innovation**: Regular feature updates
 
 **Next Steps:**
-1. ✅ PRD Review and approval by stakeholders
-2. 📋 Create detailed technical specifications
-3. 🎨 UI/UX mockups and prototypes
-4. 💻 Development sprint planning
-5. 🚀 MVP launch preparation
+1. 🔲 PRD review and approval by stakeholders
+2. 🔲 Expo project scaffold + Supabase project creation
+3. 🔲 UI/UX mockups and prototypes
+4. 🔲 Phase 0 backend bootstrap (schema, RLS, storage buckets)
+5. 🔲 Phase 1 auth screens + Supabase Auth wiring
 
 ---
 

@@ -13,7 +13,7 @@
 - **Elements** — the exact UI blocks that must appear.
 - **Actions** — what the user can do here.
 - **Enters from / Exits to** — navigation graph.
-- **Status** — ✅ Built · 🟡 Partial · ❌ Not Started.
+- **Status** — ❌ Not Started (all screens — this is a greenfield project).
 - **Phase** — which development phase ships it (see `DEVELOPMENT_PHASES.md`).
 
 Legend for elements: **[C]** = requires a reusable component, **[F]** = form/input, **[A]** = action button, **[S]** = state (loading/error/empty).
@@ -51,7 +51,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 
 ## 1. Splash & Onboarding
 
-### 1.1 SplashScreen · ✅ · Phase 0
+### 1.1 SplashScreen · ❌ · Phase 0
 **Purpose:** boot screen while the app determines auth state and preloads fonts/theme.
 **Elements:**
 - App logo + wordmark, centered.
@@ -62,7 +62,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 **Enters from:** cold app launch.
 **Exits to:** WelcomeScreen (no session) · DashboardScreen (session valid) · CompleteProfileScreen (session valid but profile incomplete).
 
-### 1.2 WelcomeScreen · ✅ · Phase 0
+### 1.2 WelcomeScreen · ❌ · Phase 0
 **Purpose:** brand-first landing for new users, sells the app in one glance.
 **Elements:**
 - Hero illustration or looping video.
@@ -88,7 +88,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 
 ## 2. Authentication
 
-### 2.1 LoginScreen · ✅ · Phase 1
+### 2.1 LoginScreen · ❌ · Phase 1
 **Purpose:** primary sign-in surface — email or mobile via OTP, or social sign-in.
 **Elements:**
 - Segmented control: Email / Mobile.
@@ -102,7 +102,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 **Enters from:** WelcomeScreen · logout.
 **Exits to:** OtpVerificationScreen · CompleteProfileScreen (if social sign-in returns new user) · TripDashboardScreen (returning social user).
 
-### 2.2 OtpVerificationScreen · ✅ · Phase 1
+### 2.2 OtpVerificationScreen · ❌ · Phase 1
 **Purpose:** verify the OTP sent to email/mobile.
 **Elements:**
 - Illustration + "Enter the 6-digit code we sent to ..." with masked identifier.
@@ -115,7 +115,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 **Enters from:** LoginScreen.
 **Exits to:** CompleteProfileScreen (new user) · TripDashboardScreen (existing user).
 
-### 2.3 CompleteProfileScreen · ✅ · Phase 1
+### 2.3 CompleteProfileScreen · ❌ · Phase 1
 **Purpose:** capture the mandatory profile fields for a first-time user.
 **Elements:**
 - **[C]** AvatarPicker (upload or choose emoji).
@@ -163,7 +163,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 
 ## 3. Profile & Personal
 
-### 3.1 ProfileScreen (Profile tab) · ✅ · Phase 1
+### 3.1 ProfileScreen (Profile tab) · ❌ · Phase 1
 **Purpose:** user's read-only profile card + entry into account management.
 **Elements:**
 - Avatar, name, profession, travel-style badge.
@@ -175,7 +175,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 **Enters from:** bottom nav Profile tab.
 **Exits to:** EditProfileScreen · SettingsScreen · WelcomeScreen (after logout).
 
-### 3.2 EditProfileScreen · 🟡 · Phase 1.5
+### 3.2 EditProfileScreen · ❌ · Phase 1
 **Purpose:** modify any profile field.
 **Elements:** same form as CompleteProfile, but with delete-avatar action and Save/Cancel.
 **Actions:** update avatar · save changes · discard.
@@ -201,7 +201,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 
 ## 4. Dashboard & Global
 
-### 4.1 TripDashboardScreen (Trips tab) · ✅ · Phase 2
+### 4.1 TripDashboardScreen (Trips tab) · ❌ · Phase 2
 **Purpose:** primary hub — see all your trips, stats, and quick actions.
 **Elements:**
 - **[C]** DashboardHeader (greeting, avatar with logout, notifications bell).
@@ -241,7 +241,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 
 ## 5. Trip Management
 
-### 5.1 CreateTripScreen · ✅ · Phase 2
+### 5.1 CreateTripScreen · ❌ · Phase 2
 **Purpose:** create a new trip.
 **Elements:**
 - **[F]** Trip name.
@@ -257,7 +257,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 **Enters from:** TripDashboard FAB · Empty state CTA.
 **Exits to:** TripDetailScreen (of newly created trip).
 
-### 5.2 TripDetailScreen · 🟡 · Phase 2
+### 5.2 TripDetailScreen · ❌ · Phase 2
 **Purpose:** the heart of the app — everything about one trip.
 **Elements:**
 - Sticky header: back arrow, trip name, dates, cover image parallax, menu (⋯).
@@ -321,7 +321,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 
 ## 6. Expenses & Settlements
 
-### 6.1 ExpensesListTab (inside TripDetail) · 🟡 · Phase 3
+### 6.1 ExpensesListTab (inside TripDetail) · ❌ · Phase 3
 **Purpose:** show all expenses for a trip.
 **Elements:**
 - Segmented control: All · By Category · By Payer.
@@ -333,7 +333,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 - **[C]** FAB → AddExpenseScreen.
 **Enters from:** TripDetail Expenses tab.
 
-### 6.2 AddExpenseScreen · ✅ · Phase 3
+### 6.2 AddExpenseScreen · ❌ · Phase 3
 **Purpose:** log a new expense on a trip.
 **Elements:**
 - **[F]** Amount + currency (large hero input).
@@ -360,7 +360,7 @@ Legend for elements: **[C]** = requires a reusable component, **[F]** = form/inp
 **Elements:** same form as AddExpenseScreen pre-filled. Warns if expense is already settled.
 **Enters from:** ExpenseDetail edit button.
 
-### 6.5 BalancesScreen (inside TripDetail) · 🟡 · Phase 3
+### 6.5 BalancesScreen (inside TripDetail) · ❌ · Phase 3
 **Purpose:** show who owes whom.
 **Elements:**
 - Personal summary card: "You owe ₹X" / "You are owed ₹Y".
@@ -857,25 +857,55 @@ RootNavigator
 
 Splash · Welcome · Login · OTP · CompleteProfile · ProfileScreen · EditProfile · ToS · Privacy · TripDashboard · CreateTrip · TripDetail · TripOverview · EditTrip · InviteMembers · MemberList · TripSettings · AcceptInvite · ExpensesListTab · AddExpense · ExpenseDetail · EditExpense · Balances · SettleUp · SettlementHistory.
 
-**Current status: 10 built · 3 partial · 12 to build.**
+**Current status: 0 built · 0 partial · 25 to build (all screens are greenfield).**
 
 ---
 
 ## Reusable component checklist (screens depend on these)
 
-- ✅ Button, TextField, Dropdown, DatePicker, OtpInput, AvatarPicker
-- ✅ BottomSheet, ConfirmationDialog, SuccessDialog, Snackbar
-- ✅ LoadingIndicator, ErrorMessage, ThemeToggle
-- ✅ DashboardHeader, SearchBar, StatsCard, TripCard, EmptyState, FloatingButton, BottomNavigation
-- ❌ ExpenseRow, SplitPreview, BalanceRow, SettleUpSheet (Phase 3)
-- ❌ MediaGridItem, MediaLightbox, UploadQueueRow, ReactionBar (Phase 4)
-- ❌ MessageBubble, TypingIndicator, PollCard, MentionAutocomplete (Phase 5)
-- ❌ TimelineDayHeader, TimelineEventCard, NoteEditor (Phase 6)
-- ❌ DocumentCard, DocumentViewer, ExpiryBadge (Phase 6)
-- ❌ ChartCard (bar/pie/line), Heatmap, StatHero (Phase 6)
-- ❌ MapMarker, PlaceCard, DirectionsSheet (Phase 7)
-- ❌ AIMessageBubble, StreamingIndicator, QuickActionChip (Phase 7)
-- ❌ PlanComparisonCard, PricePill, PaymentMethodRow (Phase 10)
+All components are to be built. Grouped by the phase they're first needed:
+
+**Phase 0–1 (Design System + Auth):**
+- ❌ Button (variants: primary, secondary, outline, ghost, danger)
+- ❌ TextField (with label, error, helper text, icons)
+- ❌ Dropdown / Select
+- ❌ DatePicker / DateRangePicker
+- ❌ OtpInput (6-cell auto-advance)
+- ❌ AvatarPicker (camera, gallery, emoji fallback)
+- ❌ BottomSheet
+- ❌ ConfirmationDialog, SuccessDialog
+- ❌ Snackbar / Toast
+- ❌ LoadingIndicator, SkeletonLoader
+- ❌ ErrorMessage, ErrorBoundary
+- ❌ ThemeToggle
+
+**Phase 2 (Trips):**
+- ❌ DashboardHeader, SearchBar, StatsCard
+- ❌ TripCard, EmptyState, FloatingButton (FAB)
+- ❌ BottomNavigation
+- ❌ MemberAvatar, RoleBadge, InviteRow
+
+**Phase 3 (Expenses):**
+- ❌ ExpenseRow, SplitPreview, BalanceRow, SettleUpSheet
+- ❌ AmountInput (large hero), CategoryGrid, MemberPicker
+
+**Phase 4 (Media):**
+- ❌ MediaGridItem, MediaLightbox, UploadQueueRow, ReactionBar
+
+**Phase 5 (Chat):**
+- ❌ MessageBubble, TypingIndicator, PollCard, MentionAutocomplete, VoiceNotePlayer
+
+**Phase 6 (Timeline, Docs, Analytics):**
+- ❌ TimelineDayHeader, TimelineEventCard, NoteEditor
+- ❌ DocumentCard, DocumentViewer, ExpiryBadge
+- ❌ ChartCard (bar/pie/line), Heatmap, StatHero
+
+**Phase 7 (Maps, AI):**
+- ❌ MapMarker, PlaceCard, DirectionsSheet
+- ❌ AIMessageBubble, StreamingIndicator, QuickActionChip
+
+**Phase 10 (Premium):**
+- ❌ PlanComparisonCard, PricePill, PaymentMethodRow
 
 ---
 

@@ -29,7 +29,6 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [tripType, setTripType] = useState('Friends');
-  const [budget, setBudget] = useState('');
   const [description, setDescription] = useState('');
   const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const [emailInput, setEmailInput] = useState('');
@@ -93,7 +92,7 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
         start_date: startDate.trim(),
         end_date: endDate.trim(),
         trip_type: tripType,
-        budget_amount: budget ? parseFloat(budget) : null,
+        budget_amount: null,
         budget_currency: 'INR',
         created_by: user.id,
       }, memberEmails);
@@ -196,20 +195,6 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-
-        {/* Budget */}
-        <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Budget (₹)</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-            placeholder="e.g. 50000"
-            placeholderTextColor={colors.textTertiary}
-            value={budget}
-            onChangeText={setBudget}
-            keyboardType="numeric"
-            accessibilityLabel="Budget"
-          />
         </View>
 
         {/* Description */}

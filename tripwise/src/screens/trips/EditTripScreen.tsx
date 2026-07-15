@@ -39,7 +39,6 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
   const [startDate, setStartDate] = useState(trip.start_date);
   const [endDate, setEndDate] = useState(trip.end_date);
   const [tripType, setTripType] = useState(trip.trip_type || 'Friends');
-  const [budget, setBudget] = useState(trip.budget_amount ? String(trip.budget_amount) : '');
   const [description, setDescription] = useState(trip.description || '');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,7 +67,7 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
           start_date: startDate.trim(),
           end_date: endDate.trim(),
           trip_type: tripType,
-          budget_amount: budget ? parseFloat(budget) : null,
+          budget_amount: null,
         })
         .eq('id', trip.id);
 
@@ -159,18 +158,6 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-
-        {/* Budget */}
-        <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Budget (₹)</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-            value={budget}
-            onChangeText={setBudget}
-            keyboardType="numeric"
-            accessibilityLabel="Budget"
-          />
         </View>
 
         {/* Description */}

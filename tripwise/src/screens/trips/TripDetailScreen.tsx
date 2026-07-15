@@ -15,7 +15,8 @@ import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { EditTripScreen } from './EditTripScreen';
-import { ArrowLeft, MapPin, Calendar, Users, IndianRupee, UserPlus, Plus, X, Trash2, LogOut, Pencil } from 'lucide-react-native';
+import { ExpensesScreen } from '../expenses/ExpensesScreen';
+import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 interface TripMember {
@@ -41,6 +42,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [showInvite, setShowInvite] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showExpenses, setShowExpenses] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -230,15 +232,6 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             </Text>
           </View>
 
-          {trip.budget_amount && (
-            <View style={styles.row}>
-              <IndianRupee color={colors.primary} size={16} />
-              <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginLeft: spacing.xs }]}>
-                ₹{trip.budget_amount.toLocaleString()} budget
-              </Text>
-            </View>
-          )}
-
           <View style={styles.row}>
             <Users color={colors.primary} size={16} />
             <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginLeft: spacing.xs }]}>
@@ -256,6 +249,15 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             <Text style={[typography.labelSmall, { color: colors.primary }]}>{trip.trip_type}</Text>
           </View>
         </View>
+
+        {/* Expenses Button */}
+        <TouchableOpacity
+          style={[styles.expensesBtn, { backgroundColor: colors.primary }]}
+          onPress={() => setShowExpenses(true)}
+        >
+          <Receipt color="#fff" size={18} />
+          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>View Expenses</Text>
+        </TouchableOpacity>
 
         {/* Members Section */}
         <View style={styles.sectionHeader}>
@@ -339,6 +341,11 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
         </View>
       </ScrollView>
 
+      {/* Expenses Modal */}
+      <Modal visible={showExpenses} animationType="slide" presentationStyle="fullScreen">
+        <ExpensesScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowExpenses(false)} />
+      </Modal>
+
       {/* Edit Trip Modal */}
       <Modal visible={showEdit} animationType="slide" presentationStyle="fullScreen">
         <EditTripScreen
@@ -365,6 +372,7 @@ const styles = StyleSheet.create({
   inviteBtn: { width: 40, height: 40, borderRadius: borderRadius.sm, justifyContent: 'center', alignItems: 'center' },
   memberRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm, borderBottomWidth: 0.5 },
   avatar: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  expensesBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 48, borderRadius: borderRadius.md, marginBottom: spacing.lg },
   actions: { marginTop: spacing.xl, gap: spacing.sm },
   actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 44, borderWidth: 1, borderRadius: borderRadius.md },
 });

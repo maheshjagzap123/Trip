@@ -1,52 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { AuthStackParamList } from '../../navigation/types';
-import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
+import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../lib/supabase';
 
 type RouteProps = RouteProp<AuthStackParamList, 'OtpVerification'>;
 
 export function OtpVerificationScreen() {
   const route = useRoute<RouteProps>();
-  const colors = useThemeColors();
   const { identifier, method } = route.params;
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [resendCooldown, setResendCooldown] = useState(60);
 
-  // Resend cooldown timer
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+  const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+    setTimeout(() => inputRef.current?.focus(), 300);
+  }, []);
+
   useEffect(() => {
     if (resendCooldown <= 0) return;
-    const timer = setInterval(() => {
-      setResendCooldown((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setResendCooldown((p) => p - 1), 1000);
+    return () => clearInterval(t);
   }, [resendCooldown]);
 
-  const handleVerify = async () => {
-    if (otp.length !== 6) {
-      Alert.alert('Error', 'Please enter the 6-digit code.');
-      return;
-    }
+  const shake = () => {
+    Animated.sequence([
+      Animated.timing(shakeAnim, { toValue: 10, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -10, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 8, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -8, duration: 60, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 0, duration: 60, useNativeDriver: true }),
+    ]).start();
+  };
 
+  const handleVerify = async () => {
+    if (otp.length !== 6) { setError('Please enter the 6-digit code.'); shake(); return; }
+    setError('');
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.verifyOtp({
+      const { error: err } = await supabase.auth.verifyOtp({
         ...(method === 'email' ? { email: identifier } : { phone: identifier }),
         token: otp,
         type: method === 'email' ? 'email' : 'sms',
       });
-
-      if (error) {
-        Alert.alert('Error', error.message);
-        return;
-      }
-
-      // Auth state change listener in authStore will handle navigation
-    } catch (err) {
-      Alert.alert('Error', 'Verification failed. Please try again.');
+      if (err) { setError(err.message); shake(); }
+    } catch {
+      setError('Verification failed. Please try again.');
+      shake();
     } finally {
       setIsLoading(false);
     }
@@ -54,113 +63,100 @@ export function OtpVerificationScreen() {
 
   const handleResend = async () => {
     if (resendCooldown > 0) return;
-
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error: err } = await supabase.auth.signInWithOtp({
       ...(method === 'email' ? { email: identifier } : { phone: identifier }),
     });
-
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      setResendCooldown(60);
-      Alert.alert('Sent!', 'A new code has been sent.');
-    }
+    if (!err) setResendCooldown(60);
   };
 
+  // Render 6 digit boxes
+  const digits = otp.padEnd(6, ' ').split('');
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.content}>
-        <Text style={[typography.h1, { color: colors.textPrimary }]}>
-          Verify your {method}
-        </Text>
-        <Text style={[typography.bodyLarge, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-          Enter the 6-digit code sent to{'\n'}
-          <Text style={{ fontWeight: '600' }}>{identifier}</Text>
-        </Text>
+    <LinearGradient colors={['#0F172A', '#1E3A5F']} style={styles.gradient}>
+      <SafeAreaView style={styles.safe}>
+        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+          {/* Icon */}
+          <View style={styles.iconWrap}>
+            <LinearGradient colors={['#00C896', '#0EA5E9']} style={styles.iconGrad}>
+              <Text style={styles.iconEmoji}>{method === 'email' ? '📧' : '📱'}</Text>
+            </LinearGradient>
+          </View>
 
-        {/* OTP Input */}
-        <TextInput
-          style={[
-            styles.otpInput,
-            {
-              backgroundColor: colors.inputBackground,
-              borderColor: colors.border,
-              color: colors.textPrimary,
-            },
-          ]}
-          placeholder="000000"
-          placeholderTextColor={colors.textTertiary}
-          value={otp}
-          onChangeText={(text) => setOtp(text.replace(/[^0-9]/g, '').slice(0, 6))}
-          keyboardType="number-pad"
-          maxLength={6}
-          autoFocus
-          textAlign="center"
-          accessibilityLabel="OTP code input"
-        />
-
-        {/* Verify Button */}
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: colors.primary, opacity: isLoading ? 0.6 : 1 },
-          ]}
-          onPress={handleVerify}
-          disabled={isLoading}
-          activeOpacity={0.8}
-          accessibilityRole="button"
-          accessibilityLabel="Verify OTP"
-        >
-          <Text style={[typography.labelLarge, { color: colors.textInverse }]}>
-            {isLoading ? 'Verifying...' : 'Verify'}
+          <Text style={styles.title}>Check your {method}</Text>
+          <Text style={styles.subtitle}>
+            We sent a 6-digit code to{'\n'}
+            <Text style={styles.identifier}>{identifier}</Text>
           </Text>
-        </TouchableOpacity>
 
-        {/* Resend */}
-        <TouchableOpacity
-          onPress={handleResend}
-          disabled={resendCooldown > 0}
-          style={styles.resend}
-          accessibilityRole="button"
-        >
-          <Text style={[typography.bodyMedium, { color: resendCooldown > 0 ? colors.textTertiary : colors.primary }]}>
-            {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          {/* Hidden real input */}
+          <TextInput
+            ref={inputRef}
+            style={styles.hiddenInput}
+            value={otp}
+            onChangeText={(t) => { setOtp(t.replace(/[^0-9]/g, '').slice(0, 6)); setError(''); }}
+            keyboardType="number-pad"
+            maxLength={6}
+          />
+
+          {/* Digit boxes */}
+          <Animated.View style={[styles.digitRow, { transform: [{ translateX: shakeAnim }] }]}>
+            {digits.map((d, i) => {
+              const filled = i < otp.length;
+              const active = i === otp.length;
+              return (
+                <TouchableOpacity key={i} style={[styles.digitBox, filled && styles.digitBoxFilled, active && styles.digitBoxActive]} onPress={() => inputRef.current?.focus()}>
+                  <Text style={[styles.digitTxt, filled && styles.digitTxtFilled]}>{filled ? d : ''}</Text>
+                  {active && <View style={styles.cursor} />}
+                </TouchableOpacity>
+              );
+            })}
+          </Animated.View>
+
+          {error ? <Text style={styles.errorTxt}>{error}</Text> : null}
+
+          {/* Verify */}
+          <TouchableOpacity onPress={handleVerify} disabled={isLoading} activeOpacity={0.85} style={styles.verifyWrap}>
+            <LinearGradient colors={otp.length === 6 ? ['#00C896', '#00A87E'] : ['#334155', '#334155']} style={styles.verifyBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <Text style={styles.verifyTxt}>{isLoading ? 'Verifying...' : 'Verify Code'}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Resend */}
+          <TouchableOpacity onPress={handleResend} disabled={resendCooldown > 0} style={styles.resend}>
+            <Text style={[styles.resendTxt, resendCooldown === 0 && styles.resendActive]}>
+              {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xxxl,
-    justifyContent: 'center',
-  },
-  otpInput: {
-    height: 64,
-    borderWidth: 1,
-    borderRadius: borderRadius.md,
-    fontSize: 28,
-    fontWeight: '600',
-    letterSpacing: 12,
-    marginTop: spacing.xl,
-  },
-  button: {
-    height: 52,
-    borderRadius: borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing.lg,
-  },
-  resend: {
-    alignItems: 'center',
-    marginTop: spacing.lg,
-    padding: spacing.sm,
-  },
+  gradient: { flex: 1 },
+  safe: { flex: 1 },
+  content: { flex: 1, paddingHorizontal: 28, justifyContent: 'center', alignItems: 'center' },
+  iconWrap: { marginBottom: 24, shadowColor: '#00C896', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 16, elevation: 10 },
+  iconGrad: { width: 80, height: 80, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
+  iconEmoji: { fontSize: 36 },
+  title: { fontSize: 30, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.5, marginBottom: 12, textAlign: 'center' },
+  subtitle: { fontSize: 16, color: 'rgba(255,255,255,0.55)', textAlign: 'center', lineHeight: 24, marginBottom: 40 },
+  identifier: { color: '#00C896', fontWeight: '700' },
+  hiddenInput: { position: 'absolute', opacity: 0, width: 1, height: 1 },
+  digitRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
+  digitBox: { width: 48, height: 60, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', justifyContent: 'center', alignItems: 'center' },
+  digitBoxFilled: { backgroundColor: 'rgba(0,200,150,0.12)', borderColor: '#00C896' },
+  digitBoxActive: { borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,0.08)' },
+  digitTxt: { fontSize: 24, fontWeight: '700', color: 'rgba(255,255,255,0.3)' },
+  digitTxtFilled: { color: '#FFFFFF' },
+  cursor: { position: 'absolute', width: 2, height: 28, backgroundColor: '#00C896', borderRadius: 1 },
+  errorTxt: { color: '#F87171', fontSize: 14, marginBottom: 16, textAlign: 'center' },
+  verifyWrap: { width: '100%', borderRadius: 16, overflow: 'hidden', marginTop: 8, shadowColor: '#00C896', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 8 },
+  verifyBtn: { height: 56, justifyContent: 'center', alignItems: 'center' },
+  verifyTxt: { fontSize: 17, fontWeight: '700', color: '#FFFFFF', letterSpacing: 0.3 },
+  resend: { marginTop: 24, padding: 8 },
+  resendTxt: { fontSize: 15, color: 'rgba(255,255,255,0.35)', fontWeight: '500' },
+  resendActive: { color: '#00C896', fontWeight: '600' },
 });

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Easing } from 'react-native';
 import { AuthStack } from './AuthStack';
 import { MainTabs } from './MainTabs';
 import { CompleteProfileScreen } from '../screens/auth/CompleteProfileScreen';
@@ -10,6 +10,25 @@ import { useThemeColors } from '../theme';
 import type { RootStackParamList } from './types';
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+// Fade + slight zoom for root-level transitions (Auth → Main)
+const forFadeScale = ({ current, next }: any) => {
+  const opacity = current.progress.interpolate({
+    inputRange: [0, 1], outputRange: [0, 1],
+  });
+  const scale = current.progress.interpolate({
+    inputRange: [0, 1], outputRange: [0.96, 1],
+  });
+  const outScale = next
+    ? next.progress.interpolate({ inputRange: [0, 1], outputRange: [1, 1.04] })
+    : 1;
+  return { cardStyle: { opacity, transform: [{ scale }, { scale: outScale }] } };
+};
+
+const rootSpec = {
+  animation: 'timing' as const,
+  config: { duration: 420, easing: Easing.inOut(Easing.cubic) },
+};
 
 export function AppNavigator() {
   const { session, profile, isLoading, isInitialized, initialize } = useAuthStore();
@@ -48,7 +67,14 @@ export function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          cardStyle: { backgroundColor: '#0A0F1E' },
+          cardStyleInterpolator: forFadeScale,
+          transitionSpec: { open: rootSpec, close: rootSpec },
+        }}
+      >
         {!isLoggedIn ? (
           <Stack.Screen name="Auth" component={AuthStack} />
         ) : !profileComplete ? (

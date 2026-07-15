@@ -16,7 +16,8 @@ import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { EditTripScreen } from './EditTripScreen';
 import { ExpensesScreen } from '../expenses/ExpensesScreen';
-import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt } from 'lucide-react-native';
+import { PhotosScreen } from '../media/PhotosScreen';
+import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt, Camera as CameraIcon } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 interface TripMember {
@@ -43,6 +44,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   const [showInvite, setShowInvite] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showExpenses, setShowExpenses] = useState(false);
+  const [showPhotos, setShowPhotos] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -259,6 +261,14 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
           <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>View Expenses</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={[styles.expensesBtn, { backgroundColor: '#6366F1', marginTop: spacing.sm }]}
+          onPress={() => setShowPhotos(true)}
+        >
+          <CameraIcon color="#fff" size={18} />
+          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Trip Photos</Text>
+        </TouchableOpacity>
+
         {/* Members Section */}
         <View style={styles.sectionHeader}>
           <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>
@@ -344,6 +354,11 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
       {/* Expenses Modal */}
       <Modal visible={showExpenses} animationType="slide" presentationStyle="fullScreen">
         <ExpensesScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowExpenses(false)} />
+      </Modal>
+
+      {/* Photos Modal */}
+      <Modal visible={showPhotos} animationType="slide" presentationStyle="fullScreen">
+        <PhotosScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowPhotos(false)} />
       </Modal>
 
       {/* Edit Trip Modal */}

@@ -41,10 +41,10 @@ export function SettleUpScreen({ tripId, onClose }: Props) {
     if (data && Array.isArray(data)) {
       const active = data.filter((m: any) => m.status === 'active');
       const userIds = active.map((m: any) => m.user_id);
-      const { data: profiles } = await supabase.from('profiles').select('id, display_name').in('id', userIds);
+      const { data: profiles } = await supabase.rpc('get_profiles_by_ids', { user_ids: userIds });
       setMembers(active.map((m: any) => ({
         user_id: m.user_id,
-        display_name: profiles?.find((p) => p.id === m.user_id)?.display_name || 'Unknown',
+        display_name: (Array.isArray(profiles) ? profiles.find((p: any) => p.id === m.user_id)?.display_name : null) || 'Member',
       })));
     }
   };

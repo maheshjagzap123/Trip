@@ -252,36 +252,37 @@ export const useTripStore = create<TripState>((set, get) => ({
   },
 
   subscribeToRealtime: () => {
-    // Subscribe to trip_members changes (new invites, accepted invites)
+    // Subscribe to changes across trip-related tables
     const channel = supabase
       .channel('trip-updates')
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'trip_members',
-        },
+        { event: '*', schema: 'public', table: 'trips' },
+        (payload) => {
+          console.log('Real-time trips update:', payload.eventType);
+          get().fetchTrips();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'trip_members' },
         (payload) => {
           console.log('Real-time trip_members update:', payload.eventType);
-          // Refresh data on any change
           get().fetchTrips();
           get().fetchInvitations();
         }
       )
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-        },
+        { event: 'INSERT', schema: 'public', table: 'notifications' },
         (payload) => {
           console.log('Real-time notification:', payload.new);
           get().fetchInvitations();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
 
     // Return cleanup function
     return () => {

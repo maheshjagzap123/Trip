@@ -7,6 +7,7 @@ import { useTripStore } from '../../stores/tripStore';
 import { supabase } from '../../lib/supabase';
 import { CreateTripScreen } from './CreateTripScreen';
 import { TripDetailScreen } from './TripDetailScreen';
+import { AddExpenseScreen } from '../expenses/AddExpenseScreen';
 import { Plus, MapPin, Calendar, Zap } from 'lucide-react-native';
 import { format } from 'date-fns';
 
@@ -20,21 +21,41 @@ export function TripDashboardScreen() {
   const { trips, invitations, fetchTrips, fetchInvitations, subscribeToRealtime } = useTripStore();
   const [showCreate, setShowCreate] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [quickExpenseTripId, setQuickExpenseTripId] = useState<string | null>(null);
   const [tripExpenses, setTripExpenses] = useState<Record<string, number>>({});
   const [myShares, setMyShares] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchTrips(); fetchInvitations();
     const unsub = subscribeToRealtime();
-    return () => unsub();
+
+    // Subscribe to expense changes for real-time totals
+    const expenseChannel = supabase
+      .channel('dashboard-expenses')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
+        fetchExpenseTotals();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'expense_splits' }, () => {
+        fetchExpenseTotals();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'settlements' }, () => {
+        fetchExpenseTotals();
+      })
+      .subscribe();
+
+    return () => { unsub(); supabase.removeChannel(expenseChannel); };
   }, []);
 
   useEffect(() => {
     if (trips.length > 0) fetchExpenseTotals();
-  }, [trips.length]);
+  }, [trips]);
 
   const fetchExpenseTotals = async () => {
-    const tripIds = trips.map((t) => t.id);
+    // Get fresh trip list from store (avoid stale closure)
+    const currentTrips = useTripStore.getState().trips;
+    if (currentTrips.length === 0) return;
+
+    const tripIds = currentTrips.map((t) => t.id);
     const { data: { user } } = await supabase.auth.getUser();
 
     const [{ data: expenses }, { data: splits }] = await Promise.all([
@@ -108,6 +129,17 @@ export function TripDashboardScreen() {
             <Text style={styles.spentAmt}>₹{(myShares[item.id] || 0).toLocaleString()}</Text>
           </View>
         </View>
+
+        {/* Quick Add Expense */}
+        <TouchableOpacity
+          style={styles.addExpenseBtn}
+          onPress={(e) => { e.stopPropagation(); setQuickExpenseTripId(item.id); }}
+          activeOpacity={0.8}
+          accessibilityLabel="Add expense to this trip"
+        >
+          <Plus size={14} color="#00C896" />
+          <Text style={styles.addExpenseTxt}>Add Expense</Text>
+        </TouchableOpacity>
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -195,7 +227,12 @@ export function TripDashboardScreen() {
         </OverlayScreen>
         <OverlayScreen visible={!!selectedTripId}>
           {selectedTripId && (
-            <TripDetailScreen tripId={selectedTripId} onClose={() => { setSelectedTripId(null); fetchTrips(); }} />
+            <TripDetailScreen tripId={selectedTripId} onClose={() => { setSelectedTripId(null); fetchTrips(); fetchExpenseTotals(); }} />
+          )}
+        </OverlayScreen>
+        <OverlayScreen visible={!!quickExpenseTripId}>
+          {quickExpenseTripId && (
+            <AddExpenseScreen tripId={quickExpenseTripId} onClose={() => { setQuickExpenseTripId(null); fetchExpenseTotals(); }} />
           )}
         </OverlayScreen>
       </SafeAreaView>
@@ -315,6 +352,8 @@ const styles = StyleSheet.create({
   spentLabel: { fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: '600' },
   spentAmt: { fontSize: 18, fontWeight: '800', color: '#00C896' },
   spentAmtMuted: { fontSize: 15, fontWeight: '600', color: 'rgba(255,255,255,0.4)' },
+  addExpenseBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 200, 150, 0.12)', borderWidth: 1, borderColor: 'rgba(0, 200, 150, 0.3)', paddingVertical: 8, borderRadius: 20, marginTop: 12, gap: 6 },
+  addExpenseTxt: { fontSize: 13, fontWeight: '700', color: '#00C896' },
   empty: { paddingTop: 80, alignItems: 'center', paddingHorizontal: 40 },
   emptyTitle: { fontSize: 22, fontWeight: '800', color: '#FFFFFF', marginTop: 16, marginBottom: 8 },
   emptySub: { fontSize: 15, color: 'rgba(255,255,255,0.4)', textAlign: 'center', lineHeight: 22 },

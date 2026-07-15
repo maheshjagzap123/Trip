@@ -43,11 +43,11 @@ export function ExpensesTab({ tripId }: Props) {
       <View style={{ flex: 1, marginLeft: spacing.sm }}>
         <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>{item.title}</Text>
         <Text style={[typography.caption, { color: colors.textTertiary }]}>
-          {item.paid_by_name} • {item.category} • {format(new Date(item.paid_at), 'MMM d')}
+          {item.paid_by_name} • {item.category} • {format(new Date(item.expense_date), 'MMM d')}
         </Text>
       </View>
       <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>₹{item.amount.toLocaleString()}</Text>
-      {item.created_by === user?.id && (
+      {(item.created_by === user?.id || item.paid_by === user?.id) && (
         <TouchableOpacity onPress={() => handleDelete(item.id)} style={{ marginLeft: spacing.sm }}>
           <Trash2 color={colors.textTertiary} size={14} />
         </TouchableOpacity>

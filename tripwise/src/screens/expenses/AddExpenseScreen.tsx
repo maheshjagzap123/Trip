@@ -47,15 +47,19 @@ export function AddExpenseScreen({ tripId, onClose }: Props) {
       const activeMembers = data.filter((m: any) => m.status === 'active');
       const userIds = activeMembers.map((m: any) => m.user_id);
 
+      // Use service function to get profiles (bypass RLS)
       const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, display_name')
-        .in('id', userIds);
+        .rpc('get_profiles_by_ids', { user_ids: userIds });
 
-      const memberList = activeMembers.map((m: any) => ({
-        user_id: m.user_id,
-        display_name: profiles?.find((p) => p.id === m.user_id)?.display_name || 'Unknown',
-      }));
+      const memberList = activeMembers.map((m: any) => {
+        const profile = Array.isArray(profiles)
+          ? profiles.find((p: any) => p.id === m.user_id)
+          : null;
+        return {
+          user_id: m.user_id,
+          display_name: profile?.display_name || profile?.email || 'Member',
+        };
+      });
 
       setMembers(memberList);
       // Default: split with everyone
@@ -112,6 +116,16 @@ export function AddExpenseScreen({ tripId, onClose }: Props) {
 
     setIsLoading(true);
     try {
+      console.log('Adding expense:', {
+        trip_id: tripId,
+        title: title.trim(),
+        amount: parseFloat(amount),
+        category,
+        paid_by: paidBy,
+        split_method: splitMethod,
+        splits,
+        created_by: user.id,
+      });
       await addExpense({
         trip_id: tripId,
         title: title.trim(),

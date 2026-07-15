@@ -10,10 +10,11 @@ export interface Expense {
   category: string;
   paid_by: string;
   paid_by_name?: string;
-  paid_at: string;
+  expense_date: string;
   notes: string | null;
   split_method: string;
-  created_by: string;
+  split_type: string;
+  created_by: string | null;
   created_at: string;
 }
 
@@ -96,19 +97,17 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
         .from('expenses')
         .select('*')
         .eq('trip_id', tripId)
-        .order('paid_at', { ascending: false });
+        .order('expense_date', { ascending: false });
 
       if (data) {
         // Enrich with payer names
         const userIds = [...new Set(data.map((e) => e.paid_by))];
         const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, display_name')
-          .in('id', userIds);
+          .rpc('get_profiles_by_ids', { user_ids: userIds });
 
         const enriched = data.map((e) => ({
           ...e,
-          paid_by_name: profiles?.find((p) => p.id === e.paid_by)?.display_name || 'Unknown',
+          paid_by_name: (Array.isArray(profiles) ? profiles.find((p: any) => p.id === e.paid_by)?.display_name : null) || 'Unknown',
         }));
 
         set({ expenses: enriched });
@@ -135,14 +134,12 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
     if (data) {
       const userIds = [...new Set([...data.map((s) => s.paid_by), ...data.map((s) => s.paid_to)])];
       const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, display_name')
-        .in('id', userIds);
+        .rpc('get_profiles_by_ids', { user_ids: userIds });
 
       const enriched = data.map((s) => ({
         ...s,
-        paid_by_name: profiles?.find((p) => p.id === s.paid_by)?.display_name || 'Unknown',
-        paid_to_name: profiles?.find((p) => p.id === s.paid_to)?.display_name || 'Unknown',
+        paid_by_name: (Array.isArray(profiles) ? profiles.find((p: any) => p.id === s.paid_by)?.display_name : null) || 'Unknown',
+        paid_to_name: (Array.isArray(profiles) ? profiles.find((p: any) => p.id === s.paid_to)?.display_name : null) || 'Unknown',
       }));
 
       set({ settlements: enriched });
@@ -153,22 +150,30 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
     const { splits, ...expenseData } = input;
 
     // Insert expense
+    const insertData: Record<string, any> = {
+      trip_id: expenseData.trip_id,
+      title: expenseData.title,
+      amount: expenseData.amount,
+      category: expenseData.category,
+      paid_by: expenseData.paid_by,
+      notes: expenseData.notes || null,
+      split_method: expenseData.split_method,
+      created_by: expenseData.created_by,
+    };
+
     const { data: expense, error } = await supabase
       .from('expenses')
-      .insert({
-        trip_id: expenseData.trip_id,
-        title: expenseData.title,
-        amount: expenseData.amount,
-        category: expenseData.category,
-        paid_by: expenseData.paid_by,
-        notes: expenseData.notes || null,
-        split_method: expenseData.split_method,
-        created_by: expenseData.created_by,
-      })
-      .select()
+      .insert(insertData)
+      .select('id')
       .single();
 
-    if (error || !expense) throw new Error(error?.message || 'Failed to add expense');
+    if (error) {
+      console.error('Expense insert error:', error);
+      throw new Error(error.message);
+    }
+    if (!expense) throw new Error('Failed to add expense — no data returned');
+
+    console.log('Expense saved:', expense.id);
 
     // Insert splits
     const splitRows = splits.map((s) => ({
@@ -178,7 +183,12 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
     }));
 
     const { error: splitError } = await supabase.from('expense_splits').insert(splitRows);
-    if (splitError) throw new Error(splitError.message);
+    if (splitError) {
+      console.error('Split insert error:', splitError);
+      throw new Error(splitError.message);
+    }
+
+    console.log('Splits saved for expense:', expense.id);
 
     // Refresh
     await get().fetchExpenses(input.trip_id);

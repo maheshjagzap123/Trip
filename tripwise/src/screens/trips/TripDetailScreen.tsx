@@ -9,11 +9,13 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Modal,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
-import { ArrowLeft, MapPin, Calendar, Users, IndianRupee, UserPlus, Plus, X, Trash2, LogOut } from 'lucide-react-native';
+import { EditTripScreen } from './EditTripScreen';
+import { ArrowLeft, MapPin, Calendar, Users, IndianRupee, UserPlus, Plus, X, Trash2, LogOut, Pencil } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 interface TripMember {
@@ -38,6 +40,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   const [creatorName, setCreatorName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [showInvite, setShowInvite] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -201,6 +204,11 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
         <Text style={[typography.h3, { color: colors.textPrimary, flex: 1, marginLeft: spacing.md }]} numberOfLines={1}>
           {trip.trip_name}
         </Text>
+        {isAdmin && (
+          <TouchableOpacity onPress={() => setShowEdit(true)} accessibilityLabel="Edit trip">
+            <Pencil color={colors.primary} size={20} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -330,6 +338,15 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
           )}
         </View>
       </ScrollView>
+
+      {/* Edit Trip Modal */}
+      <Modal visible={showEdit} animationType="slide" presentationStyle="fullScreen">
+        <EditTripScreen
+          trip={trip}
+          onClose={() => setShowEdit(false)}
+          onSaved={fetchTripDetail}
+        />
+      </Modal>
     </SafeAreaView>
   );
 }

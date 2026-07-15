@@ -197,6 +197,18 @@ export const useTripStore = create<TripState>((set, get) => ({
           console.warn(`Failed to invite ${email}:`, inviteError.message);
         } else {
           console.log(`Successfully invited ${email} as pending member`);
+
+          // Send invite email (fire and forget — don't block trip creation)
+          supabase.functions.invoke('send-invite-email', {
+            body: {
+              to_email: email,
+              trip_name: tripData.trip_name,
+              inviter_name: (await supabase.from('profiles').select('display_name').eq('id', tripData.created_by).single()).data?.display_name || 'A friend',
+            },
+          }).then((res) => {
+            if (res.error) console.warn(`Email send failed for ${email}:`, res.error);
+            else console.log(`Invite email sent to ${email}`);
+          }).catch(() => {});
         }
       } else {
         console.warn(`User ${email} not found on TripWise`, { foundUser });

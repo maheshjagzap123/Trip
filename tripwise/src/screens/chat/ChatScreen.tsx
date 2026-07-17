@@ -6,6 +6,7 @@ import {
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { useChatStore } from '../../stores/chatStore';
+import { supabase } from '../../lib/supabase';
 import type { Message } from '../../stores/chatStore';
 import { ArrowLeft, Send, Pin } from 'lucide-react-native';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -18,15 +19,49 @@ interface Props {
 
 export function ChatScreen({ tripId, tripName, onClose }: Props) {
   const colors = useThemeColors();
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const { messages, isLoading, isSending, fetchMessages, sendMessage, pinMessage, subscribeToChatRealtime } = useChatStore();
   const [inputText, setInputText] = useState('');
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const flatListRef = useRef<FlatList>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const presenceChannelRef = useRef<any>(null);
 
   useEffect(() => {
     fetchMessages(tripId);
     const unsub = subscribeToChatRealtime(tripId);
-    return unsub;
+
+    // Set up typing indicator presence channel
+    const presenceChannel = supabase
+      .channel(`typing-${tripId}`)
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        const typing: string[] = [];
+        Object.values(state).forEach((presences: any) => {
+          presences.forEach((p: any) => {
+            if (p.is_typing && p.user_id !== user?.id) {
+              typing.push(p.display_name || 'Someone');
+            }
+          });
+        });
+        setTypingUsers(typing);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({
+            user_id: user?.id,
+            display_name: profile?.display_name || 'Member',
+            is_typing: false,
+          });
+        }
+      });
+
+    presenceChannelRef.current = presenceChannel;
+
+    return () => {
+      unsub();
+      supabase.removeChannel(presenceChannel);
+    };
   }, [tripId]);
 
   // Auto-scroll to bottom when new messages arrive
@@ -42,6 +77,23 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
     if (!inputText.trim()) return;
     sendMessage(tripId, inputText);
     setInputText('');
+    // Stop typing indicator
+    if (presenceChannelRef.current) {
+      presenceChannelRef.current.track({ user_id: user?.id, display_name: profile?.display_name || 'Member', is_typing: false });
+    }
+  };
+
+  const handleTextChange = (text: string) => {
+    setInputText(text);
+    // Broadcast typing state
+    if (presenceChannelRef.current && text.trim()) {
+      presenceChannelRef.current.track({ user_id: user?.id, display_name: profile?.display_name || 'Member', is_typing: true });
+      // Auto-stop after 3 seconds of no typing
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        presenceChannelRef.current?.track({ user_id: user?.id, display_name: profile?.display_name || 'Member', is_typing: false });
+      }, 3000);
+    }
   };
 
   const formatMessageDate = (dateStr: string) => {
@@ -162,6 +214,17 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
           }
         />
 
+        {/* Typing Indicator */}
+        {typingUsers.length > 0 && (
+          <View style={styles.typingBar}>
+            <Text style={[styles.typingText, { color: colors.textTertiary }]}>
+              {typingUsers.length === 1
+                ? `${typingUsers[0]} is typing...`
+                : `${typingUsers.join(', ')} are typing...`}
+            </Text>
+          </View>
+        )}
+
         {/* Input */}
         <View style={[styles.inputBar, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
           <TextInput
@@ -169,7 +232,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             placeholder="Type a message..."
             placeholderTextColor={colors.textTertiary}
             value={inputText}
-            onChangeText={setInputText}
+            onChangeText={handleTextChange}
             multiline
             maxLength={2000}
             onSubmitEditing={handleSend}
@@ -206,6 +269,8 @@ const styles = StyleSheet.create({
   bubbleMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, alignSelf: 'flex-end' },
   timeText: { fontSize: 10 },
   inputBar: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: spacing.sm, paddingVertical: spacing.sm, borderTopWidth: 1, gap: spacing.xs },
+  typingBar: { paddingHorizontal: spacing.md, paddingVertical: 4 },
+  typingText: { fontSize: 12, fontStyle: 'italic' },
   input: { flex: 1, minHeight: 40, maxHeight: 120, borderWidth: 1, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15 },
   sendBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
 });

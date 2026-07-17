@@ -211,7 +211,7 @@ export function AddExpenseScreen({ tripId, onClose }: Props) {
                 onPress={() => setPaidBy(m.user_id)}
               >
                 <Text style={[typography.caption, { color: paidBy === m.user_id ? colors.textInverse : colors.textPrimary }]}>
-                  {m.user_id === user?.id ? 'You' : m.display_name}
+                  {m.user_id === user?.id ? `${m.display_name} (You)` : m.display_name}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -249,7 +249,7 @@ export function AddExpenseScreen({ tripId, onClose }: Props) {
                 {splitWith.includes(m.user_id) && <Check color={colors.textInverse} size={14} />}
               </View>
               <Text style={[typography.bodyMedium, { color: colors.textPrimary, flex: 1, marginLeft: spacing.sm }]}>
-                {m.user_id === user?.id ? 'You' : m.display_name}
+                {m.user_id === user?.id ? `${m.display_name} (You)` : m.display_name}
               </Text>
               {splitMethod === 'equal' && splitWith.includes(m.user_id) && (
                 <Text style={[typography.labelSmall, { color: colors.primary }]}>₹{perPerson}</Text>

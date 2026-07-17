@@ -109,7 +109,7 @@ export function ExpensesTab({ tripId }: Props) {
           {balances.map((b) => (
             <View key={b.user_id} style={[styles.balanceRow, { borderColor: colors.border }]}>
               <Text style={[typography.bodyMedium, { color: colors.textPrimary, flex: 1 }]}>
-                {b.user_id === user?.id ? 'You' : b.display_name}
+                {b.user_id === user?.id ? `${b.display_name} (You)` : b.display_name}
               </Text>
               <Text style={[typography.labelMedium, { color: b.net_balance >= 0 ? colors.success : colors.error }]}>
                 {b.net_balance >= 0 ? `gets ₹${b.net_balance.toFixed(0)}` : `owes ₹${Math.abs(b.net_balance).toFixed(0)}`}

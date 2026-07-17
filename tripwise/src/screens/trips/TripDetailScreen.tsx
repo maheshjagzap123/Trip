@@ -17,7 +17,8 @@ import { useAuthStore } from '../../stores/authStore';
 import { EditTripScreen } from './EditTripScreen';
 import { ExpensesScreen } from '../expenses/ExpensesScreen';
 import { PhotosScreen } from '../media/PhotosScreen';
-import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt, Camera as CameraIcon } from 'lucide-react-native';
+import { ChatScreen } from '../chat/ChatScreen';
+import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt, Camera as CameraIcon, MessageCircle } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 interface TripMember {
@@ -45,6 +46,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   const [showEdit, setShowEdit] = useState(false);
   const [showExpenses, setShowExpenses] = useState(false);
   const [showPhotos, setShowPhotos] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -71,15 +73,13 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
         .rpc('get_trip_members', { p_trip_id: tripId });
 
       if (memberData && Array.isArray(memberData)) {
-        // Fetch profile info for each member
+        // Fetch profile info for each member (bypass RLS via function)
         const userIds = memberData.map((m: any) => m.user_id);
         const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, display_name, email')
-          .in('id', userIds);
+          .rpc('get_profiles_by_ids', { user_ids: userIds });
 
         const enrichedMembers = memberData.map((m: any) => {
-          const profile = profiles?.find((p) => p.id === m.user_id);
+          const profile = Array.isArray(profiles) ? profiles.find((p: any) => p.id === m.user_id) : null;
           return {
             ...m,
             display_name: profile?.display_name || null,
@@ -92,11 +92,9 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
 
       // Fetch creator name
       if (tripData?.created_by) {
-        const { data: creator } = await supabase
-          .from('profiles')
-          .select('display_name')
-          .eq('id', tripData.created_by)
-          .single();
+        const { data: creatorData } = await supabase
+          .rpc('get_profiles_by_ids', { user_ids: [tripData.created_by] });
+        const creator = Array.isArray(creatorData) ? creatorData[0] : null;
         if (creator) setCreatorName(creator.display_name || 'Unknown');
       }
     } catch (err) {
@@ -269,6 +267,14 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
           <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Trip Photos</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={[styles.expensesBtn, { backgroundColor: '#F59E0B', marginTop: spacing.sm }]}
+          onPress={() => setShowChat(true)}
+        >
+          <MessageCircle color="#fff" size={18} />
+          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Trip Chat</Text>
+        </TouchableOpacity>
+
         {/* Members Section */}
         <View style={styles.sectionHeader}>
           <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>
@@ -359,6 +365,11 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
       {/* Photos Modal */}
       <Modal visible={showPhotos} animationType="slide" presentationStyle="fullScreen">
         <PhotosScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowPhotos(false)} />
+      </Modal>
+
+      {/* Chat Modal */}
+      <Modal visible={showChat} animationType="slide" presentationStyle="fullScreen">
+        <ChatScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowChat(false)} />
       </Modal>
 
       {/* Edit Trip Modal */}

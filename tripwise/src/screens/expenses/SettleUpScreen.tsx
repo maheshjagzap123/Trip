@@ -101,7 +101,7 @@ export function SettleUpScreen({ tripId, onClose }: Props) {
                 onPress={() => setPaidBy(m.user_id)}
               >
                 <Text style={[typography.caption, { color: paidBy === m.user_id ? colors.textInverse : colors.textPrimary }]}>
-                  {m.user_id === user?.id ? 'You' : m.display_name}
+                  {m.user_id === user?.id ? `${m.display_name} (You)` : m.display_name}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -119,7 +119,7 @@ export function SettleUpScreen({ tripId, onClose }: Props) {
                 onPress={() => setPaidTo(m.user_id)}
               >
                 <Text style={[typography.caption, { color: paidTo === m.user_id ? colors.textInverse : colors.textPrimary }]}>
-                  {m.user_id === user?.id ? 'You' : m.display_name}
+                  {m.user_id === user?.id ? `${m.display_name} (You)` : m.display_name}
                 </Text>
               </TouchableOpacity>
             ))}

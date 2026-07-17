@@ -1,0 +1,211 @@
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  SafeAreaView, FlatList, KeyboardAvoidingView, Platform,
+} from 'react-native';
+import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
+import { useAuthStore } from '../../stores/authStore';
+import { useChatStore } from '../../stores/chatStore';
+import type { Message } from '../../stores/chatStore';
+import { ArrowLeft, Send, Pin } from 'lucide-react-native';
+import { format, isToday, isYesterday } from 'date-fns';
+
+interface Props {
+  tripId: string;
+  tripName: string;
+  onClose: () => void;
+}
+
+export function ChatScreen({ tripId, tripName, onClose }: Props) {
+  const colors = useThemeColors();
+  const { user } = useAuthStore();
+  const { messages, isLoading, isSending, fetchMessages, sendMessage, pinMessage, subscribeToChatRealtime } = useChatStore();
+  const [inputText, setInputText] = useState('');
+  const flatListRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    fetchMessages(tripId);
+    const unsub = subscribeToChatRealtime(tripId);
+    return unsub;
+  }, [tripId]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages.length]);
+
+  const handleSend = () => {
+    if (!inputText.trim()) return;
+    sendMessage(tripId, inputText);
+    setInputText('');
+  };
+
+  const formatMessageDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isToday(date)) return format(date, 'h:mm a');
+    if (isYesterday(date)) return 'Yesterday ' + format(date, 'h:mm a');
+    return format(date, 'MMM d, h:mm a');
+  };
+
+  // Group messages by date for separators
+  const shouldShowDateHeader = (index: number) => {
+    if (index === 0) return true;
+    const curr = new Date(messages[index].created_at).toDateString();
+    const prev = new Date(messages[index - 1].created_at).toDateString();
+    return curr !== prev;
+  };
+
+  const getDateLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isToday(date)) return 'Today';
+    if (isYesterday(date)) return 'Yesterday';
+    return format(date, 'EEEE, MMM d');
+  };
+
+  const pinnedMessages = messages.filter((m) => m.is_pinned);
+
+  const renderMessage = ({ item, index }: { item: Message; index: number }) => {
+    const isMe = item.user_id === user?.id;
+    const showHeader = shouldShowDateHeader(index);
+    const showName = !isMe && (index === 0 || messages[index - 1].user_id !== item.user_id);
+
+    return (
+      <View>
+        {showHeader && (
+          <View style={styles.dateHeader}>
+            <Text style={[typography.caption, { color: colors.textTertiary }]}>
+              {getDateLabel(item.created_at)}
+            </Text>
+          </View>
+        )}
+        <View style={[styles.messageBubbleWrap, isMe ? styles.myMessageWrap : styles.otherMessageWrap]}>
+          {showName && !isMe && (
+            <Text style={[styles.senderName, { color: colors.primary }]}>
+              {item.sender_name}
+            </Text>
+          )}
+          <View style={[
+            styles.bubble,
+            isMe
+              ? [styles.myBubble, { backgroundColor: colors.primary }]
+              : [styles.otherBubble, { backgroundColor: colors.surface, borderColor: colors.border }]
+          ]}>
+            <Text style={[
+              typography.bodyMedium,
+              { color: isMe ? '#fff' : colors.textPrimary }
+            ]}>
+              {item.content}
+            </Text>
+            <View style={styles.bubbleMeta}>
+              {item.is_pinned && <Pin size={10} color={isMe ? 'rgba(255,255,255,0.6)' : colors.textTertiary} />}
+              <Text style={[styles.timeText, { color: isMe ? 'rgba(255,255,255,0.6)' : colors.textTertiary }]}>
+                {format(new Date(item.created_at), 'h:mm a')}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
+          <ArrowLeft color={colors.textPrimary} size={22} />
+        </TouchableOpacity>
+        <View style={{ flex: 1, marginLeft: spacing.sm }}>
+          <Text style={[typography.labelLarge, { color: colors.textPrimary }]} numberOfLines={1}>
+            {tripName}
+          </Text>
+          <Text style={[typography.caption, { color: colors.textTertiary }]}>
+            Trip Chat • {messages.length} messages
+          </Text>
+        </View>
+      </View>
+
+      {/* Pinned messages banner */}
+      {pinnedMessages.length > 0 && (
+        <View style={[styles.pinnedBanner, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <Pin size={12} color={colors.primary} />
+          <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: spacing.xs, flex: 1 }]} numberOfLines={1}>
+            {pinnedMessages[pinnedMessages.length - 1].content}
+          </Text>
+        </View>
+      )}
+
+      {/* Messages */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={90}
+      >
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.messageList}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyChat}>
+              <Text style={{ fontSize: 40 }}>💬</Text>
+              <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.sm, textAlign: 'center' }]}>
+                No messages yet. Start the conversation!
+              </Text>
+            </View>
+          }
+        />
+
+        {/* Input */}
+        <View style={[styles.inputBar, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
+            placeholder="Type a message..."
+            placeholderTextColor={colors.textTertiary}
+            value={inputText}
+            onChangeText={setInputText}
+            multiline
+            maxLength={2000}
+            onSubmitEditing={handleSend}
+            returnKeyType="send"
+          />
+          <TouchableOpacity
+            style={[styles.sendBtn, { backgroundColor: inputText.trim() ? colors.primary : colors.surface }]}
+            onPress={handleSend}
+            disabled={!inputText.trim() || isSending}
+          >
+            <Send size={18} color={inputText.trim() ? '#fff' : colors.textTertiary} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1 },
+  headerBtn: { padding: spacing.xs },
+  pinnedBanner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderBottomWidth: 1 },
+  messageList: { paddingHorizontal: spacing.md, paddingVertical: spacing.md, flexGrow: 1 },
+  emptyChat: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
+  dateHeader: { alignItems: 'center', marginVertical: spacing.md },
+  messageBubbleWrap: { marginBottom: spacing.xs, maxWidth: '80%' },
+  myMessageWrap: { alignSelf: 'flex-end' },
+  otherMessageWrap: { alignSelf: 'flex-start' },
+  senderName: { fontSize: 11, fontWeight: '600', marginBottom: 2, marginLeft: spacing.xs },
+  bubble: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18 },
+  myBubble: { borderBottomRightRadius: 4 },
+  otherBubble: { borderBottomLeftRadius: 4, borderWidth: 1 },
+  bubbleMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, alignSelf: 'flex-end' },
+  timeText: { fontSize: 10 },
+  inputBar: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: spacing.sm, paddingVertical: spacing.sm, borderTopWidth: 1, gap: spacing.xs },
+  input: { flex: 1, minHeight: 40, maxHeight: 120, borderWidth: 1, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15 },
+  sendBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+});

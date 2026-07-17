@@ -8,7 +8,8 @@ import type { ThemeMode } from '../../stores/themeStore';
 import { EditProfileScreen } from './EditProfileScreen';
 import { PersonalDocumentsScreen } from '../documents/PersonalDocumentsScreen';
 import { SupportScreen } from '../support/SupportScreen';
-import { Mail, MapPin, Settings, Moon, Sun, Monitor, ChevronRight, LogOut, Info, Bell, Shield, ArrowLeft, UserPen, FileText, HelpCircle } from 'lucide-react-native';
+import { ConnectDriveScreen } from '../cloud/ConnectDriveScreen';
+import { Mail, MapPin, Settings, Moon, Sun, Monitor, ChevronRight, LogOut, Info, Bell, Shield, ArrowLeft, UserPen, FileText, HelpCircle, Cloud } from 'lucide-react-native';
 
 function useProfileTheme() {
   const { resolvedScheme } = useThemeStore();
@@ -117,6 +118,7 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showDocuments, setShowDocuments] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  const [showCloud, setShowCloud] = useState(false);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
@@ -188,6 +190,11 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
               <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>My Documents</Text>
               <ChevronRight size={16} color={t.valueColor} />
             </TouchableOpacity>
+            <TouchableOpacity style={[styles.settingRow, { borderTopWidth: 1, borderTopColor: t.dividerColor }]} onPress={() => setShowCloud(true)}>
+              <Cloud size={18} color={t.iconColor} />
+              <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>Cloud Storage</Text>
+              <ChevronRight size={16} color={t.valueColor} />
+            </TouchableOpacity>
             <TouchableOpacity style={[styles.settingRow, { borderTopWidth: 1, borderTopColor: t.dividerColor }]}>
               <Bell size={18} color={t.iconColor} />
               <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>Notifications</Text>
@@ -234,6 +241,9 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
         </Modal>
         <Modal visible={showSupport} animationType="slide" presentationStyle="fullScreen">
           <SupportScreen onClose={() => setShowSupport(false)} />
+        </Modal>
+        <Modal visible={showCloud} animationType="slide" presentationStyle="fullScreen">
+          <ConnectDriveScreen onClose={() => setShowCloud(false)} />
         </Modal>
       </SafeAreaView>
     </LinearGradient>

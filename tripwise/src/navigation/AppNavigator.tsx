@@ -70,7 +70,7 @@ export function AppNavigator() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          cardStyle: { backgroundColor: '#0A0F1E' },
+          cardStyle: { backgroundColor: colors.background },
           cardStyleInterpolator: forFadeScale,
           transitionSpec: { open: rootSpec, close: rootSpec },
         }}

@@ -18,7 +18,8 @@ import { EditTripScreen } from './EditTripScreen';
 import { ExpensesScreen } from '../expenses/ExpensesScreen';
 import { PhotosScreen } from '../media/PhotosScreen';
 import { ChatScreen } from '../chat/ChatScreen';
-import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt, Camera as CameraIcon, MessageCircle } from 'lucide-react-native';
+import { TimelineScreen } from '../timeline/TimelineScreen';
+import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt, Camera as CameraIcon, MessageCircle, Clock } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 interface TripMember {
@@ -47,6 +48,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   const [showExpenses, setShowExpenses] = useState(false);
   const [showPhotos, setShowPhotos] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -275,6 +277,14 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
           <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Trip Chat</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={[styles.expensesBtn, { backgroundColor: '#8B5CF6', marginTop: spacing.sm }]}
+          onPress={() => setShowTimeline(true)}
+        >
+          <Clock color="#fff" size={18} />
+          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Timeline</Text>
+        </TouchableOpacity>
+
         {/* Members Section */}
         <View style={styles.sectionHeader}>
           <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>
@@ -370,6 +380,11 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
       {/* Chat Modal */}
       <Modal visible={showChat} animationType="slide" presentationStyle="fullScreen">
         <ChatScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowChat(false)} />
+      </Modal>
+
+      {/* Timeline Modal */}
+      <Modal visible={showTimeline} animationType="slide" presentationStyle="fullScreen">
+        <TimelineScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowTimeline(false)} />
       </Modal>
 
       {/* Edit Trip Modal */}

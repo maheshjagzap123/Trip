@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../stores/authStore';
 import { useTripStore } from '../../stores/tripStore';
+import { useThemeStore } from '../../stores/themeStore';
 import { supabase } from '../../lib/supabase';
 import { CreateTripScreen } from './CreateTripScreen';
 import { TripDetailScreen } from './TripDetailScreen';
@@ -20,6 +21,19 @@ const TRIP_TYPE_EMOJI: Record<string, string> = {
 export function TripDashboardScreen() {
   const { profile } = useAuthStore();
   const { trips, invitations, fetchTrips, fetchInvitations, subscribeToRealtime } = useTripStore();
+  const { resolvedScheme } = useThemeStore();
+  const isDark = resolvedScheme === 'dark';
+  const bgGradient: [string, string] = isDark ? ['#0A0F1E', '#0F172A'] : ['#F0FDF9', '#E6FAF5'];
+  const cardGradients: [string, string][] = isDark
+    ? [['#0D3B2E', '#0A2A20'], ['#1A2744', '#0F1A30'], ['#2A1A3E', '#1A0F2E']]
+    : [['#D1FAF0', '#B3F0E0'], ['#DBEAFE', '#BFDBFE'], ['#EDE9FE', '#DDD6FE']];
+  const textColor = isDark ? '#FFFFFF' : '#111827';
+  const subTextColor = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
+  const sectionTitleColor = isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.75)';
+  const cardBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+  const metaTextColor = isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.45)';
+  const footerBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const tripNameColor = isDark ? '#FFFFFF' : '#111827';
   const [showCreate, setShowCreate] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [quickExpenseTripId, setQuickExpenseTripId] = useState<string | null>(null);
@@ -89,7 +103,7 @@ export function TripDashboardScreen() {
   const renderTripCard = ({ item, index }: { item: typeof trips[0]; index: number }) => (
     <TouchableOpacity style={styles.tripCard} activeOpacity={0.85} onPress={() => setSelectedTripId(item.id)}>
       <LinearGradient
-        colors={index % 3 === 0 ? ['#0D3B2E', '#0A2A20'] : index % 3 === 1 ? ['#1A2744', '#0F1A30'] : ['#2A1A3E', '#1A0F2E']}
+        colors={cardGradients[index % 3]}
         style={styles.tripCardGrad}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       >
@@ -105,24 +119,24 @@ export function TripDashboardScreen() {
         </View>
 
         {/* Name */}
-        <Text style={styles.tripName} numberOfLines={1}>{item.trip_name}</Text>
+        <Text style={[styles.tripName, { color: tripNameColor }]} numberOfLines={1}>{item.trip_name}</Text>
 
         {/* Meta */}
         <View style={styles.tripMeta}>
           {item.destination && (
             <View style={styles.metaRow}>
               <MapPin size={12} color="rgba(255,255,255,0.5)" />
-              <Text style={styles.metaTxt} numberOfLines={1}>{item.destination}</Text>
+              <Text style={[styles.metaTxt, { color: metaTextColor }]} numberOfLines={1}>{item.destination}</Text>
             </View>
           )}
           <View style={styles.metaRow}>
             <Calendar size={12} color="rgba(255,255,255,0.5)" />
-            <Text style={styles.metaTxt}>{format(new Date(item.start_date), 'MMM d')} – {format(new Date(item.end_date), 'MMM d')}</Text>
+            <Text style={[styles.metaTxt, { color: metaTextColor }]}>{format(new Date(item.start_date), 'MMM d')} – {format(new Date(item.end_date), 'MMM d')}</Text>
           </View>
         </View>
 
         {/* Footer */}
-        <View style={styles.tripCardFooter}>
+        <View style={[styles.tripCardFooter, { borderTopColor: footerBorder }]}>
           <View>
             <Text style={styles.spentLabel}>Trip Total</Text>
             <Text style={styles.spentAmtMuted}>₹{(tripExpenses[item.id] || 0).toLocaleString()}</Text>
@@ -163,8 +177,8 @@ export function TripDashboardScreen() {
       {/* Greeting */}
       <View style={styles.greeting}>
         <View>
-          <Text style={styles.greetingName}>Hey, {profile?.first_name || 'Traveler'} 👋</Text>
-          <Text style={styles.greetingSub}>Ready for your next adventure?</Text>
+          <Text style={[styles.greetingName, { color: textColor }]}>Hey, {profile?.first_name || 'Traveler'} 👋</Text>
+          <Text style={[styles.greetingSub, { color: subTextColor }]}>Ready for your next adventure?</Text>
         </View>
         {invitations.length > 0 && (
           <View style={styles.notifBadge}>
@@ -203,15 +217,15 @@ export function TripDashboardScreen() {
       )}
 
       {trips.length > 0 && (
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Your Trips</Text>
+        <View style={[styles.sectionHeader, { marginTop: 8 }]}>
+          <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>Your Trips</Text>
         </View>
       )}
     </View>
   );
 
   return (
-    <LinearGradient colors={['#0A0F1E', '#0F172A']} style={styles.gradient}>
+    <LinearGradient colors={bgGradient} style={styles.gradient}>
       <SafeAreaView style={styles.safe}>
         <FlatList
           data={trips}
@@ -221,8 +235,8 @@ export function TripDashboardScreen() {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={{ fontSize: 56 }}>🗺️</Text>
-              <Text style={styles.emptyTitle}>No trips yet</Text>
-              <Text style={styles.emptySub}>Tap + to create your first trip{'\n'}and invite your friends!</Text>
+              <Text style={[styles.emptyTitle, { color: textColor }]}>No trips yet</Text>
+              <Text style={[styles.emptySub, { color: subTextColor }]}>Tap + to create your first trip{'\n'}and invite your friends!</Text>
             </View>
           }
           contentContainerStyle={styles.listContent}

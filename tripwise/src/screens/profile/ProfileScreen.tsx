@@ -5,7 +5,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
 import type { ThemeMode } from '../../stores/themeStore';
-import { Mail, MapPin, Settings, Moon, Sun, Monitor, ChevronRight, LogOut, Info, Bell, Shield, ArrowLeft } from 'lucide-react-native';
+import { EditProfileScreen } from './EditProfileScreen';
+import { PersonalDocumentsScreen } from '../documents/PersonalDocumentsScreen';
+import { SupportScreen } from '../support/SupportScreen';
+import { Mail, MapPin, Settings, Moon, Sun, Monitor, ChevronRight, LogOut, Info, Bell, Shield, ArrowLeft, UserPen, FileText, HelpCircle } from 'lucide-react-native';
 
 function useProfileTheme() {
   const { resolvedScheme } = useThemeStore();
@@ -111,6 +114,9 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
   const { signOut } = useAuthStore();
   const { mode: theme, setTheme } = useThemeStore();
   const t = useProfileTheme();
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showDocuments, setShowDocuments] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
@@ -171,8 +177,18 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
 
           {/* General */}
           <View style={[styles.card, { backgroundColor: t.cardBg, borderColor: t.cardBorder }]}>
-            <Text style={[styles.cardLabel, { color: t.labelColor }]}>GENERAL</Text>
-            <TouchableOpacity style={styles.settingRow}>
+            <Text style={[styles.cardLabel, { color: t.labelColor }]}>ACCOUNT</Text>
+            <TouchableOpacity style={styles.settingRow} onPress={() => setShowEditProfile(true)}>
+              <UserPen size={18} color={t.iconColor} />
+              <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>Edit Profile</Text>
+              <ChevronRight size={16} color={t.valueColor} />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.settingRow, { borderTopWidth: 1, borderTopColor: t.dividerColor }]} onPress={() => setShowDocuments(true)}>
+              <FileText size={18} color={t.iconColor} />
+              <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>My Documents</Text>
+              <ChevronRight size={16} color={t.valueColor} />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.settingRow, { borderTopWidth: 1, borderTopColor: t.dividerColor }]}>
               <Bell size={18} color={t.iconColor} />
               <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>Notifications</Text>
               <Text style={[styles.settingRowValue, { color: t.valueColor }]}>Coming soon</Text>
@@ -181,6 +197,11 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
               <Shield size={18} color={t.iconColor} />
               <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>Privacy & Security</Text>
               <Text style={[styles.settingRowValue, { color: t.valueColor }]}>Coming soon</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.settingRow, { borderTopWidth: 1, borderTopColor: t.dividerColor }]} onPress={() => setShowSupport(true)}>
+              <HelpCircle size={18} color={t.iconColor} />
+              <Text style={[styles.settingRowTxt, { color: t.infoTextColor }]}>Help & Support</Text>
+              <ChevronRight size={16} color={t.valueColor} />
             </TouchableOpacity>
           </View>
 
@@ -203,6 +224,17 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
             <Text style={styles.signOutTxt}>Sign Out</Text>
           </TouchableOpacity>
         </ScrollView>
+
+        {/* Modals */}
+        <Modal visible={showEditProfile} animationType="slide" presentationStyle="fullScreen">
+          <EditProfileScreen onClose={() => setShowEditProfile(false)} />
+        </Modal>
+        <Modal visible={showDocuments} animationType="slide" presentationStyle="fullScreen">
+          <PersonalDocumentsScreen onClose={() => setShowDocuments(false)} />
+        </Modal>
+        <Modal visible={showSupport} animationType="slide" presentationStyle="fullScreen">
+          <SupportScreen onClose={() => setShowSupport(false)} />
+        </Modal>
       </SafeAreaView>
     </LinearGradient>
   );

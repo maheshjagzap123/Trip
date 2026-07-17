@@ -10,7 +10,8 @@ import { CreateTripScreen } from './CreateTripScreen';
 import { TripDetailScreen } from './TripDetailScreen';
 import { AddExpenseScreen } from '../expenses/AddExpenseScreen';
 import { ChatScreen } from '../chat/ChatScreen';
-import { Plus, MapPin, Calendar, Zap, MessageCircle } from 'lucide-react-native';
+import { NotificationsScreen } from '../notifications/NotificationsScreen';
+import { Plus, MapPin, Calendar, Zap, MessageCircle, Bell } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 const TRIP_TYPE_EMOJI: Record<string, string> = {
@@ -39,6 +40,7 @@ export function TripDashboardScreen() {
   const [quickExpenseTripId, setQuickExpenseTripId] = useState<string | null>(null);
   const [quickChatTripId, setQuickChatTripId] = useState<string | null>(null);
   const [quickChatTripName, setQuickChatTripName] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
   const [tripExpenses, setTripExpenses] = useState<Record<string, number>>({});
   const [myShares, setMyShares] = useState<Record<string, number>>({});
 
@@ -181,9 +183,14 @@ export function TripDashboardScreen() {
           <Text style={[styles.greetingSub, { color: subTextColor }]}>Ready for your next adventure?</Text>
         </View>
         {invitations.length > 0 && (
-          <View style={styles.notifBadge}>
+          <TouchableOpacity style={styles.notifBadge} onPress={() => setShowNotifications(true)}>
             <Text style={styles.notifTxt}>{invitations.length}</Text>
-          </View>
+          </TouchableOpacity>
+        )}
+        {invitations.length === 0 && (
+          <TouchableOpacity onPress={() => setShowNotifications(true)}>
+            <Bell size={22} color={metaTextColor} />
+          </TouchableOpacity>
         )}
       </View>
 
@@ -267,6 +274,9 @@ export function TripDashboardScreen() {
           {quickChatTripId && (
             <ChatScreen tripId={quickChatTripId} tripName={quickChatTripName} onClose={() => { setQuickChatTripId(null); }} />
           )}
+        </OverlayScreen>
+        <OverlayScreen visible={showNotifications}>
+          <NotificationsScreen onClose={() => setShowNotifications(false)} />
         </OverlayScreen>
       </SafeAreaView>
     </LinearGradient>

@@ -5,6 +5,7 @@ import { ActivityIndicator, View, StyleSheet, Easing } from 'react-native';
 import { AuthStack } from './AuthStack';
 import { MainTabs } from './MainTabs';
 import { CompleteProfileScreen } from '../screens/auth/CompleteProfileScreen';
+import { SplashScreen } from '../screens/auth/SplashScreen';
 import { useAuthStore } from '../stores/authStore';
 import { useThemeColors } from '../theme';
 import type { RootStackParamList } from './types';
@@ -38,13 +39,9 @@ export function AppNavigator() {
     initialize();
   }, [initialize]);
 
-  // Show loading screen while checking auth state
+  // Show splash screen while checking auth state
   if (!isInitialized || isLoading) {
-    return (
-      <View style={[styles.loading, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   // Determine routing:
@@ -56,13 +53,9 @@ export function AppNavigator() {
   const profileLoaded = profile !== null;
   const profileComplete = profile?.profile_completed === true;
 
-  // If logged in but profile hasn't loaded yet, keep showing loader
+  // If logged in but profile hasn't loaded yet, keep showing splash
   if (isLoggedIn && !profileLoaded) {
-    return (
-      <View style={[styles.loading, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   return (

@@ -8,7 +8,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useChatStore } from '../../stores/chatStore';
 import { supabase } from '../../lib/supabase';
 import type { Message } from '../../stores/chatStore';
-import { ArrowLeft, Send, Pin } from 'lucide-react-native';
+import { ArrowLeft, Send, Pin, X } from 'lucide-react-native';
 import { format, isToday, isYesterday } from 'date-fns';
 
 interface Props {
@@ -22,6 +22,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
   const { user, profile } = useAuthStore();
   const { messages, isLoading, isSending, fetchMessages, sendMessage, pinMessage, subscribeToChatRealtime } = useChatStore();
   const [inputText, setInputText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,8 +76,9 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
 
   const handleSend = () => {
     if (!inputText.trim()) return;
-    sendMessage(tripId, inputText);
+    sendMessage(tripId, inputText, replyingTo?.id);
     setInputText('');
+    setReplyingTo(null);
     // Stop typing indicator
     if (presenceChannelRef.current) {
       presenceChannelRef.current.track({ user_id: user?.id, display_name: profile?.display_name || 'Member', is_typing: false });
@@ -134,12 +136,26 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             </Text>
           </View>
         )}
-        <View style={[styles.messageBubbleWrap, isMe ? styles.myMessageWrap : styles.otherMessageWrap]}>
+        <TouchableOpacity
+          style={[styles.messageBubbleWrap, isMe ? styles.myMessageWrap : styles.otherMessageWrap]}
+          onLongPress={() => setReplyingTo(item)}
+          activeOpacity={0.85}
+        >
           {showName && !isMe && (
             <Text style={[styles.senderName, { color: colors.primary }]}>
               {item.sender_name}
             </Text>
           )}
+          {/* Reply preview */}
+          {item.reply_to && (() => {
+            const repliedMsg = messages.find((m) => m.id === item.reply_to);
+            return repliedMsg ? (
+              <View style={[styles.replyPreview, { borderColor: colors.primary }]}>
+                <Text style={[styles.replyName, { color: colors.primary }]}>{repliedMsg.sender_name}</Text>
+                <Text style={[styles.replyContent, { color: colors.textTertiary }]} numberOfLines={1}>{repliedMsg.content}</Text>
+              </View>
+            ) : null;
+          })()}
           <View style={[
             styles.bubble,
             isMe
@@ -159,7 +175,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
               </Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -213,6 +229,19 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             </View>
           }
         />
+
+        {/* Reply Indicator */}
+        {replyingTo && (
+          <View style={[styles.replyBar, { backgroundColor: colors.surface, borderLeftColor: colors.primary }]}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.replyBarName, { color: colors.primary }]}>{replyingTo.sender_name}</Text>
+              <Text style={[styles.replyBarContent, { color: colors.textSecondary }]} numberOfLines={1}>{replyingTo.content}</Text>
+            </View>
+            <TouchableOpacity onPress={() => setReplyingTo(null)}>
+              <X size={18} color={colors.textTertiary} />
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Typing Indicator */}
         {typingUsers.length > 0 && (
@@ -271,6 +300,12 @@ const styles = StyleSheet.create({
   inputBar: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: spacing.sm, paddingVertical: spacing.sm, borderTopWidth: 1, gap: spacing.xs },
   typingBar: { paddingHorizontal: spacing.md, paddingVertical: 4 },
   typingText: { fontSize: 12, fontStyle: 'italic' },
+  replyPreview: { borderLeftWidth: 3, paddingLeft: 8, paddingVertical: 2, marginBottom: 4, marginLeft: 4 },
+  replyName: { fontSize: 11, fontWeight: '700' },
+  replyContent: { fontSize: 12 },
+  replyBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: 8, borderLeftWidth: 3, marginHorizontal: spacing.sm, borderRadius: 4 },
+  replyBarName: { fontSize: 12, fontWeight: '700' },
+  replyBarContent: { fontSize: 13 },
   input: { flex: 1, minHeight: 40, maxHeight: 120, borderWidth: 1, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15 },
   sendBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
 });

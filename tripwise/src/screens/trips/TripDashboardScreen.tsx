@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Animated, Dimensions, Easing } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, FlatList, Animated, Dimensions, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../stores/authStore';
@@ -41,11 +41,21 @@ export function TripDashboardScreen() {
   const [quickChatTripId, setQuickChatTripId] = useState<string | null>(null);
   const [quickChatTripName, setQuickChatTripName] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
   const [tripExpenses, setTripExpenses] = useState<Record<string, number>>({});
+
+  const fetchUnreadCount = async () => {
+    const { data: { user: u } } = await supabase.auth.getUser();
+    if (!u) return;
+    const { count } = await supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', u.id).eq('read', false);
+    setUnreadCount(count || 0);
+  };
   const [myShares, setMyShares] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    fetchTrips(); fetchInvitations();
+    fetchTrips(); fetchInvitations(); fetchUnreadCount();
     const unsub = subscribeToRealtime();
 
     // Subscribe to expense changes for real-time totals
@@ -101,6 +111,15 @@ export function TripDashboardScreen() {
   };
 
   const totalSpent = Object.values(myShares).reduce((a, b) => a + b, 0);
+
+  // Filter trips based on search and status
+  const filteredTrips = trips.filter((t) => {
+    const matchesSearch = !searchQuery.trim() || 
+      t.trip_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.destination || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || t.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const renderTripCard = ({ item, index }: { item: typeof trips[0]; index: number }) => (
     <TouchableOpacity style={styles.tripCard} activeOpacity={0.85} onPress={() => setSelectedTripId(item.id)}>
@@ -182,12 +201,11 @@ export function TripDashboardScreen() {
           <Text style={[styles.greetingName, { color: textColor }]}>Hey, {profile?.first_name || 'Traveler'} 👋</Text>
           <Text style={[styles.greetingSub, { color: subTextColor }]}>Ready for your next adventure?</Text>
         </View>
-        {invitations.length > 0 && (
-          <TouchableOpacity style={styles.notifBadge} onPress={() => setShowNotifications(true)}>
-            <Text style={styles.notifTxt}>{invitations.length}</Text>
+        {unreadCount > 0 ? (
+          <TouchableOpacity style={styles.notifBadge} onPress={() => { setShowNotifications(true); }}>
+            <Text style={styles.notifTxt}>{unreadCount > 99 ? '99+' : unreadCount}</Text>
           </TouchableOpacity>
-        )}
-        {invitations.length === 0 && (
+        ) : (
           <TouchableOpacity onPress={() => setShowNotifications(true)}>
             <Bell size={22} color={metaTextColor} />
           </TouchableOpacity>
@@ -228,6 +246,30 @@ export function TripDashboardScreen() {
           <Text style={[styles.sectionTitle, { color: sectionTitleColor }]}>Your Trips</Text>
         </View>
       )}
+
+      {/* Search & Filter */}
+      {trips.length > 0 && (
+        <View style={styles.searchSection}>
+          <TextInput
+            style={[styles.searchInput, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', color: textColor, borderColor: cardBorder }]}
+            placeholder="Search trips..."
+            placeholderTextColor={subTextColor}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          <View style={styles.filterRow}>
+            {['All', 'Planning', 'Active', 'Completed'].map((s) => (
+              <TouchableOpacity
+                key={s}
+                style={[styles.filterChip, { backgroundColor: statusFilter === s ? '#00C896' : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'), borderColor: statusFilter === s ? '#00C896' : cardBorder }]}
+                onPress={() => setStatusFilter(s)}
+              >
+                <Text style={{ fontSize: 11, fontWeight: '600', color: statusFilter === s ? '#fff' : subTextColor }}>{s}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
     </View>
   );
 
@@ -235,7 +277,7 @@ export function TripDashboardScreen() {
     <LinearGradient colors={bgGradient} style={styles.gradient}>
       <SafeAreaView style={styles.safe}>
         <FlatList
-          data={trips}
+          data={filteredTrips}
           keyExtractor={(item) => item.id}
           renderItem={renderTripCard}
           ListHeaderComponent={ListHeader}
@@ -276,7 +318,7 @@ export function TripDashboardScreen() {
           )}
         </OverlayScreen>
         <OverlayScreen visible={showNotifications}>
-          <NotificationsScreen onClose={() => setShowNotifications(false)} />
+          <NotificationsScreen onClose={() => { setShowNotifications(false); fetchUnreadCount(); }} />
         </OverlayScreen>
       </SafeAreaView>
     </LinearGradient>
@@ -368,6 +410,10 @@ const styles = StyleSheet.create({
   statDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.25)', marginHorizontal: 8 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: 'rgba(255,255,255,0.85)' },
+  searchSection: { marginBottom: 12 },
+  searchInput: { height: 40, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, fontSize: 14, marginBottom: 8 },
+  filterRow: { flexDirection: 'row', gap: 6 },
+  filterChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14, borderWidth: 1 },
   inviteSection: { marginBottom: 24 },
   inviteCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(245,158,11,0.08)', borderRadius: 18, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(245,158,11,0.2)', gap: 12 },
   inviteIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(245,158,11,0.15)', justifyContent: 'center', alignItems: 'center' },

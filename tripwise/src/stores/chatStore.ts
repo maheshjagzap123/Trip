@@ -72,16 +72,34 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     set({ isSending: true });
     try {
-      const { error } = await supabase.from('messages').insert({
+      const { data, error } = await supabase.from('messages').insert({
         trip_id: tripId,
         user_id: user.id,
         content: content.trim(),
         message_type: 'text',
         reply_to: replyTo || null,
-      });
+      }).select().single();
 
-      if (error) throw new Error(error.message);
-      // Real-time subscription will pick up the new message
+      if (error) {
+        console.error('Send message error:', error);
+        throw new Error(error.message);
+      }
+
+      // Optimistically add to local state immediately
+      if (data) {
+        const { data: profiles } = await supabase.rpc('get_profiles_by_ids', { user_ids: [user.id] });
+        const profile = Array.isArray(profiles) ? profiles[0] : null;
+
+        const newMsg: Message = {
+          ...data,
+          sender_name: profile?.display_name || 'You',
+          sender_avatar: profile?.avatar_url || null,
+        };
+
+        set((state) => ({
+          messages: [...state.messages, newMsg],
+        }));
+      }
     } finally {
       set({ isSending: false });
     }
@@ -112,8 +130,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `trip_id=eq.${tripId}` },
         async (payload) => {
-          // Fetch sender info for the new message
           const newMsg = payload.new as any;
+
+          // Skip if we already have this message (optimistic update already added it)
+          const existing = get().messages.find((m) => m.id === newMsg.id);
+          if (existing) return;
+
+          // Fetch sender info for the new message
           const { data: profiles } = await supabase.rpc('get_profiles_by_ids', { user_ids: [newMsg.user_id] });
           const profile = Array.isArray(profiles) ? profiles[0] : null;
 

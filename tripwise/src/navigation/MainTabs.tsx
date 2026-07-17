@@ -28,11 +28,10 @@ export function MainTabs() {
           backgroundColor: '#0A0F1E',
           borderTopColor: 'rgba(255,255,255,0.06)',
           borderTopWidth: 1,
-          height: 64,
-          paddingBottom: 10,
-          paddingTop: 8,
+          paddingBottom: 8,
+          paddingTop: 6,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2, marginBottom: 4 },
       }}
     >
       <Tab.Screen

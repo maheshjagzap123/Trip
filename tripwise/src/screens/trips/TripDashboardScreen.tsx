@@ -8,7 +8,8 @@ import { supabase } from '../../lib/supabase';
 import { CreateTripScreen } from './CreateTripScreen';
 import { TripDetailScreen } from './TripDetailScreen';
 import { AddExpenseScreen } from '../expenses/AddExpenseScreen';
-import { Plus, MapPin, Calendar, Zap } from 'lucide-react-native';
+import { ChatScreen } from '../chat/ChatScreen';
+import { Plus, MapPin, Calendar, Zap, MessageCircle } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 const TRIP_TYPE_EMOJI: Record<string, string> = {
@@ -22,6 +23,8 @@ export function TripDashboardScreen() {
   const [showCreate, setShowCreate] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [quickExpenseTripId, setQuickExpenseTripId] = useState<string | null>(null);
+  const [quickChatTripId, setQuickChatTripId] = useState<string | null>(null);
+  const [quickChatTripName, setQuickChatTripName] = useState('');
   const [tripExpenses, setTripExpenses] = useState<Record<string, number>>({});
   const [myShares, setMyShares] = useState<Record<string, number>>({});
 
@@ -130,16 +133,27 @@ export function TripDashboardScreen() {
           </View>
         </View>
 
-        {/* Quick Add Expense */}
-        <TouchableOpacity
-          style={styles.addExpenseBtn}
-          onPress={(e) => { e.stopPropagation(); setQuickExpenseTripId(item.id); }}
-          activeOpacity={0.8}
-          accessibilityLabel="Add expense to this trip"
-        >
-          <Plus size={14} color="#00C896" />
-          <Text style={styles.addExpenseTxt}>Add Expense</Text>
-        </TouchableOpacity>
+        {/* Quick Actions */}
+        <View style={styles.quickActions}>
+          <TouchableOpacity
+            style={styles.addExpenseBtn}
+            onPress={(e) => { e.stopPropagation(); setQuickExpenseTripId(item.id); }}
+            activeOpacity={0.8}
+            accessibilityLabel="Add expense to this trip"
+          >
+            <Plus size={14} color="#00C896" />
+            <Text style={styles.addExpenseTxt}>Add Expense</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.chatBtn}
+            onPress={(e) => { e.stopPropagation(); setQuickChatTripId(item.id); setQuickChatTripName(item.trip_name); }}
+            activeOpacity={0.8}
+            accessibilityLabel="Open trip chat"
+          >
+            <MessageCircle size={14} color="#F59E0B" />
+            <Text style={styles.chatBtnTxt}>Chat</Text>
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -233,6 +247,11 @@ export function TripDashboardScreen() {
         <OverlayScreen visible={!!quickExpenseTripId}>
           {quickExpenseTripId && (
             <AddExpenseScreen tripId={quickExpenseTripId} onClose={() => { setQuickExpenseTripId(null); fetchExpenseTotals(); }} />
+          )}
+        </OverlayScreen>
+        <OverlayScreen visible={!!quickChatTripId}>
+          {quickChatTripId && (
+            <ChatScreen tripId={quickChatTripId} tripName={quickChatTripName} onClose={() => { setQuickChatTripId(null); }} />
           )}
         </OverlayScreen>
       </SafeAreaView>
@@ -338,7 +357,7 @@ const styles = StyleSheet.create({
   declineBtn: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   declineTxt: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.5)', textAlign: 'center' },
   tripCard: { marginBottom: 14, borderRadius: 22, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8 },
-  tripCardGrad: { padding: 18 },
+  tripCardGrad: { padding: 16, paddingBottom: 14 },
   tripCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   tripTypeEmoji: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center' },
   statusPill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 100 },
@@ -348,12 +367,15 @@ const styles = StyleSheet.create({
   tripMeta: { gap: 5, marginBottom: 14 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   metaTxt: { fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: '500' },
-  tripCardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)' },
+  tripCardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)' },
   spentLabel: { fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: '600' },
   spentAmt: { fontSize: 18, fontWeight: '800', color: '#00C896' },
   spentAmtMuted: { fontSize: 15, fontWeight: '600', color: 'rgba(255,255,255,0.4)' },
-  addExpenseBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 200, 150, 0.12)', borderWidth: 1, borderColor: 'rgba(0, 200, 150, 0.3)', paddingVertical: 8, borderRadius: 20, marginTop: 12, gap: 6 },
-  addExpenseTxt: { fontSize: 13, fontWeight: '700', color: '#00C896' },
+  addExpenseBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 200, 150, 0.12)', borderWidth: 1, borderColor: 'rgba(0, 200, 150, 0.3)', paddingVertical: 7, borderRadius: 16, gap: 4 },
+  addExpenseTxt: { fontSize: 12, fontWeight: '700', color: '#00C896' },
+  quickActions: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  chatBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(245, 158, 11, 0.12)', borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.3)', paddingVertical: 7, borderRadius: 16, gap: 4 },
+  chatBtnTxt: { fontSize: 12, fontWeight: '700', color: '#F59E0B' },
   empty: { paddingTop: 80, alignItems: 'center', paddingHorizontal: 40 },
   emptyTitle: { fontSize: 22, fontWeight: '800', color: '#FFFFFF', marginTop: 16, marginBottom: 8 },
   emptySub: { fontSize: 15, color: 'rgba(255,255,255,0.4)', textAlign: 'center', lineHeight: 22 },

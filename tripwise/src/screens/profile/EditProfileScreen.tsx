@@ -74,7 +74,7 @@ export function EditProfileScreen({ onClose }: Props) {
         const response = await fetch(asset.uri);
         fileData = await response.arrayBuffer();
       } else {
-        const base64 = await FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.Base64 });
+        const base64 = await FileSystem.readAsStringAsync(asset.uri, { encoding: 'base64' });
         fileData = decode(base64);
       }
 

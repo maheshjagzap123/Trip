@@ -157,7 +157,7 @@ function AddDocModal({ onClose }: { onClose: () => void }) {
       if (Platform.OS === 'web') {
         fileData = await (await fetch(asset.uri)).arrayBuffer();
       } else {
-        const b64 = await FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.Base64 });
+        const b64 = await FileSystem.readAsStringAsync(asset.uri, { encoding: 'base64' });
         fileData = decode(b64);
       }
 

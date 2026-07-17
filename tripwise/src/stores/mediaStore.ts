@@ -92,7 +92,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
       } else {
         // Native: read as base64 and decode
         const base64 = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
+          encoding: 'base64',
         });
         fileData = decode(base64);
       }

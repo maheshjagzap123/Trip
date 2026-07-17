@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator,
+  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator, Linking,
 } from 'react-native';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Cloud, CloudOff, Check, HardDrive } from 'lucide-react-native';
 
-WebBrowser.maybeCompleteAuthSession();
-
 const GOOGLE_CLIENT_ID = '596689950582-me8hjlaj74c53pi7e57gins8mf9js8n5.apps.googleusercontent.com';
-
-const discovery = {
-  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-  tokenEndpoint: 'https://oauth2.googleapis.com/token',
-  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
-};
 
 interface Props {
   onClose: () => void;
@@ -31,70 +21,89 @@ export function ConnectDriveScreen({ onClose }: Props) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [driveEmail, setDriveEmail] = useState('');
 
-  const redirectUri = AuthSession.makeRedirectUri({ scheme: 'tripwise' });
-
-  const [request, response, promptAsync] = AuthSession.useAuthRequest(
-    {
-      clientId: GOOGLE_CLIENT_ID,
-      scopes: ['https://www.googleapis.com/auth/drive.file', 'https://www.googleapis.com/auth/userinfo.email'],
-      redirectUri,
-      responseType: AuthSession.ResponseType.Code,
-      usePKCE: true,
-    },
-    discovery
-  );
-
   useEffect(() => { checkConnection(); }, []);
 
-  useEffect(() => {
-    if (response?.type === 'success' && response.params.code) {
-      exchangeCodeForToken(response.params.code);
-    }
-  }, [response]);
-
   const checkConnection = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('cloud_connections')
-      .select('id, provider_email')
-      .eq('user_id', user.id)
-      .eq('provider', 'google_drive')
-      .single();
+    if (!user) { setIsLoading(false); return; }
+    try {
+      const { data } = await supabase
+        .from('cloud_connections')
+        .select('id, provider_email')
+        .eq('user_id', user.id)
+        .eq('provider', 'google_drive')
+        .single();
 
-    if (data) {
-      setIsConnected(true);
-      setDriveEmail(data.provider_email || '');
-    }
+      if (data) {
+        setIsConnected(true);
+        setDriveEmail(data.provider_email || '');
+      }
+    } catch {}
     setIsLoading(false);
   };
 
-  const exchangeCodeForToken = async (code: string) => {
+  const handleConnect = async () => {
     if (!user) return;
     setIsConnecting(true);
+
     try {
-      // Exchange code for tokens
-      const tokenResponse = await fetch(discovery.tokenEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          code,
-          client_id: GOOGLE_CLIENT_ID,
-          redirect_uri: redirectUri,
-          grant_type: 'authorization_code',
-          code_verifier: request?.codeVerifier || '',
-        }).toString(),
-      });
+      // Build OAuth URL manually (works on web and native)
+      const redirectUri = Platform.OS === 'web' 
+        ? window.location.origin 
+        : 'tripwise://oauth-callback';
 
-      const tokens = await tokenResponse.json();
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${GOOGLE_CLIENT_ID}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&response_type=token` +
+        `&scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email')}` +
+        `&prompt=consent`;
 
-      if (tokens.error) {
-        showAlert('Error', tokens.error_description || 'Failed to connect');
-        return;
+      if (Platform.OS === 'web') {
+        // Open popup for web
+        const popup = window.open(authUrl, 'google-auth', 'width=500,height=600');
+
+        // Listen for the redirect with token
+        const checkPopup = setInterval(async () => {
+          try {
+            if (popup?.closed) {
+              clearInterval(checkPopup);
+              setIsConnecting(false);
+              return;
+            }
+            const url = popup?.location.href;
+            if (url && url.includes('access_token')) {
+              clearInterval(checkPopup);
+              popup?.close();
+
+              // Extract access token from URL hash
+              const hash = url.split('#')[1];
+              const params = new URLSearchParams(hash);
+              const accessToken = params.get('access_token');
+
+              if (accessToken) {
+                await saveConnection(accessToken);
+              }
+            }
+          } catch {
+            // Cross-origin error — popup still on Google domain, keep waiting
+          }
+        }, 500);
+      } else {
+        // Native: open in browser
+        await Linking.openURL(authUrl);
       }
+    } catch (err: any) {
+      showAlert('Error', err.message || 'Failed to connect');
+      setIsConnecting(false);
+    }
+  };
 
-      // Get user email from Google
+  const saveConnection = async (accessToken: string) => {
+    if (!user) return;
+    try {
+      // Get user email
       const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: { Authorization: `Bearer ${tokens.access_token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       const userInfo = await userInfoRes.json();
 
@@ -102,20 +111,19 @@ export function ConnectDriveScreen({ onClose }: Props) {
       await supabase.from('cloud_connections').upsert({
         user_id: user.id,
         provider: 'google_drive',
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+        access_token: accessToken,
         provider_email: userInfo.email,
+        expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
       }, { onConflict: 'user_id,provider' });
 
-      // Create TripWise folder in Drive
-      await createTripWiseFolder(tokens.access_token);
+      // Create TripWise folder
+      await createTripWiseFolder(accessToken);
 
       setIsConnected(true);
       setDriveEmail(userInfo.email || '');
       showAlert('Connected!', `Google Drive connected as ${userInfo.email}`);
     } catch (err: any) {
-      showAlert('Error', err.message || 'Connection failed');
+      showAlert('Error', err.message || 'Failed to save connection');
     } finally {
       setIsConnecting(false);
     }
@@ -205,8 +213,8 @@ export function ConnectDriveScreen({ onClose }: Props) {
               ) : (
                 <TouchableOpacity
                   style={[styles.connectBtn, { backgroundColor: colors.primary, opacity: isConnecting ? 0.6 : 1 }]}
-                  onPress={() => promptAsync()}
-                  disabled={!request || isConnecting}
+                  onPress={handleConnect}
+                  disabled={isConnecting}
                 >
                   <Cloud size={18} color="#fff" />
                   <Text style={[typography.labelMedium, { color: '#fff', marginLeft: spacing.sm }]}>

@@ -9,8 +9,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { useMediaStore } from '../../stores/mediaStore';
+import { supabase } from '../../lib/supabase';
+import { ConnectDriveScreen } from '../cloud/ConnectDriveScreen';
 import type { MediaItem } from '../../stores/mediaStore';
-import { ArrowLeft, Plus, Trash2, X, Upload, ImageIcon } from 'lucide-react-native';
+import { ArrowLeft, Plus, Trash2, X, Upload, ImageIcon, Cloud } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 const GAP = 2;
@@ -27,21 +29,42 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
   const { user } = useAuthStore();
   const { media, isLoading, isUploading, uploadProgress, fetchMedia, uploadMedia, deleteMedia, subscribeToMedia } = useMediaStore();
   const [selectedImage, setSelectedImage] = useState<MediaItem | null>(null);
+  const [showConnectDrive, setShowConnectDrive] = useState(false);
+  const [driveConnected, setDriveConnected] = useState<boolean | null>(null); // null = loading
   const { width: screenWidth } = useWindowDimensions();
 
   const imageSize = (screenWidth - GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
 
   useEffect(() => {
     fetchMedia(tripId);
+    checkDriveConnection();
     const unsub = subscribeToMedia(tripId);
     return unsub;
   }, [tripId]);
+
+  const checkDriveConnection = async () => {
+    const { data: { user: u } } = await supabase.auth.getUser();
+    if (!u) return;
+    const { data } = await supabase
+      .from('cloud_connections')
+      .select('id')
+      .eq('user_id', u.id)
+      .eq('provider', 'google_drive')
+      .maybeSingle();
+    setDriveConnected(!!data);
+  };
 
   const showAlert = (title: string, msg: string) => {
     Platform.OS === 'web' ? window.alert(`${title}: ${msg}`) : Alert.alert(title, msg);
   };
 
   const handlePickImage = async () => {
+    // Check if Drive is connected
+    if (!driveConnected) {
+      setShowConnectDrive(true);
+      return;
+    }
+
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       showAlert('Permission needed', 'Please allow access to your photos to upload.');
@@ -170,14 +193,18 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
           </View>
           <Text style={[typography.h3, { color: colors.textPrimary, marginTop: spacing.lg }]}>No photos yet</Text>
           <Text style={[typography.bodyMedium, { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs, paddingHorizontal: spacing.xl }]}>
-            Capture your trip memories! Upload photos and everyone in the trip can see them.
+            {driveConnected
+              ? 'Capture your trip memories! Upload photos and everyone in the trip can see them.'
+              : 'Connect Google Drive to upload and store your trip photos safely in your own cloud.'}
           </Text>
           <TouchableOpacity
             style={[styles.emptyUploadBtn, { backgroundColor: colors.primary }]}
-            onPress={handlePickImage}
+            onPress={driveConnected ? handlePickImage : () => setShowConnectDrive(true)}
           >
-            <Upload color="#fff" size={18} />
-            <Text style={[typography.labelMedium, { color: '#fff', marginLeft: spacing.sm }]}>Upload Photos</Text>
+            {driveConnected ? <Upload color="#fff" size={18} /> : <Cloud color="#fff" size={18} />}
+            <Text style={[typography.labelMedium, { color: '#fff', marginLeft: spacing.sm }]}>
+              {driveConnected ? 'Upload Photos' : 'Connect Google Drive'}
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -272,6 +299,11 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
             </View>
           </View>
         )}
+      </Modal>
+
+      {/* Connect Drive Modal */}
+      <Modal visible={showConnectDrive} animationType="slide" presentationStyle="fullScreen">
+        <ConnectDriveScreen onClose={() => { setShowConnectDrive(false); checkDriveConnection(); }} />
       </Modal>
     </SafeAreaView>
   );

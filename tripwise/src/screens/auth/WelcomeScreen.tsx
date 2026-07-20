@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, Easing } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, Easing, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../navigation/types';
@@ -99,7 +99,10 @@ export function WelcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+    ...(Platform.OS === 'web' ? { minHeight: '100vh' } : {}),
+  } as any,
   orb1: {
     position: 'absolute', width: 360, height: 360, borderRadius: 180,
     backgroundColor: 'rgba(59,130,246,0.07)', top: -80, right: -100,

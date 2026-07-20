@@ -25,6 +25,7 @@ interface ChatState {
   fetchMessages: (tripId: string) => Promise<void>;
   sendMessage: (tripId: string, content: string, replyTo?: string) => Promise<void>;
   deleteMessage: (messageId: string, tripId: string) => Promise<void>;
+  deleteForEveryone: (messageId: string, tripId: string) => Promise<void>;
   pinMessage: (messageId: string, pinned: boolean, tripId: string) => Promise<void>;
   subscribeToChatRealtime: (tripId: string) => () => void;
 }
@@ -111,7 +112,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', messageId);
 
-    await get().fetchMessages(tripId);
+    // Remove from local state immediately
+    set((state) => ({
+      messages: state.messages.filter((m) => m.id !== messageId),
+    }));
+  },
+
+  deleteForEveryone: async (messageId: string, tripId: string) => {
+    // Permanently delete the message for all participants
+    await supabase
+      .from('messages')
+      .delete()
+      .eq('id', messageId);
+
+    // Remove from local state immediately
+    set((state) => ({
+      messages: state.messages.filter((m) => m.id !== messageId),
+    }));
   },
 
   pinMessage: async (messageId: string, pinned: boolean, tripId: string) => {

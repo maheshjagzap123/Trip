@@ -1,23 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Modal, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
+import { supabase } from '../../lib/supabase';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import type { ThemeMode } from '../../stores/themeStore';
 import { EditProfileScreen } from './EditProfileScreen';
 import { PersonalDocumentsScreen } from '../documents/PersonalDocumentsScreen';
 import { SupportScreen } from '../support/SupportScreen';
 import { ConnectDriveScreen } from '../cloud/ConnectDriveScreen';
-import { Mail, MapPin, Settings, Moon, Sun, Monitor, ChevronRight, LogOut, Info, Bell, Shield, ArrowLeft, UserPen, FileText, HelpCircle, Cloud } from 'lucide-react-native';
+import { Mail, MapPin, Settings, Moon, Sun, Monitor, ChevronRight, LogOut, Info, Shield, ArrowLeft, UserPen, FileText, HelpCircle, Cloud, Trash2 } from 'lucide-react-native';
+import { TermsOfServiceScreen } from '../auth/TermsOfServiceScreen';
+import { PrivacyPolicyScreen } from '../auth/PrivacyPolicyScreen';
 
 export function ProfileScreen() {
-  const { profile, user } = useAuthStore();
+  const { profile, user, fetchProfile } = useAuthStore();
   const colors = useThemeColors();
   const [showSettings, setShowSettings] = useState(false);
 
   const initials = `${profile?.first_name?.[0] || ''}${profile?.last_name?.[0] || ''}`.toUpperCase() || '?';
+
+  // Re-fetch profile when settings modal closes to pick up avatar/profile changes
+  const handleSettingsClose = useCallback(() => {
+    setShowSettings(false);
+    fetchProfile();
+  }, [fetchProfile]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
@@ -28,9 +38,17 @@ export function ProfileScreen() {
             colors={[colors.primary, colors.secondary]}
             style={styles.avatarRing}
           >
-            <View style={[styles.avatarInner, { backgroundColor: colors.background }]}>
-              <Text style={[styles.avatarTxt, { color: colors.primary }]}>{initials}</Text>
-            </View>
+            {profile?.avatar_url ? (
+              <Image
+                source={{ uri: profile.avatar_url }}
+                style={styles.avatarImage}
+                contentFit="cover"
+              />
+            ) : (
+              <View style={[styles.avatarInner, { backgroundColor: colors.background }]}>
+                <Text style={[styles.avatarTxt, { color: colors.primary }]}>{initials}</Text>
+              </View>
+            )}
           </LinearGradient>
           <Text style={[typography.h1, { color: colors.textPrimary, marginTop: spacing.md }]}>
             {profile?.display_name || 'Traveler'}
@@ -103,7 +121,7 @@ export function ProfileScreen() {
 
       {/* Settings Modal */}
       <Modal visible={showSettings} animationType="slide" presentationStyle="fullScreen">
-        <SettingsPage onClose={() => setShowSettings(false)} />
+        <SettingsPage onClose={handleSettingsClose} />
       </Modal>
     </SafeAreaView>
   );
@@ -121,6 +139,9 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
   const [showDocuments, setShowDocuments] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const [showCloud, setShowCloud] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
@@ -134,6 +155,58 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
         { text: 'Cancel', style: 'cancel' },
         { text: 'Sign Out', style: 'destructive', onPress: () => { signOut(); onClose(); } },
       ]);
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    const performDelete = async () => {
+      setDeleting(true);
+      try {
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        if (!currentUser) return;
+
+        // Soft delete: mark profile as deleted (retains data for recovery)
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            deleted_at: new Date().toISOString(),
+            display_name: '[Deleted User]',
+            profile_completed: false,
+          })
+          .eq('id', currentUser.id);
+
+        if (error) {
+          const msg = 'Failed to delete account. Please try again or contact support.';
+          Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Error', msg);
+          return;
+        }
+
+        // Sign out after soft delete
+        await signOut();
+        onClose();
+      } catch {
+        const msg = 'Something went wrong. Please contact support.';
+        Platform.OS === 'web' ? window.alert(msg) : Alert.alert('Error', msg);
+      } finally {
+        setDeleting(false);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(
+        'Delete your account?\n\nYour account will be deactivated and your data will be hidden. ' +
+        'You can contact support within 30 days to recover your account. After that, data may be permanently removed.'
+      );
+      if (confirmed) performDelete();
+    } else {
+      Alert.alert(
+        'Delete Account',
+        'Your account will be deactivated and your data will be hidden. You can contact support within 30 days to recover your account. After that, data may be permanently removed.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Delete', style: 'destructive', onPress: performDelete },
+        ]
+      );
     }
   };
 
@@ -185,8 +258,8 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
           <SettingRow icon={<UserPen size={18} color={colors.textTertiary} />} label="Edit Profile" onPress={() => setShowEditProfile(true)} colors={colors} />
           <SettingRow icon={<FileText size={18} color={colors.textTertiary} />} label="My Documents" onPress={() => setShowDocuments(true)} colors={colors} />
           <SettingRow icon={<Cloud size={18} color={colors.textTertiary} />} label="Cloud Storage" onPress={() => setShowCloud(true)} colors={colors} />
-          <SettingRow icon={<Bell size={18} color={colors.textTertiary} />} label="Notifications" value="Coming soon" colors={colors} />
-          <SettingRow icon={<Shield size={18} color={colors.textTertiary} />} label="Privacy & Security" value="Coming soon" colors={colors} last />
+          <SettingRow icon={<Shield size={18} color={colors.textTertiary} />} label="Privacy Policy" onPress={() => setShowPrivacy(true)} colors={colors} />
+          <SettingRow icon={<FileText size={18} color={colors.textTertiary} />} label="Terms of Service" onPress={() => setShowTerms(true)} colors={colors} />
           <SettingRow icon={<HelpCircle size={18} color={colors.textTertiary} />} label="Help & Support" onPress={() => setShowSupport(true)} colors={colors} last />
         </View>
 
@@ -205,6 +278,22 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
           <LogOut size={18} color={colors.error} />
           <Text style={[typography.labelLarge, { color: colors.error, marginLeft: spacing.sm }]}>Sign Out</Text>
         </TouchableOpacity>
+
+        {/* Delete Account */}
+        <TouchableOpacity
+          style={[styles.deleteBtn, { borderColor: colors.error + '20' }]}
+          onPress={handleDeleteAccount}
+          activeOpacity={0.8}
+          disabled={deleting}
+        >
+          <Trash2 size={16} color={colors.error} />
+          <Text style={[styles.deleteBtnTxt, { color: colors.error }]}>
+            {deleting ? 'Deleting...' : 'Delete Account'}
+          </Text>
+        </TouchableOpacity>
+        <Text style={[styles.deleteHint, { color: colors.textTertiary }]}>
+          Your data will be deactivated. Contact support within 30 days to recover.
+        </Text>
       </ScrollView>
 
       {/* Modals */}
@@ -219,6 +308,12 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
       </Modal>
       <Modal visible={showCloud} animationType="slide" presentationStyle="fullScreen">
         <ConnectDriveScreen onClose={() => setShowCloud(false)} />
+      </Modal>
+      <Modal visible={showTerms} animationType="slide" presentationStyle="fullScreen">
+        <TermsOfServiceScreen onClose={() => setShowTerms(false)} />
+      </Modal>
+      <Modal visible={showPrivacy} animationType="slide" presentationStyle="fullScreen">
+        <PrivacyPolicyScreen onClose={() => setShowPrivacy(false)} />
       </Modal>
     </SafeAreaView>
   );
@@ -254,6 +349,7 @@ const styles = StyleSheet.create({
     width: 96, height: 96, borderRadius: 48, padding: 3,
     ...shadows.brand,
   },
+  avatarImage: { width: 90, height: 90, borderRadius: 45 },
   avatarInner: { flex: 1, borderRadius: 45, justifyContent: 'center', alignItems: 'center' },
   avatarTxt: { fontSize: 30, fontWeight: '800' },
   card: { borderRadius: borderRadius.xl, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1 },
@@ -276,4 +372,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     height: 52, borderRadius: borderRadius.lg, borderWidth: 1.5, marginTop: spacing.sm,
   },
+  deleteBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    height: 44, borderRadius: borderRadius.lg, borderWidth: 1,
+    marginTop: spacing.md,
+  },
+  deleteBtnTxt: { fontSize: 13, fontWeight: '600', marginLeft: spacing.xs },
+  deleteHint: { fontSize: 11, textAlign: 'center', marginTop: spacing.xs, lineHeight: 16 },
 });

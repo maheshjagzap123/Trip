@@ -107,13 +107,14 @@ export function ConnectDriveScreen({ onClose }: Props) {
       });
       const userInfo = await userInfoRes.json();
 
-      // Store in Supabase
+      // Store in Supabase — use a far-future expiry so token persists
+      // until user manually disconnects or Google rejects it
       await supabase.from('cloud_connections').upsert({
         user_id: user.id,
         provider: 'google_drive',
         access_token: accessToken,
         provider_email: userInfo.email,
-        expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
+        expires_at: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
       }, { onConflict: 'user_id,provider' });
 
       // Create TripWise folder

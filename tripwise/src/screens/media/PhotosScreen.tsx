@@ -99,7 +99,31 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
       try {
         await uploadMedia(tripId, asset.uri, fileName, mimeType);
       } catch (err: any) {
-        showAlert('Upload Failed', err.message);
+        if (err.message === 'DRIVE_TOKEN_EXPIRED' || err.message === 'DRIVE_NOT_CONNECTED') {
+          const msg = err.message === 'DRIVE_TOKEN_EXPIRED'
+            ? 'Your Google Drive session has expired. Please reconnect your Drive.'
+            : 'Google Drive is not connected. Please connect your Drive to upload photos.';
+
+          if (Platform.OS === 'web') {
+            window.alert(msg);
+          } else {
+            Alert.alert(
+              'Drive Connection Required',
+              msg,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Connect Drive', onPress: () => setShowConnectDrive(true) },
+              ]
+            );
+          }
+          // If on web, also open the connect drive screen
+          if (Platform.OS === 'web') {
+            setShowConnectDrive(true);
+          }
+          break; // Stop processing remaining photos
+        } else {
+          showAlert('Upload Failed', err.message);
+        }
       }
     }
   };

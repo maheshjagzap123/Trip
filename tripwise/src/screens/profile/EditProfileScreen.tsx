@@ -91,6 +91,8 @@ export function EditProfileScreen({ onClose }: Props) {
       // Update profile
       await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
       setAvatarUri(publicUrl);
+      // Refresh the auth store so profile screen picks up the new avatar
+      await fetchProfile();
     } catch (err: any) {
       showAlert('Error', err.message || 'Upload failed');
     } finally {

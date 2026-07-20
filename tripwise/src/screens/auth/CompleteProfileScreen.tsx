@@ -22,6 +22,8 @@ export function CompleteProfileScreen() {
   const [lastName, setLastName] = useState('');
   const [homeCity, setHomeCity] = useState('');
   const [gender, setGender] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState('');
@@ -39,8 +41,18 @@ export function CompleteProfileScreen() {
   const toggleInterest = (i: string) =>
     setSelectedInterests((p) => p.includes(i) ? p.filter((x) => x !== i) : [...p, i]);
 
+  const validatePhone = (p: string) => {
+    const digits = p.replace(/\D/g, '');
+    if (!digits) return 'Mobile number is required';
+    if (digits.length !== 10) return 'Enter a valid 10-digit mobile number';
+    if (!/^[6-9]/.test(digits)) return 'Enter a valid Indian mobile number';
+    return '';
+  };
+
   const handleSave = async () => {
     if (!firstName.trim()) { Alert.alert('Required', 'Please enter your first name.'); return; }
+    const pErr = validatePhone(phoneNumber);
+    if (pErr) { setPhoneError(pErr); return; }
     if (!user) return;
     setIsLoading(true);
     try {
@@ -51,6 +63,7 @@ export function CompleteProfileScreen() {
         home_city: homeCity.trim() || null,
         gender: gender || null,
         travel_interests: selectedInterests,
+        phone_number: phoneNumber.replace(/\D/g, ''),
         profile_completed: true,
       }).eq('id', user.id);
       if (error) { Alert.alert('Error', error.message); return; }
@@ -110,6 +123,28 @@ export function CompleteProfileScreen() {
                   onBlur={() => setFocusedField('')}
                 />
               </View>
+            </View>
+
+            {/* Phone */}
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>MOBILE NUMBER *</Text>
+              <View style={[inputStyle('phone'), { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }]}>
+                <Text style={{ color: 'rgba(255,255,255,0.5)', marginRight: 6, fontSize: 15 }}>+91</Text>
+                <TextInput
+                  style={{ flex: 1, height: 52, fontSize: 15, color: '#FFFFFF', fontWeight: '500' }}
+                  placeholder="9876543210"
+                  placeholderTextColor="rgba(255,255,255,0.28)"
+                  value={phoneNumber}
+                  onChangeText={(t) => { setPhoneNumber(t); if (phoneError) setPhoneError(''); }}
+                  keyboardType="phone-pad"
+                  maxLength={10}
+                  onFocus={() => setFocusedField('phone')}
+                  onBlur={() => setFocusedField('')}
+                />
+              </View>
+              {phoneError ? (
+                <Text style={{ color: '#FB7185', fontSize: 12, marginTop: 6 }}>{phoneError}</Text>
+              ) : null}
             </View>
 
             {/* City */}

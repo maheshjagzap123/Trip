@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Bell, UserPlus, MessageCircle, Check } from 'lucide-react-native';
+import { ArrowLeft, Bell, UserPlus, MessageCircle, Check, CreditCard } from 'lucide-react-native';
 import { format, formatDistanceToNow } from 'date-fns';
 
 interface Notification {
@@ -80,6 +80,9 @@ export function NotificationsScreen({ onClose }: Props) {
       case 'trip_invite': return <UserPlus size={18} color={colors.primary} />;
       case 'trip_accepted': return <Check size={18} color={colors.success} />;
       case 'new_message': return <MessageCircle size={18} color="#F59E0B" />;
+      case 'settlement_confirm_request': return <CreditCard size={18} color="#D97706" />;
+      case 'settlement_confirmed': return <Check size={18} color={colors.success} />;
+      case 'settlement_disputed': return <CreditCard size={18} color={colors.error} />;
       default: return <Bell size={18} color={colors.textTertiary} />;
     }
   };

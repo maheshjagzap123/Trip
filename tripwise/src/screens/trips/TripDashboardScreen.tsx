@@ -274,6 +274,19 @@ export function TripDashboardScreen() {
             <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>Your Trips</Text>
           </View>
 
+          {/* Search */}
+          <View style={[styles.searchBox, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+            <Search size={16} color={colors.textTertiary} />
+            <TextInput
+              style={[styles.searchInput, { color: colors.textPrimary }]}
+              placeholder="Search trips..."
+              placeholderTextColor={colors.textTertiary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+
+          {/* Filter chips */}
           <View style={styles.filterRow}>
             {['All', 'Planning', 'Active', 'Completed'].map((s) => (
               <TouchableOpacity
@@ -293,16 +306,6 @@ export function TripDashboardScreen() {
                 ]}>{s}</Text>
               </TouchableOpacity>
             ))}
-            <View style={[styles.miniSearchBox, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
-              <TextInput
-                style={[styles.miniSearchInput, { color: colors.textPrimary }]}
-                placeholder="Search..."
-                placeholderTextColor={colors.textTertiary}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-              <Search size={14} color={colors.textTertiary} />
-            </View>
           </View>
         </View>
       )}
@@ -501,25 +504,23 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.sm },
 
   // Search & Filter
-  miniSearchBox: {
-    flex: 1,
+  searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: borderRadius.full,
+    borderRadius: borderRadius.md,
     paddingHorizontal: spacing.sm + 2,
-    height: 34,
-    minWidth: 80,
-    gap: 4,
+    height: 42,
+    marginBottom: spacing.sm,
+    gap: spacing.xs,
   },
-  miniSearchInput: {
+  searchInput: {
     flex: 1,
-    fontSize: 13,
-    height: 34,
+    fontSize: 14,
+    height: 42,
     paddingVertical: 0,
-    outlineStyle: 'none',
   } as any,
-  filterRow: { flexDirection: 'row', gap: spacing.xs, marginBottom: spacing.md, alignItems: 'center' },
+  filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginBottom: spacing.md, alignItems: 'center' },
   filterChip: {
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.full, borderWidth: 1,

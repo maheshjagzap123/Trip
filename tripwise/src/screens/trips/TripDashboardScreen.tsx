@@ -15,7 +15,7 @@ import { TripDetailScreen } from './TripDetailScreen';
 import { AddExpenseScreen } from '../expenses/AddExpenseScreen';
 import { ChatScreen } from '../chat/ChatScreen';
 import { NotificationsScreen } from '../notifications/NotificationsScreen';
-import { Plus, MapPin, Calendar, Zap, MessageCircle, Bell, Search, X } from 'lucide-react-native';
+import { Plus, MapPin, Calendar, Zap, MessageCircle, Bell, Search } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
@@ -40,7 +40,6 @@ export function TripDashboardScreen() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [tripExpenses, setTripExpenses] = useState<Record<string, number>>({});
   const [myShares, setMyShares] = useState<Record<string, number>>({});
@@ -273,21 +272,7 @@ export function TripDashboardScreen() {
         <View style={{ marginTop: spacing.sm }}>
           <View style={styles.sectionHeader}>
             <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>Your Trips</Text>
-            <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
-              {showSearch ? <X size={18} color={colors.textTertiary} /> : <Search size={18} color={colors.textTertiary} />}
-            </TouchableOpacity>
           </View>
-
-          {showSearch && (
-            <TextInput
-              style={[styles.searchInput, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-              placeholder="Search trips..."
-              placeholderTextColor={colors.textTertiary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              autoFocus
-            />
-          )}
 
           <View style={styles.filterRow}>
             {['All', 'Planning', 'Active', 'Completed'].map((s) => (
@@ -308,6 +293,16 @@ export function TripDashboardScreen() {
                 ]}>{s}</Text>
               </TouchableOpacity>
             ))}
+            <View style={[styles.miniSearchBox, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+              <TextInput
+                style={[styles.miniSearchInput, { color: colors.textPrimary }]}
+                placeholder="Search..."
+                placeholderTextColor={colors.textTertiary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              <Search size={14} color={colors.textTertiary} />
+            </View>
           </View>
         </View>
       )}
@@ -506,11 +501,24 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.sm },
 
   // Search & Filter
-  searchInput: {
-    height: 42, borderWidth: 1, borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md, fontSize: 14, marginBottom: spacing.sm,
+  miniSearchBox: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.sm + 2,
+    height: 34,
+    minWidth: 80,
+    gap: 4,
   },
-  filterRow: { flexDirection: 'row', gap: spacing.xs, marginBottom: spacing.md, flexWrap: 'wrap' },
+  miniSearchInput: {
+    flex: 1,
+    fontSize: 13,
+    height: 34,
+    paddingVertical: 0,
+  },
+  filterRow: { flexDirection: 'row', gap: spacing.xs, marginBottom: spacing.md, alignItems: 'center' },
   filterChip: {
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.full, borderWidth: 1,

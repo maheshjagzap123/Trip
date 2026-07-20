@@ -35,7 +35,6 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition>({ x: 0, y: 0 });
-  const [searchVisible, setSearchVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -395,36 +394,25 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             Trip Chat • {messages.length} messages
           </Text>
         </View>
-        <TouchableOpacity
-          onPress={() => { setSearchVisible(!searchVisible); if (searchVisible) setSearchText(''); }}
-          style={styles.headerBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          accessibilityLabel="Search messages"
-        >
-          {searchVisible ? <X color={colors.textPrimary} size={20} /> : <Search color={colors.textPrimary} size={20} />}
-        </TouchableOpacity>
       </View>
 
-      {/* Search Bar */}
-      {searchVisible && (
-        <View style={[styles.searchBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          <Search size={16} color={colors.textTertiary} />
-          <TextInput
-            style={[styles.searchInput, { color: colors.textPrimary }]}
-            placeholder="Search messages..."
-            placeholderTextColor={colors.textTertiary}
-            value={searchText}
-            onChangeText={setSearchText}
-            autoFocus
-            returnKeyType="search"
-          />
-          {searchText.length > 0 && (
-            <Text style={[typography.caption, { color: colors.textTertiary }]}>
-              {filteredMessages.length} found
-            </Text>
-          )}
-        </View>
-      )}
+      {/* Search Bar - always visible */}
+      <View style={[styles.searchBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <Search size={16} color={colors.textTertiary} />
+        <TextInput
+          style={[styles.searchInput, { color: colors.textPrimary }]}
+          placeholder="Search messages..."
+          placeholderTextColor={colors.textTertiary}
+          value={searchText}
+          onChangeText={setSearchText}
+          returnKeyType="search"
+        />
+        {searchText.length > 0 && (
+          <Text style={[typography.caption, { color: colors.textTertiary }]}>
+            {filteredMessages.length} found
+          </Text>
+        )}
+      </View>
 
       {/* Pinned messages banner */}
       {pinnedMessages.length > 0 && (

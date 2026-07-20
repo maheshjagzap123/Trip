@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  FlatList, TextInput, Modal, Platform, Alert,
+  FlatList, TextInput, Modal, Platform, Alert, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -37,6 +37,15 @@ export function TimelineScreen({ tripId, tripName, onClose }: Props) {
   useEffect(() => {
     fetchTimeline();
   }, [tripId]);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   const fetchTimeline = async () => {
     setIsLoading(true);

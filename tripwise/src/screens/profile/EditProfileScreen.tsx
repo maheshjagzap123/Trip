@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, SafeAreaView, Alert, Platform, ActivityIndicator,
+  ScrollView, SafeAreaView, Alert, Platform, ActivityIndicator, BackHandler,
 } from 'react-native';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
@@ -32,6 +32,15 @@ export function EditProfileScreen({ onClose }: Props) {
   const [avatarUri, setAvatarUri] = useState<string | null>(profile?.avatar_url || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   const showAlert = (title: string, msg: string) => {
     Platform.OS === 'web' ? window.alert(`${title}: ${msg}`) : Alert.alert(title, msg);

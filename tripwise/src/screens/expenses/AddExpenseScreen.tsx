@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, SafeAreaView, Alert, Platform,
+  ScrollView, SafeAreaView, Alert, Platform, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -40,6 +40,15 @@ export function AddExpenseScreen({ tripId, onClose }: Props) {
   useEffect(() => {
     fetchMembers();
   }, []);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   const fetchMembers = async () => {
     const { data } = await supabase.rpc('get_trip_members', { p_trip_id: tripId });

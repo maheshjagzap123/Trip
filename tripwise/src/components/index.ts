@@ -17,6 +17,6 @@ export {
 } from './ui';
 
 export { AnimatedPressable } from './AnimatedPressable';
-export { ScreenWrapper, useScreenInsets } from './ScreenWrapper';
+export { ScreenWrapper, useScreenInsets, useBackHandler } from './ScreenWrapper';
 export { ToastContainer, useToastStore, toast } from './Toast';
 export { BottomSheet } from './BottomSheet';

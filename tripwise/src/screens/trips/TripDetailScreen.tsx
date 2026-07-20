@@ -10,6 +10,7 @@ import {
   Alert,
   Platform,
   Modal,
+  BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
@@ -59,6 +60,15 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   useEffect(() => {
     fetchTripDetail();
   }, [tripId]);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   const fetchTripDetail = async () => {
     setIsLoading(true);
@@ -193,8 +203,29 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   if (isLoading || !trip) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-        <View style={styles.loading}>
-          <Text style={[typography.bodyMedium, { color: colors.textSecondary }]}>Loading...</Text>
+        <View style={[styles.header, { borderBottomColor: colors.border }]}>
+          <TouchableOpacity onPress={onClose} accessibilityLabel="Back" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} style={{ padding: spacing.xs }}>
+            <ArrowLeft color={colors.textPrimary} size={22} />
+          </TouchableOpacity>
+          <View style={{ flex: 1, marginLeft: spacing.md }}>
+            <View style={{ width: 140, height: 18, backgroundColor: colors.skeletonBase, borderRadius: 6 }} />
+          </View>
+        </View>
+        <View style={styles.content}>
+          <View style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+            <View style={{ width: '70%', height: 22, backgroundColor: colors.skeletonBase, borderRadius: 6, marginBottom: 16 }} />
+            <View style={{ width: '50%', height: 14, backgroundColor: colors.skeletonBase, borderRadius: 6, marginBottom: 12 }} />
+            <View style={{ width: '60%', height: 14, backgroundColor: colors.skeletonBase, borderRadius: 6, marginBottom: 12 }} />
+            <View style={{ width: '40%', height: 14, backgroundColor: colors.skeletonBase, borderRadius: 6 }} />
+          </View>
+          <View style={styles.actionsGrid}>
+            {[1, 2, 3, 4].map((i) => (
+              <View key={i} style={[styles.actionCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}>
+                <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colors.skeletonBase }} />
+                <View style={{ width: 50, height: 12, backgroundColor: colors.skeletonBase, borderRadius: 4, marginTop: 10 }} />
+              </View>
+            ))}
+          </View>
         </View>
       </SafeAreaView>
     );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,15 @@ import {
   ScrollView,
   SafeAreaView,
   Platform,
+  BackHandler,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
+import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { useTripStore } from '../../stores/tripStore';
 import { ArrowLeft, Plus, X, UserPlus } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const TRIP_TYPES = ['Friends', 'Family', 'Couple', 'Solo', 'Office', 'Adventure', 'Pilgrimage'];
 
@@ -33,6 +35,15 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
   const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const [emailInput, setEmailInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Handle Android back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   const showAlert = (title: string, message: string) => {
     if (Platform.OS === 'web') {
@@ -265,16 +276,23 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
 
         {/* Create Button */}
         <TouchableOpacity
-          style={[styles.createButton, { backgroundColor: colors.primary, opacity: isLoading ? 0.6 : 1 }]}
+          style={[styles.createButton, { opacity: isLoading ? 0.6 : 1 }]}
           onPress={handleCreate}
           disabled={isLoading}
-          activeOpacity={0.8}
+          activeOpacity={0.88}
           accessibilityRole="button"
           accessibilityLabel="Create trip"
         >
-          <Text style={[typography.labelLarge, { color: colors.textInverse }]}>
-            {isLoading ? 'Creating...' : 'Create Trip'}
-          </Text>
+          <LinearGradient
+            colors={['#3B82F6', '#6366F1']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.createButtonGradient}
+          >
+            <Text style={[typography.buttonLarge, { color: '#fff' }]}>
+              {isLoading ? 'Creating...' : 'Create Trip →'}
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -351,10 +369,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   createButton: {
-    height: 52,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    marginTop: spacing.md,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
+  },
+  createButtonGradient: {
+    height: 56,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: spacing.md,
   },
 });

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
   FlatList, Dimensions, Modal, Platform, Alert, ActivityIndicator,
-  useWindowDimensions,
+  useWindowDimensions, BackHandler,
 } from 'react-native';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
@@ -41,6 +41,19 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
     const unsub = subscribeToMedia(tripId);
     return unsub;
   }, [tripId]);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (selectedImage) {
+        setSelectedImage(null);
+        return true;
+      }
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose, selectedImage]);
 
   const checkDriveConnection = async () => {
     const { data: { user: u } } = await supabase.auth.getUser();

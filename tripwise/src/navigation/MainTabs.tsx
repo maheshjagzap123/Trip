@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BlurView } from 'expo-blur';
 import type { MainTabsParamList } from './types';
 import { TripDashboardScreen } from '../screens/trips/TripDashboardScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { AnalyticsScreen } from '../screens/analytics/AnalyticsScreen';
 import { Map, User, BarChart3 } from 'lucide-react-native';
 import { useThemeColors, spacing, shadows } from '../theme';
+import { useThemeStore } from '../stores/themeStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator<MainTabsParamList>();
@@ -24,7 +26,9 @@ function TabIcon({ icon, focused, activeColor }: { icon: React.ReactNode; focuse
 
 export function MainTabs() {
   const colors = useThemeColors();
+  const { resolvedScheme } = useThemeStore();
   const insets = useSafeAreaInsets();
+  const isDark = resolvedScheme === 'dark';
 
   const tabBarHeight = Platform.OS === 'ios' ? 52 + insets.bottom : 60;
 
@@ -34,8 +38,19 @@ export function MainTabs() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textTertiary,
+        tabBarBackground: () =>
+          Platform.OS === 'ios' ? (
+            <BlurView
+              intensity={80}
+              tint={isDark ? 'dark' : 'light'}
+              style={StyleSheet.absoluteFill}
+            />
+          ) : (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.tabBarBackground }]} />
+          ),
         tabBarStyle: {
-          backgroundColor: colors.tabBarBackground,
+          position: Platform.OS === 'ios' ? 'absolute' : 'relative',
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : colors.tabBarBackground,
           borderTopColor: colors.tabBarBorder,
           borderTopWidth: StyleSheet.hairlineWidth,
           height: tabBarHeight,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity,
   FlatList, Animated, Dimensions, Easing, Platform, RefreshControl,
@@ -205,7 +205,7 @@ export function TripDashboardScreen() {
     );
   };
 
-  const ListHeader = () => (
+  const ListHeader = useMemo(() => (
     <View>
       {/* Greeting */}
       <View style={styles.greeting}>
@@ -307,7 +307,7 @@ export function TripDashboardScreen() {
         </View>
       )}
     </View>
-  );
+  ), [colors, profile, unreadCount, trips, invitations, totalSpent, statusFilter, searchQuery]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -316,7 +316,7 @@ export function TripDashboardScreen() {
           data={filteredTrips}
           keyExtractor={(item) => item.id}
           renderItem={renderTripCard}
-          ListHeaderComponent={ListHeader}
+          ListHeaderComponent={<>{ListHeader}</>}
           ListEmptyComponent={
             <View style={styles.empty}>
               <View style={[styles.emptyIconWrap, { backgroundColor: colors.primaryLight }]}>
@@ -517,7 +517,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     height: 34,
     paddingVertical: 0,
-  },
+    outlineStyle: 'none',
+  } as any,
   filterRow: { flexDirection: 'row', gap: spacing.xs, marginBottom: spacing.md, alignItems: 'center' },
   filterChip: {
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2,

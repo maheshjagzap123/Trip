@@ -184,7 +184,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={onClose} style={styles.headerBtn}>
+        <TouchableOpacity onPress={onClose} style={styles.headerBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} accessibilityLabel="Go back">
           <ArrowLeft color={colors.textPrimary} size={22} />
         </TouchableOpacity>
         <View style={{ flex: 1, marginLeft: spacing.sm }}>
@@ -210,8 +210,8 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
       {/* Messages */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={90}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <FlatList
           ref={flatListRef}
@@ -306,6 +306,6 @@ const styles = StyleSheet.create({
   replyBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: 8, borderLeftWidth: 3, marginHorizontal: spacing.sm, borderRadius: 4 },
   replyBarName: { fontSize: 12, fontWeight: '700' },
   replyBarContent: { fontSize: 13 },
-  input: { flex: 1, minHeight: 40, maxHeight: 120, borderWidth: 1, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15 },
-  sendBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  input: { flex: 1, minHeight: 42, maxHeight: 120, borderWidth: 1, borderRadius: 22, paddingHorizontal: 16, paddingVertical: Platform.OS === 'ios' ? 10 : 8, fontSize: 15 },
+  sendBtn: { width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center' },
 });

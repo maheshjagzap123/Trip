@@ -80,10 +80,28 @@ export const useTripStore = create<TripState>((set, get) => ({
       const { data: trips } = await supabase
         .from('trips')
         .select('*')
-        .in('id', tripIds)
-        .order('start_date', { ascending: false });
+        .in('id', tripIds);
 
-      set({ trips: trips || [], isLoading: false });
+      const today = new Date().toISOString().slice(0, 10);
+      const statusOrder: Record<string, number> = { Active: 0, Planning: 1, Completed: 2 };
+
+      const tripsWithStatus = (trips || [])
+        .map((trip) => ({
+          ...trip,
+          status:
+            trip.end_date < today
+              ? 'Completed'
+              : trip.start_date <= today && trip.end_date >= today
+              ? 'Active'
+              : 'Planning',
+        }))
+        .sort((a, b) => {
+          const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+          if (statusDiff !== 0) return statusDiff;
+          return a.start_date.localeCompare(b.start_date);
+        });
+
+      set({ trips: tripsWithStatus, isLoading: false });
     } catch {
       set({ isLoading: false });
     }

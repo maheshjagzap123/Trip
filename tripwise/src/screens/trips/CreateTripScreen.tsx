@@ -109,8 +109,8 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={onClose} accessibilityLabel="Close">
-          <ArrowLeft color={colors.textPrimary} size={24} />
+        <TouchableOpacity onPress={onClose} accessibilityLabel="Close" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <ArrowLeft color={colors.textPrimary} size={22} />
         </TouchableOpacity>
         <Text style={[typography.h3, { color: colors.textPrimary }]}>Create Trip</Text>
         <View style={{ width: 24 }} />

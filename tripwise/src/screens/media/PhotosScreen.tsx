@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     borderBottomWidth: 1,
   },
-  headerBtn: { padding: spacing.xs },
+  headerBtn: { padding: spacing.xs + 2 },
   headerUploadBtn: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 12, paddingVertical: 6,

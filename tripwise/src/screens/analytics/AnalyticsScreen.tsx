@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
+import { View, Text, StyleSheet, ScrollView, Dimensions, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
-import { TrendingUp, Wallet, Tag, Map } from 'lucide-react-native';
+import { TrendingUp, Wallet, Tag, Map, BarChart3 } from 'lucide-react-native';
+
+const { width: SCREEN_W } = Dimensions.get('window');
+const CARD_WIDTH = (SCREEN_W - spacing.lg * 2 - spacing.sm) / 2;
 
 interface Analytics {
   total_trips: number;
@@ -17,6 +22,7 @@ export function AnalyticsScreen() {
   const colors = useThemeColors();
   const { user } = useAuthStore();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (user) fetchAnalytics();
@@ -30,53 +36,108 @@ export function AnalyticsScreen() {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchAnalytics();
+    setRefreshing(false);
+  };
+
+  const stats = [
+    {
+      icon: <Map size={22} color={colors.success} />,
+      value: String(analytics?.total_trips || 0),
+      label: 'Total Trips',
+      gradient: [colors.success + '20', colors.success + '08'] as [string, string],
+    },
+    {
+      icon: <Wallet size={22} color={colors.warning} />,
+      value: `₹${(analytics?.total_spent || 0).toLocaleString()}`,
+      label: 'Total Spent',
+      gradient: [colors.warning + '20', colors.warning + '08'] as [string, string],
+    },
+    {
+      icon: <TrendingUp size={22} color={colors.primary} />,
+      value: `₹${(analytics?.total_owed || 0).toLocaleString()}`,
+      label: 'Total Paid',
+      gradient: [colors.primary + '20', colors.primary + '08'] as [string, string],
+    },
+    {
+      icon: <Tag size={22} color="#EC4899" />,
+      value: analytics?.top_category || 'N/A',
+      label: 'Top Category',
+      gradient: ['rgba(236,72,153,0.2)', 'rgba(236,72,153,0.08)'] as [string, string],
+    },
+  ];
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[typography.h2, { color: colors.textPrimary, marginBottom: spacing.lg }]}>
-          Your Travel Stats
-        </Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} colors={[colors.primary]} />
+        }
+      >
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <View style={[styles.headerIcon, { backgroundColor: colors.primaryLight }]}>
+            <BarChart3 size={24} color={colors.primary} />
+          </View>
+          <Text style={[typography.h1, { color: colors.textPrimary, marginTop: spacing.md }]}>
+            Your Travel Stats
+          </Text>
+          <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.xs }]}>
+            Insights from all your trips
+          </Text>
+        </View>
 
         {/* Stats Grid */}
         <View style={styles.grid}>
-          <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Map size={22} color="#00C896" />
-            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
-              {analytics?.total_trips || 0}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Total Trips</Text>
-          </View>
-
-          <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Wallet size={22} color="#F59E0B" />
-            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
-              ₹{(analytics?.total_spent || 0).toLocaleString()}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Total Spent</Text>
-          </View>
-
-          <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <TrendingUp size={22} color="#6366F1" />
-            <Text style={[styles.statValue, { color: colors.textPrimary }]}>
-              ₹{(analytics?.total_owed || 0).toLocaleString()}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Total Paid</Text>
-          </View>
-
-          <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Tag size={22} color="#EC4899" />
-            <Text style={[styles.statValue, { color: colors.textPrimary }]} numberOfLines={1}>
-              {analytics?.top_category || 'N/A'}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.textTertiary }]}>Top Category</Text>
-          </View>
+          {stats.map((stat, i) => (
+            <View
+              key={i}
+              style={[styles.statCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }, shadows.card]}
+            >
+              <LinearGradient
+                colors={stat.gradient}
+                style={styles.statIconBg}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                {stat.icon}
+              </LinearGradient>
+              <Text
+                style={[typography.numberMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {stat.value}
+              </Text>
+              <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]}>
+                {stat.label}
+              </Text>
+            </View>
+          ))}
         </View>
 
-        {/* Info */}
-        <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[typography.bodyMedium, { color: colors.textSecondary, textAlign: 'center' }]}>
-            More detailed analytics (charts, trends, comparisons) coming in future updates!
-          </Text>
+        {/* Coming Soon Card */}
+        <View style={[styles.comingSoonCard, { backgroundColor: colors.surface, borderColor: colors.borderLight }, shadows.card]}>
+          <LinearGradient
+            colors={[colors.primary + '15', colors.secondary + '10']}
+            style={styles.comingSoonBg}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.comingSoonInner}>
+              <Text style={{ fontSize: 36 }}>📊</Text>
+              <Text style={[typography.h3, { color: colors.textPrimary, marginTop: spacing.md, textAlign: 'center' }]}>
+                More Insights Coming
+              </Text>
+              <Text style={[typography.bodySmall, { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs, maxWidth: 260 }]}>
+                Interactive charts, spending trends, monthly comparisons, and trip summaries are on the way.
+              </Text>
+            </View>
+          </LinearGradient>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -85,10 +146,36 @@ export function AnalyticsScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  statCard: { width: '48%', padding: spacing.md, borderRadius: borderRadius.lg, borderWidth: 1, alignItems: 'center', gap: spacing.xs },
-  statValue: { fontSize: 22, fontWeight: '800', marginTop: spacing.xs },
-  statLabel: { fontSize: 12, fontWeight: '600' },
-  infoCard: { marginTop: spacing.xl, padding: spacing.lg, borderRadius: borderRadius.lg, borderWidth: 1 },
+  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xxl },
+  headerSection: { alignItems: 'center', marginBottom: spacing.xl },
+  headerIcon: {
+    width: 56, height: 56, borderRadius: 28,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  grid: {
+    flexDirection: 'row', flexWrap: 'wrap',
+    gap: spacing.sm, marginBottom: spacing.lg,
+  },
+  statCard: {
+    width: CARD_WIDTH,
+    padding: spacing.md,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  statIconBg: {
+    width: 48, height: 48, borderRadius: 24,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  comingSoonCard: {
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  comingSoonBg: {
+    padding: spacing.xl,
+  },
+  comingSoonInner: {
+    alignItems: 'center',
+  },
 });

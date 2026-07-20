@@ -1,16 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Animated } from 'react-native';
+import {
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  Alert, ScrollView, Animated, Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useThemeColors } from '../../theme';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 
-const INTERESTS = ['🏔️ Adventure', '🏖️ Beach', '⛰️ Mountains', '🍜 Food', '🎭 Culture', '🦁 Wildlife', '🚗 Roadtrip', '🛕 Pilgrimage', '🛍️ Shopping', '🎉 Nightlife'];
+const INTERESTS = [
+  '🏔️ Adventure', '🏖️ Beach', '⛰️ Mountains', '🍜 Food',
+  '🎭 Culture', '🦁 Wildlife', '🚗 Roadtrip', '🛕 Pilgrimage',
+  '🛍️ Shopping', '🎉 Nightlife',
+];
 const GENDERS = ['Male', 'Female', 'Other'];
+const { width: W } = Dimensions.get('window');
 
 export function CompleteProfileScreen() {
-  const colors = useThemeColors();
   const { user, fetchProfile } = useAuthStore();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -20,7 +26,7 @@ export function CompleteProfileScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState('');
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
@@ -62,14 +68,18 @@ export function CompleteProfileScreen() {
   ];
 
   return (
-    <LinearGradient colors={['#0F172A', '#1E3A5F']} style={styles.gradient}>
+    <LinearGradient colors={['#080E1A', '#0F172A', '#1A2744']} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
       <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
             {/* Header */}
             <View style={styles.header}>
-              <LinearGradient colors={['#00C896', '#0EA5E9']} style={styles.headerIcon}>
-                <Text style={{ fontSize: 28 }}>👤</Text>
+              <LinearGradient colors={['#3B82F6', '#8B5CF6']} style={styles.headerIcon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                <Text style={{ fontSize: 30 }}>👤</Text>
               </LinearGradient>
               <Text style={styles.title}>Tell us about you</Text>
               <Text style={styles.subtitle}>Personalize your TripWise experience</Text>
@@ -82,7 +92,7 @@ export function CompleteProfileScreen() {
                 <TextInput
                   style={[inputStyle('first'), { flex: 1 }]}
                   placeholder="First name *"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
+                  placeholderTextColor="rgba(255,255,255,0.28)"
                   value={firstName}
                   onChangeText={setFirstName}
                   autoCapitalize="words"
@@ -92,7 +102,7 @@ export function CompleteProfileScreen() {
                 <TextInput
                   style={[inputStyle('last'), { flex: 1 }]}
                   placeholder="Last name"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
+                  placeholderTextColor="rgba(255,255,255,0.28)"
                   value={lastName}
                   onChangeText={setLastName}
                   autoCapitalize="words"
@@ -108,7 +118,7 @@ export function CompleteProfileScreen() {
               <TextInput
                 style={inputStyle('city')}
                 placeholder="Where are you based?"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor="rgba(255,255,255,0.28)"
                 value={homeCity}
                 onChangeText={setHomeCity}
                 autoCapitalize="words"
@@ -122,7 +132,12 @@ export function CompleteProfileScreen() {
               <Text style={styles.sectionLabel}>GENDER</Text>
               <View style={styles.chipRow}>
                 {GENDERS.map((g) => (
-                  <TouchableOpacity key={g} style={[styles.chip, gender === g && styles.chipActive]} onPress={() => setGender(g)}>
+                  <TouchableOpacity
+                    key={g}
+                    style={[styles.chip, gender === g && styles.chipActive]}
+                    onPress={() => setGender(g)}
+                    activeOpacity={0.8}
+                  >
                     <Text style={[styles.chipTxt, gender === g && styles.chipTxtActive]}>{g}</Text>
                   </TouchableOpacity>
                 ))}
@@ -137,7 +152,12 @@ export function CompleteProfileScreen() {
                 {INTERESTS.map((i) => {
                   const sel = selectedInterests.includes(i);
                   return (
-                    <TouchableOpacity key={i} style={[styles.chip, sel && styles.chipActive]} onPress={() => toggleInterest(i)}>
+                    <TouchableOpacity
+                      key={i}
+                      style={[styles.chip, sel && styles.chipActive]}
+                      onPress={() => toggleInterest(i)}
+                      activeOpacity={0.8}
+                    >
                       <Text style={[styles.chipTxt, sel && styles.chipTxtActive]}>{i}</Text>
                     </TouchableOpacity>
                   );
@@ -146,9 +166,9 @@ export function CompleteProfileScreen() {
             </View>
 
             {/* Save */}
-            <TouchableOpacity onPress={handleSave} disabled={isLoading} activeOpacity={0.85} style={styles.saveBtnWrap}>
-              <LinearGradient colors={['#00C896', '#00A87E']} style={styles.saveBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                <Text style={styles.saveTxt}>{isLoading ? 'Saving...' : 'Save & Continue →'}</Text>
+            <TouchableOpacity onPress={handleSave} disabled={isLoading} activeOpacity={0.88} style={styles.saveBtnWrap}>
+              <LinearGradient colors={['#3B82F6', '#6366F1']} style={styles.saveBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <Text style={styles.saveTxt}>{isLoading ? 'Saving…' : 'Save & Continue →'}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
@@ -162,22 +182,36 @@ const styles = StyleSheet.create({
   gradient: { flex: 1 },
   safe: { flex: 1 },
   content: { paddingHorizontal: 24, paddingTop: 24, paddingBottom: 48 },
-  header: { alignItems: 'center', marginBottom: 32 },
-  headerIcon: { width: 72, height: 72, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
-  title: { fontSize: 28, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.5, marginBottom: 8, textAlign: 'center' },
-  subtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center' },
+  header: { alignItems: 'center', marginBottom: 36 },
+  headerIcon: {
+    width: 76, height: 76, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginBottom: 18,
+    shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 18, elevation: 12,
+  },
+  title: { fontSize: 28, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.8, marginBottom: 8, textAlign: 'center' },
+  subtitle: { fontSize: 14, color: 'rgba(255,255,255,0.45)', textAlign: 'center' },
   section: { marginBottom: 24 },
-  sectionLabel: { fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: 1.5, marginBottom: 10 },
-  sectionHint: { fontSize: 13, color: 'rgba(255,255,255,0.35)', marginBottom: 10, marginTop: -4 },
+  sectionLabel: { fontSize: 10, fontWeight: '700', color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, marginBottom: 10 },
+  sectionHint: { fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 10, marginTop: -4 },
   row: { flexDirection: 'row', gap: 12 },
-  input: { height: 52, backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 14, paddingHorizontal: 16, fontSize: 16, color: '#FFFFFF', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)', fontWeight: '500' },
-  inputFocused: { borderColor: '#00C896', backgroundColor: 'rgba(0,200,150,0.06)' },
+  input: {
+    height: 52, backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 14, paddingHorizontal: 16, fontSize: 15, color: '#FFFFFF',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)', fontWeight: '500',
+  },
+  inputFocused: { borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.08)' },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { paddingHorizontal: 16, paddingVertical: 9, borderRadius: 100, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.12)' },
-  chipActive: { backgroundColor: 'rgba(0,200,150,0.2)', borderColor: '#00C896' },
-  chipTxt: { fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: '600' },
-  chipTxtActive: { color: '#00C896' },
-  saveBtnWrap: { marginTop: 8, borderRadius: 16, overflow: 'hidden', shadowColor: '#00C896', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12, elevation: 8 },
+  chip: {
+    paddingHorizontal: 14, paddingVertical: 9, borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)',
+  },
+  chipActive: { backgroundColor: 'rgba(59,130,246,0.2)', borderColor: '#3B82F6' },
+  chipTxt: { fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: '600' },
+  chipTxtActive: { color: '#60A5FA' },
+  saveBtnWrap: {
+    marginTop: 8, borderRadius: 16, overflow: 'hidden',
+    shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 14, elevation: 8,
+  },
   saveBtn: { height: 58, justifyContent: 'center', alignItems: 'center' },
-  saveTxt: { fontSize: 17, fontWeight: '700', color: '#FFFFFF', letterSpacing: 0.3 },
+  saveTxt: { fontSize: 16, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
 });

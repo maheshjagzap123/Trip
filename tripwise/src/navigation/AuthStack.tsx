@@ -41,6 +41,7 @@ export function AuthStack() {
         transitionSpec: { open: smoothSpec, close: smoothSpec },
         gestureEnabled: true,
         gestureDirection: 'vertical',
+        gestureResponseDistance: 200,
       }}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />

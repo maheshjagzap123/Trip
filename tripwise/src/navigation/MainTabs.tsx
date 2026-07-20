@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { MainTabsParamList } from './types';
 import { TripDashboardScreen } from '../screens/trips/TripDashboardScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { AnalyticsScreen } from '../screens/analytics/AnalyticsScreen';
 import { Map, User, BarChart3 } from 'lucide-react-native';
-import { useThemeColors } from '../theme';
+import { useThemeColors, spacing, shadows } from '../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator<MainTabsParamList>();
 
@@ -14,13 +15,19 @@ function TabIcon({ icon, focused, activeColor }: { icon: React.ReactNode; focuse
   return (
     <View style={styles.iconWrap}>
       {icon}
-      {focused && <View style={[styles.activeDot, { backgroundColor: activeColor, shadowColor: activeColor }]} />}
+      {focused && (
+        <View style={[styles.activeDot, { backgroundColor: activeColor }]} />
+      )}
     </View>
   );
 }
 
 export function MainTabs() {
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+
+  const tabBarHeight = Platform.OS === 'ios' ? 52 + insets.bottom : 60;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -30,11 +37,21 @@ export function MainTabs() {
         tabBarStyle: {
           backgroundColor: colors.tabBarBackground,
           borderTopColor: colors.tabBarBorder,
-          borderTopWidth: 1,
-          paddingBottom: 8,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          height: tabBarHeight,
           paddingTop: 6,
+          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 8,
+          ...shadows.sm,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2, marginBottom: 4 },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 2,
+          letterSpacing: 0.1,
+        },
+        tabBarItemStyle: {
+          paddingVertical: 4,
+        },
       }}
     >
       <Tab.Screen
@@ -43,7 +60,7 @@ export function MainTabs() {
         options={{
           tabBarLabel: 'Trips',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon icon={<Map color={color} size={size} />} focused={focused} activeColor={colors.primary} />
+            <TabIcon icon={<Map color={color} size={size - 2} />} focused={focused} activeColor={colors.primary} />
           ),
         }}
       />
@@ -53,7 +70,7 @@ export function MainTabs() {
         options={{
           tabBarLabel: 'Stats',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon icon={<BarChart3 color={color} size={size} />} focused={focused} activeColor={colors.primary} />
+            <TabIcon icon={<BarChart3 color={color} size={size - 2} />} focused={focused} activeColor={colors.primary} />
           ),
         }}
       />
@@ -63,7 +80,7 @@ export function MainTabs() {
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon icon={<User color={color} size={size} />} focused={focused} activeColor={colors.primary} />
+            <TabIcon icon={<User color={color} size={size - 2} />} focused={focused} activeColor={colors.primary} />
           ),
         }}
       />
@@ -72,15 +89,15 @@ export function MainTabs() {
 }
 
 const styles = StyleSheet.create({
-  iconWrap: { alignItems: 'center', justifyContent: 'center' },
+  iconWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 28,
+  },
   activeDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    marginTop: 3,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 4,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    marginTop: 4,
   },
 });

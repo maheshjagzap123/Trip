@@ -16,8 +16,8 @@ export function ExpensesScreen({ tripId, tripName, onClose }: Props) {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={onClose}>
-          <ArrowLeft color={colors.textPrimary} size={24} />
+        <TouchableOpacity onPress={onClose} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} accessibilityLabel="Go back">
+          <ArrowLeft color={colors.textPrimary} size={22} />
         </TouchableOpacity>
         <Text style={[typography.h3, { color: colors.textPrimary, marginLeft: spacing.md, flex: 1 }]} numberOfLines={1}>
           {tripName} — Expenses

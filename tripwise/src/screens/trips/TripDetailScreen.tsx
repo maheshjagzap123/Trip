@@ -202,14 +202,14 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={onClose} accessibilityLabel="Back">
-          <ArrowLeft color={colors.textPrimary} size={24} />
+        <TouchableOpacity onPress={onClose} accessibilityLabel="Back" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} style={{ padding: spacing.xs }}>
+          <ArrowLeft color={colors.textPrimary} size={22} />
         </TouchableOpacity>
         <Text style={[typography.h3, { color: colors.textPrimary, flex: 1, marginLeft: spacing.md }]} numberOfLines={1}>
           {trip.trip_name}
         </Text>
         {isAdmin && (
-          <TouchableOpacity onPress={() => setShowEdit(true)} accessibilityLabel="Edit trip">
+          <TouchableOpacity onPress={() => setShowEdit(true)} accessibilityLabel="Edit trip" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
             <Pencil color={colors.primary} size={20} />
           </TouchableOpacity>
         )}
@@ -252,38 +252,52 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
           </View>
         </View>
 
-        {/* Expenses Button */}
-        <TouchableOpacity
-          style={[styles.expensesBtn, { backgroundColor: colors.primary }]}
-          onPress={() => setShowExpenses(true)}
-        >
-          <Receipt color="#fff" size={18} />
-          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>View Expenses</Text>
-        </TouchableOpacity>
+        {/* Quick Actions — 2x2 Grid */}
+        <View style={styles.actionsGrid}>
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}
+            onPress={() => setShowExpenses(true)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(59,130,246,0.12)' }]}>
+              <Receipt color={colors.primary} size={22} />
+            </View>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Expenses</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.expensesBtn, { backgroundColor: '#6366F1', marginTop: spacing.sm }]}
-          onPress={() => setShowPhotos(true)}
-        >
-          <CameraIcon color="#fff" size={18} />
-          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Trip Photos</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}
+            onPress={() => setShowPhotos(true)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(99,102,241,0.12)' }]}>
+              <CameraIcon color="#6366F1" size={22} />
+            </View>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Photos</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.expensesBtn, { backgroundColor: '#F59E0B', marginTop: spacing.sm }]}
-          onPress={() => setShowChat(true)}
-        >
-          <MessageCircle color="#fff" size={18} />
-          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Trip Chat</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}
+            onPress={() => setShowChat(true)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(245,158,11,0.12)' }]}>
+              <MessageCircle color="#F59E0B" size={22} />
+            </View>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Chat</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.expensesBtn, { backgroundColor: '#8B5CF6', marginTop: spacing.sm }]}
-          onPress={() => setShowTimeline(true)}
-        >
-          <Clock color="#fff" size={18} />
-          <Text style={[typography.labelLarge, { color: '#fff', marginLeft: spacing.sm }]}>Timeline</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}
+            onPress={() => setShowTimeline(true)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(139,92,246,0.12)' }]}>
+              <Clock color="#8B5CF6" size={22} />
+            </View>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Timeline</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Members Section */}
         <View style={styles.sectionHeader}>
@@ -413,7 +427,9 @@ const styles = StyleSheet.create({
   inviteBtn: { width: 40, height: 40, borderRadius: borderRadius.sm, justifyContent: 'center', alignItems: 'center' },
   memberRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm, borderBottomWidth: 0.5 },
   avatar: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
-  expensesBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 48, borderRadius: borderRadius.md, marginBottom: spacing.lg },
+  actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
+  actionCard: { width: '48%', flexGrow: 1, alignItems: 'center', paddingVertical: spacing.lg, borderRadius: borderRadius.lg, borderWidth: 1 },
+  actionIconWrap: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
   actions: { marginTop: spacing.xl, gap: spacing.sm },
   actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 44, borderWidth: 1, borderRadius: borderRadius.md },
 });

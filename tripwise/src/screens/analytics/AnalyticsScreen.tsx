@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
 import { TrendingUp, Wallet, Tag, Map, BarChart3 } from 'lucide-react-native';
-
-const { width: SCREEN_W } = Dimensions.get('window');
-const CARD_WIDTH = (SCREEN_W - spacing.lg * 2 - spacing.sm) / 2;
 
 interface Analytics {
   total_trips: number;
@@ -154,14 +151,16 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: 'row', flexWrap: 'wrap',
-    gap: spacing.sm, marginBottom: spacing.lg,
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
   },
   statCard: {
-    width: CARD_WIDTH,
+    width: '48%',
     padding: spacing.md,
     borderRadius: borderRadius.xl,
     borderWidth: 1,
     alignItems: 'center',
+    marginBottom: spacing.sm,
   },
   statIconBg: {
     width: 48, height: 48, borderRadius: 24,

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, Alert, Animated, Dimensions,
+  KeyboardAvoidingView, Platform, Alert, Animated, Dimensions, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -10,6 +10,8 @@ import type { AuthStackParamList } from '../../navigation/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Mail, Phone } from 'lucide-react-native';
+import { TermsOfServiceScreen } from './TermsOfServiceScreen';
+import { PrivacyPolicyScreen } from './PrivacyPolicyScreen';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'Login'>;
 type AuthMethod = 'email' | 'phone';
@@ -21,6 +23,8 @@ export function LoginScreen() {
   const [identifier, setIdentifier] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const fadeAnim  = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(40)).current;
@@ -136,10 +140,25 @@ export function LoginScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.terms}>By continuing, you agree to our Terms & Privacy Policy</Text>
+            <Text style={styles.terms}>
+              By continuing, you agree to our{' '}
+              <Text style={styles.termsLink} onPress={() => setShowTerms(true)}>Terms of Service</Text>
+              {' & '}
+              <Text style={styles.termsLink} onPress={() => setShowPrivacy(true)}>Privacy Policy</Text>
+            </Text>
           </Animated.View>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      {/* Terms of Service Modal */}
+      <Modal visible={showTerms} animationType="slide" presentationStyle="fullScreen">
+        <TermsOfServiceScreen onClose={() => setShowTerms(false)} />
+      </Modal>
+
+      {/* Privacy Policy Modal */}
+      <Modal visible={showPrivacy} animationType="slide" presentationStyle="fullScreen">
+        <PrivacyPolicyScreen onClose={() => setShowPrivacy(false)} />
+      </Modal>
     </LinearGradient>
   );
 }
@@ -194,4 +213,5 @@ const styles = StyleSheet.create({
   sendBtn: { height: 56, justifyContent: 'center', alignItems: 'center' },
   sendTxt: { fontSize: 16, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
   terms: { textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 24, lineHeight: 18 },
+  termsLink: { color: '#60A5FA', textDecorationLine: 'underline' },
 });

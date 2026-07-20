@@ -19,6 +19,7 @@ import { ExpensesScreen } from '../expenses/ExpensesScreen';
 import { PhotosScreen } from '../media/PhotosScreen';
 import { ChatScreen } from '../chat/ChatScreen';
 import { TimelineScreen } from '../timeline/TimelineScreen';
+import { MemberListScreen } from './MemberListScreen';
 import { ArrowLeft, MapPin, Calendar, Users, UserPlus, Plus, X, Trash2, LogOut, Pencil, Receipt, Camera as CameraIcon, MessageCircle, Clock } from 'lucide-react-native';
 import { format } from 'date-fns';
 
@@ -49,6 +50,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
   const [showPhotos, setShowPhotos] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviting, setInviting] = useState(false);
 
@@ -301,9 +303,12 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
 
         {/* Members Section */}
         <View style={styles.sectionHeader}>
-          <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>
-            Members ({members.filter(m => m.status === 'active').length})
-          </Text>
+          <TouchableOpacity onPress={() => setShowMembers(true)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>
+              Members ({members.filter(m => m.status === 'active').length})
+            </Text>
+            <Text style={[typography.caption, { color: colors.primary, marginLeft: spacing.xs }]}>View All</Text>
+          </TouchableOpacity>
           {isAdmin && (
             <TouchableOpacity onPress={() => setShowInvite(!showInvite)}>
               <UserPlus color={colors.primary} size={20} />
@@ -407,6 +412,15 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
           trip={trip}
           onClose={() => setShowEdit(false)}
           onSaved={fetchTripDetail}
+        />
+      </Modal>
+
+      {/* Members Modal */}
+      <Modal visible={showMembers} animationType="slide" presentationStyle="fullScreen">
+        <MemberListScreen
+          tripId={tripId}
+          tripName={trip?.trip_name || ''}
+          onClose={() => { setShowMembers(false); fetchTripDetail(); }}
         />
       </Modal>
     </SafeAreaView>

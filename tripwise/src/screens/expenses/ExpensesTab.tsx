@@ -128,7 +128,7 @@ export function ExpensesTab({ tripId }: Props) {
     <View style={styles.container}>
       {/* Summary Card */}
       <LinearGradient
-        colors={[colors.primary, '#6366F1']}
+        colors={[colors.primary, '#7B61FF']}
         style={[styles.summaryCard, shadows.brand]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}

@@ -76,7 +76,7 @@ export function OtpVerificationScreen() {
   const digits = otp.padEnd(6, ' ').split('');
 
   return (
-    <LinearGradient colors={['#080E1A', '#0F172A', '#1A2744']} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+    <LinearGradient colors={['#080C16', '#0D1320', '#111827']} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 0.3, y: 1 }}>
       <SafeAreaView style={styles.safe}>
         {/* Back */}
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }} accessibilityLabel="Go back" accessibilityRole="button">
@@ -88,7 +88,7 @@ export function OtpVerificationScreen() {
         <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
           {/* Icon */}
           <View style={styles.iconWrap}>
-            <LinearGradient colors={['#3B82F6', '#8B5CF6']} style={styles.iconGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <LinearGradient colors={['#5B8CFF', '#7B61FF']} style={styles.iconGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
               <Text style={styles.iconEmoji}>{method === 'email' ? '📧' : '📱'}</Text>
             </LinearGradient>
           </View>
@@ -140,7 +140,7 @@ export function OtpVerificationScreen() {
           {/* Verify */}
           <TouchableOpacity onPress={handleVerify} disabled={isLoading} activeOpacity={0.88} style={styles.verifyWrap}>
             <LinearGradient
-              colors={otp.length === 6 ? ['#3B82F6', '#6366F1'] : ['#1E293B', '#1E293B']}
+              colors={otp.length === 6 ? ['#5B8CFF', '#7B61FF'] : ['#1E293B', '#1E293B']}
               style={styles.verifyBtn}
               start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
             >
@@ -165,21 +165,21 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   backBtn: { paddingHorizontal: 16, paddingTop: 8 },
   backCircle: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   content: { flex: 1, paddingHorizontal: 28, justifyContent: 'center', alignItems: 'center' },
   iconWrap: {
     marginBottom: 24,
-    shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.45, shadowRadius: 20, elevation: 12,
+    shadowColor: '#5B8CFF', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.45, shadowRadius: 20, elevation: 12,
   },
   iconGrad: { width: 84, height: 84, borderRadius: 26, justifyContent: 'center', alignItems: 'center' },
   iconEmoji: { fontSize: 38 },
   title: { fontSize: 30, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.8, marginBottom: 12, textAlign: 'center' },
   subtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 24, marginBottom: 40 },
-  identifier: { color: '#60A5FA', fontWeight: '700' },
+  identifier: { color: '#5B8CFF', fontWeight: '700' },
   hiddenInput: { position: 'absolute', opacity: 0, width: 1, height: 1 },
   digitRow: { flexDirection: 'row', gap: 10, marginBottom: 8 },
   digitBox: {
@@ -188,20 +188,20 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.12)',
     justifyContent: 'center', alignItems: 'center',
   },
-  digitBoxFilled: { backgroundColor: 'rgba(59,130,246,0.15)', borderColor: '#3B82F6' },
-  digitBoxActive: { borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.08)' },
+  digitBoxFilled: { backgroundColor: 'rgba(91,140,255,0.12)', borderColor: '#5B8CFF' },
+  digitBoxActive: { borderColor: '#5B8CFF', backgroundColor: 'rgba(91,140,255,0.08)' },
   digitBoxError: { borderColor: '#FB7185' },
   digitTxt: { fontSize: 24, fontWeight: '700', color: 'rgba(255,255,255,0.3)' },
   digitTxtFilled: { color: '#FFFFFF' },
-  cursor: { position: 'absolute', width: 2, height: 28, backgroundColor: '#3B82F6', borderRadius: 1 },
+  cursor: { position: 'absolute', width: 2, height: 28, backgroundColor: '#5B8CFF', borderRadius: 1 },
   errorTxt: { color: '#FB7185', fontSize: 13, marginBottom: 8, textAlign: 'center' },
   verifyWrap: {
     width: '100%', borderRadius: 16, overflow: 'hidden', marginTop: 8,
-    shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 14, elevation: 8,
+    shadowColor: '#5B8CFF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 14, elevation: 8,
   },
   verifyBtn: { height: 56, justifyContent: 'center', alignItems: 'center' },
   verifyTxt: { fontSize: 16, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
   resend: { marginTop: 24, padding: 8 },
   resendTxt: { fontSize: 14, color: 'rgba(255,255,255,0.32)', fontWeight: '500' },
-  resendActive: { color: '#60A5FA', fontWeight: '700' },
+  resendActive: { color: '#5B8CFF', fontWeight: '700' },
 });

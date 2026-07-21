@@ -233,7 +233,7 @@ export function TripDashboardScreen() {
 
       {/* Stats Banner */}
       <LinearGradient
-        colors={[colors.primary, '#6366F1']}
+        colors={[colors.primary, '#7B61FF']}
         style={[styles.statsBanner, shadows.brand]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -353,7 +353,7 @@ export function TripDashboardScreen() {
           accessibilityLabel="Create new trip"
         >
           <LinearGradient
-            colors={[colors.primary, '#6366F1']}
+            colors={[colors.primary, '#7B61FF']}
             style={styles.fabGrad}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   notifBadge: {
     position: 'absolute', top: 6, right: 6,
     minWidth: 18, height: 18, borderRadius: 9,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6B7A',
     justifyContent: 'center', alignItems: 'center',
     paddingHorizontal: 4,
   },
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   // Stats
   statsBanner: {
     borderRadius: borderRadius.xl, padding: spacing.lg,
-    flexDirection: 'row', marginBottom: spacing.lg,
+    flexDirection: 'row', marginBottom: spacing.xl,
   },
   statItem: { flex: 1, alignItems: 'center' },
   statNum: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 2 },
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
   // Trip Card
   tripCard: {
     borderRadius: borderRadius.xl,
-    padding: spacing.md,
+    padding: spacing.lg,
     marginBottom: spacing.md,
     borderWidth: 1,
   },
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
 
   // FAB
   fab: {
-    position: 'absolute', right: spacing.lg, bottom: spacing.lg,
+    position: 'absolute', right: spacing.lg, bottom: 90,
     borderRadius: 30, overflow: 'hidden',
   },
   fabGrad: { width: 58, height: 58, justifyContent: 'center', alignItems: 'center' },

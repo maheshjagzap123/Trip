@@ -292,7 +292,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             onPress={() => setShowExpenses(true)}
             activeOpacity={0.8}
           >
-            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(59,130,246,0.12)' }]}>
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(91,140,255,0.12)' }]}>
               <Receipt color={colors.primary} size={22} />
             </View>
             <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Expenses</Text>
@@ -303,8 +303,8 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             onPress={() => setShowPhotos(true)}
             activeOpacity={0.8}
           >
-            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(99,102,241,0.12)' }]}>
-              <CameraIcon color="#6366F1" size={22} />
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(123,97,255,0.12)' }]}>
+              <CameraIcon color="#7B61FF" size={22} />
             </View>
             <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Photos</Text>
           </TouchableOpacity>
@@ -314,8 +314,8 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             onPress={() => setShowChat(true)}
             activeOpacity={0.8}
           >
-            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(245,158,11,0.12)' }]}>
-              <MessageCircle color="#F59E0B" size={22} />
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(255,182,72,0.12)' }]}>
+              <MessageCircle color="#FFB648" size={22} />
             </View>
             <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Chat</Text>
           </TouchableOpacity>
@@ -325,8 +325,8 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             onPress={() => setShowTimeline(true)}
             activeOpacity={0.8}
           >
-            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(139,92,246,0.12)' }]}>
-              <Clock color="#8B5CF6" size={22} />
+            <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(123,97,255,0.12)' }]}>
+              <Clock color="#7B61FF" size={22} />
             </View>
             <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Timeline</Text>
           </TouchableOpacity>
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1 },
   content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xxl },
-  card: { padding: spacing.lg, borderRadius: borderRadius.lg, borderWidth: 1, marginBottom: spacing.lg },
+  card: { padding: spacing.lg, borderRadius: borderRadius.xl, borderWidth: 1, marginBottom: spacing.lg },
   row: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.sm },
   typeBadge: { alignSelf: 'flex-start', paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.full, marginTop: spacing.md },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
@@ -473,8 +473,8 @@ const styles = StyleSheet.create({
   memberRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm, borderBottomWidth: 0.5 },
   avatar: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
   actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
-  actionCard: { width: '48%', flexGrow: 1, alignItems: 'center', paddingVertical: spacing.lg, borderRadius: borderRadius.lg, borderWidth: 1 },
-  actionIconWrap: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
+  actionCard: { width: '48%', flexGrow: 1, alignItems: 'center', paddingVertical: spacing.xl, borderRadius: borderRadius.xl, borderWidth: 1 },
+  actionIconWrap: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center' },
   actions: { marginTop: spacing.xl, gap: spacing.sm },
   actionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 44, borderWidth: 1, borderRadius: borderRadius.md },
 });

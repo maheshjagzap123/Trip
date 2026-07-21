@@ -284,7 +284,7 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
           accessibilityLabel="Create trip"
         >
           <LinearGradient
-            colors={['#3B82F6', '#6366F1']}
+            colors={['#5B8CFF', '#7B61FF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.createButtonGradient}
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     overflow: 'hidden',
     marginTop: spacing.md,
-    shadowColor: '#3B82F6',
+    shadowColor: '#5B8CFF',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 14,

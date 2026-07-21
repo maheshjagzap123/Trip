@@ -81,7 +81,7 @@ export function CompleteProfileScreen() {
   ];
 
   return (
-    <LinearGradient colors={['#080E1A', '#0F172A', '#1A2744']} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+    <LinearGradient colors={['#080C16', '#0D1320', '#111827']} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 0.3, y: 1 }}>
       <SafeAreaView style={styles.safe}>
         <ScrollView
           contentContainerStyle={styles.content}
@@ -91,7 +91,7 @@ export function CompleteProfileScreen() {
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
             {/* Header */}
             <View style={styles.header}>
-              <LinearGradient colors={['#3B82F6', '#8B5CF6']} style={styles.headerIcon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+              <LinearGradient colors={['#5B8CFF', '#7B61FF']} style={styles.headerIcon} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                 <Text style={{ fontSize: 30 }}>👤</Text>
               </LinearGradient>
               <Text style={styles.title}>Tell us about you</Text>
@@ -202,7 +202,7 @@ export function CompleteProfileScreen() {
 
             {/* Save */}
             <TouchableOpacity onPress={handleSave} disabled={isLoading} activeOpacity={0.88} style={styles.saveBtnWrap}>
-              <LinearGradient colors={['#3B82F6', '#6366F1']} style={styles.saveBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <LinearGradient colors={['#5B8CFF', '#7B61FF']} style={styles.saveBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 <Text style={styles.saveTxt}>{isLoading ? 'Saving…' : 'Save & Continue →'}</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   header: { alignItems: 'center', marginBottom: 36 },
   headerIcon: {
     width: 76, height: 76, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginBottom: 18,
-    shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 18, elevation: 12,
+    shadowColor: '#5B8CFF', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 18, elevation: 12,
   },
   title: { fontSize: 28, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.8, marginBottom: 8, textAlign: 'center' },
   subtitle: { fontSize: 14, color: 'rgba(255,255,255,0.45)', textAlign: 'center' },
@@ -233,19 +233,19 @@ const styles = StyleSheet.create({
     borderRadius: 14, paddingHorizontal: 16, fontSize: 15, color: '#FFFFFF',
     borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)', fontWeight: '500',
   },
-  inputFocused: { borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.08)' },
+  inputFocused: { borderColor: '#5B8CFF', backgroundColor: 'rgba(91,140,255,0.08)' },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     paddingHorizontal: 14, paddingVertical: 9, borderRadius: 100,
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)',
   },
-  chipActive: { backgroundColor: 'rgba(59,130,246,0.2)', borderColor: '#3B82F6' },
+  chipActive: { backgroundColor: 'rgba(91,140,255,0.15)', borderColor: '#5B8CFF' },
   chipTxt: { fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: '600' },
-  chipTxtActive: { color: '#60A5FA' },
+  chipTxtActive: { color: '#5B8CFF' },
   saveBtnWrap: {
     marginTop: 8, borderRadius: 16, overflow: 'hidden',
-    shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 14, elevation: 8,
+    shadowColor: '#5B8CFF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 14, elevation: 8,
   },
   saveBtn: { height: 58, justifyContent: 'center', alignItems: 'center' },
   saveTxt: { fontSize: 16, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },

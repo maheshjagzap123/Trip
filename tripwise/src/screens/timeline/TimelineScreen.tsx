@@ -57,7 +57,7 @@ export function TimelineScreen({ tripId, tripName, onClose }: Props) {
   const getEventIcon = (type: string) => {
     switch (type) {
       case 'expense': return <Receipt size={16} color="#00C896" />;
-      case 'note': return <FileText size={16} color="#6366F1" />;
+      case 'note': return <FileText size={16} color="#7B61FF" />;
       case 'photo': return <Camera size={16} color="#F59E0B" />;
       default: return <FileText size={16} color={colors.textTertiary} />;
     }
@@ -66,7 +66,7 @@ export function TimelineScreen({ tripId, tripName, onClose }: Props) {
   const getEventColor = (type: string) => {
     switch (type) {
       case 'expense': return '#00C896';
-      case 'note': return '#6366F1';
+      case 'note': return '#7B61FF';
       case 'photo': return '#F59E0B';
       default: return colors.textTertiary;
     }

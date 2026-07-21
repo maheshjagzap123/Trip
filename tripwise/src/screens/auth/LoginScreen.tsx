@@ -27,28 +27,28 @@ export function LoginScreen() {
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   const fadeAnim  = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(40)).current;
+  const slideAnim = useRef(new Animated.Value(32)).current;
   const borderAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 550, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 550, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true }),
     ]).start();
   }, []);
 
   const onFocus = () => {
     setFocused(true);
-    Animated.timing(borderAnim, { toValue: 1, duration: 200, useNativeDriver: false }).start();
+    Animated.timing(borderAnim, { toValue: 1, duration: 250, useNativeDriver: false }).start();
   };
   const onBlur = () => {
     setFocused(false);
-    Animated.timing(borderAnim, { toValue: 0, duration: 200, useNativeDriver: false }).start();
+    Animated.timing(borderAnim, { toValue: 0, duration: 250, useNativeDriver: false }).start();
   };
 
   const borderColor = borderAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['rgba(255,255,255,0.12)', '#3B82F6'],
+    outputRange: ['rgba(255,255,255,0.08)', '#5B8CFF'],
   });
 
   const handleSendOtp = async () => {
@@ -72,13 +72,13 @@ export function LoginScreen() {
   };
 
   return (
-    <LinearGradient colors={['#080E1A', '#0F172A', '#1A2744']} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+    <LinearGradient colors={['#080C16', '#0D1320', '#111827']} style={styles.gradient} start={{ x: 0, y: 0 }} end={{ x: 0.3, y: 1 }}>
       <SafeAreaView style={styles.safe}>
         <KeyboardAvoidingView style={styles.kav} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           {/* Back */}
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }} accessibilityLabel="Go back" accessibilityRole="button">
             <View style={styles.backCircle}>
-              <ArrowLeft color="#fff" size={18} />
+              <ArrowLeft color="#fff" size={18} strokeWidth={2.2} />
             </View>
           </TouchableOpacity>
 
@@ -101,8 +101,8 @@ export function LoginScreen() {
                     activeOpacity={0.8}
                   >
                     {m === 'email'
-                      ? <Mail size={14} color={method === m ? '#3B82F6' : 'rgba(255,255,255,0.4)'} />
-                      : <Phone size={14} color={method === m ? '#3B82F6' : 'rgba(255,255,255,0.4)'} />
+                      ? <Mail size={15} color={method === m ? '#5B8CFF' : 'rgba(255,255,255,0.35)'} strokeWidth={2} />
+                      : <Phone size={15} color={method === m ? '#5B8CFF' : 'rgba(255,255,255,0.35)'} strokeWidth={2} />
                     }
                     <Text style={[styles.toggleTxt, method === m && styles.toggleTxtActive]}>
                       {m === 'email' ? 'Email' : 'Phone'}
@@ -114,13 +114,13 @@ export function LoginScreen() {
               {/* Input */}
               <Animated.View style={[styles.inputWrap, { borderColor }]}>
                 {method === 'email'
-                  ? <Mail size={17} color={focused ? '#3B82F6' : 'rgba(255,255,255,0.35)'} />
-                  : <Phone size={17} color={focused ? '#3B82F6' : 'rgba(255,255,255,0.35)'} />
+                  ? <Mail size={18} color={focused ? '#5B8CFF' : 'rgba(255,255,255,0.3)'} strokeWidth={1.8} />
+                  : <Phone size={18} color={focused ? '#5B8CFF' : 'rgba(255,255,255,0.3)'} strokeWidth={1.8} />
                 }
                 <TextInput
                   style={styles.input}
                   placeholder={method === 'email' ? 'you@example.com' : '+91 98765 43210'}
-                  placeholderTextColor="rgba(255,255,255,0.28)"
+                  placeholderTextColor="rgba(255,255,255,0.22)"
                   value={identifier}
                   onChangeText={setIdentifier}
                   keyboardType={method === 'email' ? 'email-address' : 'phone-pad'}
@@ -134,7 +134,7 @@ export function LoginScreen() {
 
               {/* Send OTP */}
               <TouchableOpacity onPress={handleSendOtp} disabled={isLoading} activeOpacity={0.88} style={styles.sendWrap}>
-                <LinearGradient colors={['#3B82F6', '#6366F1']} style={styles.sendBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <LinearGradient colors={['#5B8CFF', '#7B61FF']} style={styles.sendBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                   <Text style={styles.sendTxt}>{isLoading ? 'Sending…' : 'Send Code →'}</Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -167,51 +167,51 @@ const styles = StyleSheet.create({
   gradient: { flex: 1 },
   safe: { flex: 1 },
   kav: { flex: 1 },
-  backBtn: { paddingHorizontal: 16, paddingTop: 8 },
+  backBtn: { paddingHorizontal: 20, paddingTop: 12 },
   backCircle: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   content: { flex: 1, paddingHorizontal: 24, justifyContent: 'center' },
-  header: { marginBottom: 32 },
-  title: { fontSize: 34, fontWeight: '800', color: '#FFFFFF', letterSpacing: -1, marginBottom: 8 },
-  subtitle: { fontSize: 15, color: 'rgba(255,255,255,0.5)', fontWeight: '400' },
+  header: { marginBottom: 36 },
+  title: { fontSize: 34, fontWeight: '800', color: '#FFFFFF', letterSpacing: -1.2, marginBottom: 8 },
+  subtitle: { fontSize: 15, color: 'rgba(255,255,255,0.45)', fontWeight: '400', lineHeight: 22 },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 24, padding: 20,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)',
-    gap: 14,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 24, padding: 24,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    gap: 16,
   },
   toggle: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    borderRadius: 12, padding: 3, gap: 3,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 14, padding: 4, gap: 4,
   },
   toggleBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 6, paddingVertical: 10, borderRadius: 9,
+    gap: 8, paddingVertical: 12, borderRadius: 10,
   },
   toggleBtnActive: {
-    backgroundColor: 'rgba(59,130,246,0.18)',
-    borderWidth: 1, borderColor: 'rgba(59,130,246,0.4)',
+    backgroundColor: 'rgba(91,140,255,0.12)',
+    borderWidth: 1, borderColor: 'rgba(91,140,255,0.3)',
   },
-  toggleTxt: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.45)' },
-  toggleTxtActive: { color: '#60A5FA' },
+  toggleTxt: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.4)' },
+  toggleTxtActive: { color: '#5B8CFF' },
   inputWrap: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    borderRadius: 14, paddingHorizontal: 16, paddingVertical: 4,
-    borderWidth: 1.5,
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 16, paddingHorizontal: 18, paddingVertical: 4,
+    borderWidth: 1,
   },
-  input: { flex: 1, height: 52, fontSize: 16, color: '#FFFFFF', fontWeight: '500' },
+  input: { flex: 1, height: 54, fontSize: 16, color: '#FFFFFF', fontWeight: '500' },
   sendWrap: {
-    borderRadius: 14, overflow: 'hidden',
-    shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 16, elevation: 8,
+    borderRadius: 16, overflow: 'hidden',
+    shadowColor: '#5B8CFF', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.35, shadowRadius: 20, elevation: 8,
   },
-  sendBtn: { height: 56, justifyContent: 'center', alignItems: 'center' },
+  sendBtn: { height: 58, justifyContent: 'center', alignItems: 'center' },
   sendTxt: { fontSize: 16, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
-  terms: { textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 24, lineHeight: 18 },
-  termsLink: { color: '#60A5FA', textDecorationLine: 'underline' },
+  terms: { textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.22)', marginTop: 28, lineHeight: 20 },
+  termsLink: { color: '#5B8CFF', textDecorationLine: 'underline' },
 });

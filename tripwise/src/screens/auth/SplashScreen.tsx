@@ -58,10 +58,10 @@ export function SplashScreen() {
 
   return (
     <LinearGradient
-      colors={['#080E1A', '#0F172A', '#162035']}
+      colors={['#080C16', '#0D1320', '#111827']}
       style={styles.container}
       start={{ x: 0, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+      end={{ x: 0.3, y: 1 }}
     >
       {/* Ambient orbs */}
       <Animated.View style={[styles.orb1, { transform: [{ translateY: orb1Y }] }]} />
@@ -70,7 +70,7 @@ export function SplashScreen() {
       {/* Logo */}
       <Animated.View style={[styles.logoWrap, { opacity: logoOpacity, transform: [{ scale: logoScale }] }]}>
         <LinearGradient
-          colors={['#3B82F6', '#7C3AED']}
+          colors={['#5B8CFF', '#7B61FF']}
           style={styles.logoGrad}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -93,7 +93,7 @@ export function SplashScreen() {
       {/* Pulsing loading dot */}
       <View style={styles.loadingWrap}>
         <Animated.View style={[styles.dotWrap, { transform: [{ scale: Animated.multiply(dotScale, pulse) }] }]}>
-          <LinearGradient colors={['#3B82F6', '#7C3AED']} style={styles.dot} />
+          <LinearGradient colors={['#5B8CFF', '#7B61FF']} style={styles.dot} />
         </Animated.View>
       </View>
 
@@ -106,30 +106,30 @@ export function SplashScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   orb1: {
-    position: 'absolute', width: 300, height: 300, borderRadius: 150,
-    backgroundColor: 'rgba(59,130,246,0.06)', top: H * -0.05, right: W * -0.2,
+    position: 'absolute', width: 320, height: 320, borderRadius: 160,
+    backgroundColor: 'rgba(91,140,255,0.05)', top: H * -0.05, right: W * -0.2,
   },
   orb2: {
-    position: 'absolute', width: 220, height: 220, borderRadius: 110,
-    backgroundColor: 'rgba(124,58,237,0.05)', bottom: H * 0.08, left: W * -0.15,
+    position: 'absolute', width: 240, height: 240, borderRadius: 120,
+    backgroundColor: 'rgba(123,97,255,0.04)', bottom: H * 0.08, left: W * -0.15,
   },
   logoWrap: {
-    marginBottom: 24,
+    marginBottom: 28,
     ...Platform.select({
-      ios: { shadowColor: '#3B82F6', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.4, shadowRadius: 28 },
+      ios: { shadowColor: '#5B8CFF', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.35, shadowRadius: 28 },
       android: { elevation: 16 },
     }),
   },
-  logoGrad: { width: 100, height: 100, borderRadius: 30, justifyContent: 'center', alignItems: 'center' },
-  logoEmoji: { fontSize: 46 },
+  logoGrad: { width: 96, height: 96, borderRadius: 30, justifyContent: 'center', alignItems: 'center' },
+  logoEmoji: { fontSize: 44 },
   glowRing: {
     position: 'absolute', top: -6, left: -6, right: -6, bottom: -6,
-    borderRadius: 36, borderWidth: 1, borderColor: 'rgba(59,130,246,0.2)',
+    borderRadius: 36, borderWidth: 1, borderColor: 'rgba(91,140,255,0.15)',
   },
-  appName: { fontSize: 36, fontWeight: '900', color: '#FFFFFF', letterSpacing: -1.2, marginBottom: 8 },
-  tagline: { fontSize: 14, color: 'rgba(255,255,255,0.4)', fontWeight: '500', letterSpacing: 0.3, marginBottom: 48 },
+  appName: { fontSize: 38, fontWeight: '900', color: '#FFFFFF', letterSpacing: -1.4, marginBottom: 8 },
+  tagline: { fontSize: 14, color: 'rgba(255,255,255,0.35)', fontWeight: '500', letterSpacing: 0.3, marginBottom: 52 },
   loadingWrap: { height: 16, justifyContent: 'center', alignItems: 'center' },
   dotWrap: { width: 8, height: 8, borderRadius: 4, overflow: 'hidden' },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  version: { position: 'absolute', bottom: 36, fontSize: 11, color: 'rgba(255,255,255,0.15)', fontWeight: '600', letterSpacing: 0.5 },
+  version: { position: 'absolute', bottom: 40, fontSize: 11, color: 'rgba(255,255,255,0.12)', fontWeight: '600', letterSpacing: 0.5 },
 });

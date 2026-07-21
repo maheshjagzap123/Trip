@@ -7,9 +7,10 @@ import { TripDashboardScreen } from '../screens/trips/TripDashboardScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { AnalyticsScreen } from '../screens/analytics/AnalyticsScreen';
 import { Map, User, BarChart3 } from 'lucide-react-native';
-import { useThemeColors, spacing, shadows } from '../theme';
+import { useThemeColors, spacing, borderRadius, shadows } from '../theme';
 import { useThemeStore } from '../stores/themeStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 const Tab = createBottomTabNavigator<MainTabsParamList>();
 
@@ -30,7 +31,7 @@ export function MainTabs() {
   const insets = useSafeAreaInsets();
   const isDark = resolvedScheme === 'dark';
 
-  const tabBarHeight = Platform.OS === 'ios' ? 52 + insets.bottom : 60;
+  const tabBarHeight = Platform.OS === 'ios' ? 56 + insets.bottom : 64;
 
   return (
     <Tab.Navigator
@@ -40,29 +41,34 @@ export function MainTabs() {
         tabBarInactiveTintColor: colors.textTertiary,
         tabBarBackground: () =>
           Platform.OS === 'ios' ? (
-            <BlurView
-              intensity={80}
-              tint={isDark ? 'dark' : 'light'}
-              style={StyleSheet.absoluteFill}
-            />
+            <View style={[StyleSheet.absoluteFill, styles.tabBarBg]}>
+              <BlurView
+                intensity={90}
+                tint={isDark ? 'dark' : 'light'}
+                style={StyleSheet.absoluteFill}
+              />
+            </View>
           ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.tabBarBackground }]} />
+            <View style={[StyleSheet.absoluteFill, styles.tabBarBg, { backgroundColor: isDark ? 'rgba(8,12,22,0.95)' : 'rgba(255,255,255,0.95)' }]} />
           ),
         tabBarStyle: {
-          position: Platform.OS === 'ios' ? 'absolute' : 'relative',
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : colors.tabBarBackground,
+          position: 'absolute',
+          bottom: Platform.OS === 'ios' ? 0 : 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'transparent',
           borderTopColor: colors.tabBarBorder,
           borderTopWidth: StyleSheet.hairlineWidth,
           height: tabBarHeight,
-          paddingTop: 6,
-          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 8,
-          ...shadows.sm,
+          paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 10,
+          ...shadows.glass,
         },
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
-          marginTop: 2,
-          letterSpacing: 0.1,
+          marginTop: 4,
+          letterSpacing: 0.2,
         },
         tabBarItemStyle: {
           paddingVertical: 4,
@@ -75,7 +81,7 @@ export function MainTabs() {
         options={{
           tabBarLabel: 'Trips',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon icon={<Map color={color} size={size - 2} />} focused={focused} activeColor={colors.primary} />
+            <TabIcon icon={<Map color={color} size={22} strokeWidth={focused ? 2.2 : 1.8} />} focused={focused} activeColor={colors.primary} />
           ),
         }}
       />
@@ -85,7 +91,7 @@ export function MainTabs() {
         options={{
           tabBarLabel: 'Stats',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon icon={<BarChart3 color={color} size={size - 2} />} focused={focused} activeColor={colors.primary} />
+            <TabIcon icon={<BarChart3 color={color} size={22} strokeWidth={focused ? 2.2 : 1.8} />} focused={focused} activeColor={colors.primary} />
           ),
         }}
       />
@@ -95,7 +101,7 @@ export function MainTabs() {
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon icon={<User color={color} size={size - 2} />} focused={focused} activeColor={colors.primary} />
+            <TabIcon icon={<User color={color} size={22} strokeWidth={focused ? 2.2 : 1.8} />} focused={focused} activeColor={colors.primary} />
           ),
         }}
       />
@@ -107,12 +113,17 @@ const styles = StyleSheet.create({
   iconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 28,
+    height: 30,
   },
   activeDot: {
     width: 5,
     height: 5,
     borderRadius: 2.5,
     marginTop: 4,
+  },
+  tabBarBg: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
   },
 });

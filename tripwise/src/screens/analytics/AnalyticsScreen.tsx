@@ -156,14 +156,14 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '48%',
-    padding: spacing.md,
+    padding: spacing.lg,
     borderRadius: borderRadius.xl,
     borderWidth: 1,
     alignItems: 'center',
     marginBottom: spacing.sm,
   },
   statIconBg: {
-    width: 48, height: 48, borderRadius: 24,
+    width: 52, height: 52, borderRadius: 26,
     justifyContent: 'center', alignItems: 'center',
   },
   comingSoonCard: {

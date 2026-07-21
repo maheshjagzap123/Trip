@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useThemeColors, borderRadius } from '../theme';
 import type { SettlementStatus } from '../stores/expenseStore';
 
 interface Props {
@@ -7,22 +8,27 @@ interface Props {
   size?: 'sm' | 'md';
 }
 
-const CONFIG: Record<SettlementStatus, { label: string; icon: string; bg: string; color: string }> = {
-  pending:              { label: 'Pending',              icon: '⏳', bg: '#F1F5F9', color: '#64748B' },
-  initiated:            { label: 'Initiated',            icon: '🔵', bg: '#EFF6FF', color: '#2563EB' },
-  pending_confirmation: { label: 'Awaiting Confirmation', icon: '🟡', bg: '#FFFBEB', color: '#D97706' },
-  confirmed:            { label: 'Confirmed',            icon: '✅', bg: '#ECFDF5', color: '#059669' },
-  rejected:             { label: 'Disputed',             icon: '❌', bg: '#FFF1F2', color: '#E11D48' },
+const CONFIG: Record<SettlementStatus, { label: string; icon: string; color: string }> = {
+  pending:              { label: 'Pending',              icon: '⏳', color: '#94A3B8' },
+  initiated:            { label: 'Initiated',            icon: '🔵', color: '#5B8CFF' },
+  pending_confirmation: { label: 'Awaiting Confirmation', icon: '🟡', color: '#FFB648' },
+  confirmed:            { label: 'Confirmed',            icon: '✅', color: '#35D07F' },
+  rejected:             { label: 'Disputed',             icon: '❌', color: '#FF6B7A' },
 };
 
 export function PaymentStatusBadge({ status, size = 'md' }: Props) {
+  const colors = useThemeColors();
   const cfg = CONFIG[status] ?? CONFIG.pending;
   const isSmall = size === 'sm';
 
   return (
     <View style={[
       styles.wrap,
-      { backgroundColor: cfg.bg, paddingHorizontal: isSmall ? 8 : 10, paddingVertical: isSmall ? 3 : 5 },
+      {
+        backgroundColor: cfg.color + '14',
+        paddingHorizontal: isSmall ? 10 : 12,
+        paddingVertical: isSmall ? 4 : 6,
+      },
     ]}>
       <Text style={{ fontSize: isSmall ? 10 : 11 }}>{cfg.icon} </Text>
       <Text style={[styles.label, { color: cfg.color, fontSize: isSmall ? 10 : 11 }]}>
@@ -33,6 +39,6 @@ export function PaymentStatusBadge({ status, size = 'md' }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { flexDirection: 'row', alignItems: 'center', borderRadius: 999 },
+  wrap: { flexDirection: 'row', alignItems: 'center', borderRadius: borderRadius.full },
   label: { fontWeight: '700', letterSpacing: 0.2 },
 });

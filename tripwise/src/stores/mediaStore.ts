@@ -55,21 +55,24 @@ async function getDriveConnection(userId: string): Promise<DriveConnection | nul
   return data as DriveConnection;
 }
 
-/** Refresh token if expired — for now just return existing (implicit grant doesn't have refresh) */
+/** Get a valid access token - don't reject based on local expiry time,
+ *  instead let the actual API call determine if the token is still valid.
+ *  Google implicit tokens can last longer than the stated expiry in practice,
+ *  and we want the token to persist until the user manually disconnects. */
 async function getValidAccessToken(userId: string): Promise<string | null> {
   const conn = await getDriveConnection(userId);
   if (!conn) return null;
-
-  // Check if token is expired (with 5 min buffer)
-  const expiresAt = new Date(conn.expires_at).getTime();
-  const now = Date.now();
-  if (now > expiresAt - 5 * 60 * 1000) {
-    // Token expired — user needs to reconnect
-    // For implicit grant flow, we can't refresh automatically
-    return null;
-  }
-
   return conn.access_token;
+}
+
+/** Verify the token is still accepted by Google. Returns true if valid. */
+async function isTokenValid(accessToken: string): Promise<boolean> {
+  try {
+    const res = await fetch('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + accessToken);
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 /** Find or create the TripWise folder in Google Drive */
@@ -303,6 +306,12 @@ export const useMediaStore = create<MediaState>((set, get) => ({
       const accessToken = await getValidAccessToken(user.id);
 
       if (accessToken) {
+        // Verify the token is still accepted by Google
+        const tokenValid = await isTokenValid(accessToken);
+        if (!tokenValid) {
+          throw new Error('DRIVE_TOKEN_EXPIRED');
+        }
+
         // ─── Upload to Google Drive ─────────────────────────────────────
         set({ uploadProgress: 40 });
 
@@ -355,7 +364,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
 
       } else {
         // ─── No Drive connection — show error ──────────────────────────
-        throw new Error('Google Drive not connected or token expired. Please reconnect your Drive in Settings.');
+        throw new Error('DRIVE_NOT_CONNECTED');
       }
 
       set({ uploadProgress: 100 });

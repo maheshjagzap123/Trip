@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useExpenseStore } from '../../stores/expenseStore';
 import { useAuthStore } from '../../stores/authStore';
 import { AddExpenseScreen } from './AddExpenseScreen';
 import { SettleUpScreen } from './SettleUpScreen';
-import { Plus, Trash2, TrendingUp, TrendingDown } from 'lucide-react-native';
+import { SettlementDetailScreen } from './SettlementDetailScreen';
+import { PaymentStatusBadge } from '../../components/PaymentStatusBadge';
+import { Plus, Trash2, TrendingUp, TrendingDown, Clock } from 'lucide-react-native';
 import { format } from 'date-fns';
 import type { Expense } from '../../stores/expenseStore';
 
@@ -22,15 +24,56 @@ interface Props {
 
 export function ExpensesTab({ tripId }: Props) {
   const colors = useThemeColors();
-  const { user } = useAuthStore();
-  const { expenses, balances, isLoading, fetchExpenses, fetchBalances, deleteExpense, subscribeToExpenses } = useExpenseStore();
+  const { user, profile } = useAuthStore();
+  const { expenses, balances, settlements, isLoading, fetchExpenses, fetchBalances, fetchSettlements, deleteExpense, subscribeToExpenses } = useExpenseStore();
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [showSettleUp, setShowSettleUp] = useState(false);
+  const [settleWithMember, setSettleWithMember] = useState<string | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<'expenses' | 'balances'>('expenses');
+  const [detailSettlementId, setDetailSettlementId] = useState<string | null>(null);
+
+  // Compute simplified pairwise debts.
+  // net_balance > 0 means this person is owed money (creditor).
+  // net_balance < 0 means this person owes money (debtor).
+  // Only balances with |net_balance| >= 1 rupee are shown (avoids floating point noise).
+  const computeSimplifiedDebts = () => {
+    const THRESHOLD = 0.5; // ignore sub-rupee rounding noise
+    const debtors  = balances
+      .filter((b) => b.net_balance < -THRESHOLD)
+      .map((b) => ({ ...b, remaining: Math.abs(b.net_balance) }));
+    const creditors = balances
+      .filter((b) => b.net_balance > THRESHOLD)
+      .map((b) => ({ ...b, remaining: b.net_balance }));
+
+    const debts: { from: string; fromName: string; to: string; toName: string; amount: number }[] = [];
+    let i = 0, j = 0;
+    while (i < debtors.length && j < creditors.length) {
+      const payment = Math.min(debtors[i].remaining, creditors[j].remaining);
+      if (payment > THRESHOLD) {
+        debts.push({
+          from: debtors[i].user_id,
+          fromName: debtors[i].display_name,
+          to: creditors[j].user_id,
+          toName: creditors[j].display_name,
+          amount: Math.round(payment), // round to whole rupees for display
+        });
+      }
+      debtors[i].remaining  -= payment;
+      creditors[j].remaining -= payment;
+      if (debtors[i].remaining  <= THRESHOLD) i++;
+      if (creditors[j].remaining <= THRESHOLD) j++;
+    }
+    return debts;
+  };
+
+  const simplifiedDebts = computeSimplifiedDebts();
+  const youOwe     = simplifiedDebts.filter((d) => d.from === user?.id);
+  const youReceive = simplifiedDebts.filter((d) => d.to   === user?.id);
 
   useEffect(() => {
     fetchExpenses(tripId);
     fetchBalances(tripId);
+    fetchSettlements(tripId);
     const unsub = subscribeToExpenses(tripId);
     return unsub;
   }, [tripId]);
@@ -44,34 +87,48 @@ export function ExpensesTab({ tripId }: Props) {
     deleteExpense(expenseId, tripId);
   };
 
-  const renderExpense = ({ item }: { item: Expense }) => (
-    <View style={[styles.expenseRow, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }, shadows.card]}>
-      <View style={[styles.categoryIcon, { backgroundColor: colors.primaryLight }]}>
-        <Text style={{ fontSize: 18 }}>{CATEGORY_EMOJI[item.category] || '💰'}</Text>
+  const renderExpense = ({ item }: { item: Expense }) => {
+    const youPaid = item.paid_by === user?.id;
+    // Assuming equal split: your share is total / number of members
+    const memberCount = balances.length || 1;
+    const yourShare = item.amount / memberCount;
+    // If you paid: you're owed (total - yourShare). If someone else paid: you owe yourShare.
+    const yourImpact = youPaid ? item.amount - yourShare : -yourShare;
+
+    return (
+      <View style={[styles.expenseRow, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }, shadows.card]}>
+        <View style={[styles.categoryIcon, { backgroundColor: colors.primaryLight }]}>
+          <Text style={{ fontSize: 18 }}>{CATEGORY_EMOJI[item.category] || '💰'}</Text>
+        </View>
+        <View style={{ flex: 1, marginLeft: spacing.sm }}>
+          <Text style={[typography.labelMedium, { color: colors.textPrimary }]} numberOfLines={1}>{item.title}</Text>
+          <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]} numberOfLines={1}>
+            {youPaid ? 'You paid' : `${item.paid_by_name} paid`} • {format(new Date(item.expense_date), 'MMM d')}
+          </Text>
+          <Text style={[typography.caption, { color: yourImpact >= 0 ? colors.success : colors.error, marginTop: 2 }]}>
+            {yourImpact >= 0
+              ? `You'll receive ₹${Math.round(yourImpact)} from others`
+              : `You need to pay ₹${Math.round(Math.abs(yourImpact))} to ${item.paid_by_name}`}
+          </Text>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={[typography.numberSmall, { color: colors.textPrimary }]}>₹{item.amount.toLocaleString()}</Text>
+          <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]}>{item.category}</Text>
+        </View>
+        {(item.created_by === user?.id || item.paid_by === user?.id) && (
+          <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Trash2 color={colors.textTertiary} size={14} />
+          </TouchableOpacity>
+        )}
       </View>
-      <View style={{ flex: 1, marginLeft: spacing.sm }}>
-        <Text style={[typography.labelMedium, { color: colors.textPrimary }]} numberOfLines={1}>{item.title}</Text>
-        <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]} numberOfLines={1}>
-          {item.paid_by_name} • {format(new Date(item.expense_date), 'MMM d')}
-        </Text>
-      </View>
-      <View style={{ alignItems: 'flex-end' }}>
-        <Text style={[typography.numberSmall, { color: colors.textPrimary }]}>₹{item.amount.toLocaleString()}</Text>
-        <Text style={[typography.caption, { color: colors.textTertiary }]}>{item.category}</Text>
-      </View>
-      {(item.created_by === user?.id || item.paid_by === user?.id) && (
-        <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Trash2 color={colors.textTertiary} size={14} />
-        </TouchableOpacity>
-      )}
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
       {/* Summary Card */}
       <LinearGradient
-        colors={[colors.primary, '#6366F1']}
+        colors={[colors.primary, '#7B61FF']}
         style={[styles.summaryCard, shadows.brand]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -139,29 +196,124 @@ export function ExpensesTab({ tripId }: Props) {
           </View>
         )
       ) : (
-        <View style={{ flex: 1 }}>
-          {balances.map((b) => (
-            <View key={b.user_id} style={[styles.balanceRow, { borderBottomColor: colors.borderLight }]}>
-              <View style={[styles.balanceAvatar, { backgroundColor: colors.primaryLight }]}>
-                <Text style={[typography.labelSmall, { color: colors.primary }]}>
-                  {(b.display_name || '?')[0].toUpperCase()}
-                </Text>
-              </View>
-              <Text style={[typography.bodyMedium, { color: colors.textPrimary, flex: 1, marginLeft: spacing.sm }]}>
-                {b.user_id === user?.id ? `${b.display_name} (You)` : b.display_name}
-              </Text>
-              <Text style={[typography.labelMedium, { color: b.net_balance >= 0 ? colors.success : colors.error }]}>
-                {b.net_balance >= 0 ? `gets ₹${b.net_balance.toFixed(0)}` : `owes ₹${Math.abs(b.net_balance).toFixed(0)}`}
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
+
+          {/* ── Your Summary ── */}
+          <View style={[styles.yourSummaryCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}>
+            <View style={[styles.balanceAvatar, { backgroundColor: colors.primaryLight }]}>
+              <Text style={[typography.labelSmall, { color: colors.primary }]}>
+                {(profile?.display_name || '?')[0].toUpperCase()}
               </Text>
             </View>
-          ))}
-          <TouchableOpacity
-            style={[styles.settleBtn, { backgroundColor: colors.primary }, shadows.brand]}
-            onPress={() => setShowSettleUp(true)}
-          >
-            <Text style={[typography.buttonMedium, { color: '#fff' }]}>Settle Up</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={{ flex: 1, marginLeft: spacing.sm }}>
+              <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>
+                {profile?.display_name || 'You'}
+              </Text>
+              <View style={{ flexDirection: 'row', marginTop: 4, gap: spacing.md }}>
+                {youReceive.length > 0 && (
+                  <Text style={[typography.caption, { color: colors.success }]}>
+                    Will receive: ₹{youReceive.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
+                  </Text>
+                )}
+                {youOwe.length > 0 && (
+                  <Text style={[typography.caption, { color: colors.error }]}>
+                    Need to pay: ₹{youOwe.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
+                  </Text>
+                )}
+                {youOwe.length === 0 && youReceive.length === 0 && (
+                  <Text style={[typography.caption, { color: colors.textTertiary }]}>All settled up!</Text>
+                )}
+              </View>
+            </View>
+          </View>
+
+          {/* ── You need to pay ── */}
+          {youOwe.length > 0 && (
+            <View style={styles.balanceSection}>
+              <Text style={[typography.overline, { color: colors.error, marginBottom: spacing.sm }]}>YOU NEED TO PAY</Text>
+              {youOwe.map((d) => (
+                <View key={d.to} style={[styles.balanceRow, { borderBottomColor: colors.borderLight }]}>
+                  <View style={[styles.balanceAvatar, { backgroundColor: '#FFF1F2' }]}>
+                    <Text style={[typography.labelSmall, { color: colors.error }]}>
+                      {(d.toName || '?')[0].toUpperCase()}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                    <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>{d.toName}</Text>
+                    <Text style={[typography.caption, { color: colors.error }]}>You need to pay ₹{d.amount.toLocaleString()}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.settleRowBtn, { backgroundColor: colors.primary }]}
+                    onPress={() => { setSettleWithMember(d.to); setShowSettleUp(true); }}
+                  >
+                    <Text style={[typography.caption, { color: '#fff', fontWeight: '700' }]}>Settle Up</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* ── You will receive ── */}
+          {youReceive.length > 0 && (
+            <View style={styles.balanceSection}>
+              <Text style={[typography.overline, { color: colors.success, marginBottom: spacing.sm }]}>YOU WILL RECEIVE</Text>
+              {youReceive.map((d) => (
+                <View key={d.from} style={[styles.balanceRow, { borderBottomColor: colors.borderLight }]}>
+                  <View style={[styles.balanceAvatar, { backgroundColor: colors.successBackground }]}>
+                    <Text style={[typography.labelSmall, { color: colors.success }]}>
+                      {(d.fromName || '?')[0].toUpperCase()}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                    <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>{d.fromName}</Text>
+                    <Text style={[typography.caption, { color: colors.success }]}>{d.fromName} needs to pay you ₹{d.amount.toLocaleString()}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* ── All settled ── */}
+          {youOwe.length === 0 && youReceive.length === 0 && (
+            <View style={styles.allSettled}>
+              <Text style={{ fontSize: 32 }}>🎉</Text>
+              <Text style={[typography.labelLarge, { color: colors.success, marginTop: spacing.sm }]}>All settled up!</Text>
+              <Text style={[typography.bodySmall, { color: colors.textSecondary, marginTop: spacing.xs, textAlign: 'center' }]}>
+                No pending balances in this trip.
+              </Text>
+            </View>
+          )}
+
+          {/* ── In-flight settlements (pending confirmation) ── */}
+          {settlements.filter((s) => s.status !== 'confirmed' && s.status !== 'rejected').length > 0 && (
+            <View style={styles.balanceSection}>
+              <Text style={[typography.overline, { color: colors.textTertiary, marginBottom: spacing.sm }]}>IN PROGRESS</Text>
+              {settlements
+                .filter((s) => s.status !== 'confirmed' && s.status !== 'rejected')
+                .map((s) => (
+                  <TouchableOpacity
+                    key={s.id}
+                    style={[styles.inFlightRow, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }, shadows.card]}
+                    onPress={() => setDetailSettlementId(s.id)}
+                    activeOpacity={0.75}
+                  >
+                    <Clock size={14} color={colors.textTertiary} style={{ marginTop: 2 }} />
+                    <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                      <Text style={[typography.labelSmall, { color: colors.textPrimary }]}>
+                        {s.paid_by_name} → {s.paid_to_name}  ₹{s.amount.toLocaleString()}
+                      </Text>
+                      <Text style={[typography.caption, { color: colors.textTertiary }]}>
+                        {format(new Date(s.created_at), 'dd MMM, h:mm a')}
+                      </Text>
+                    </View>
+                    <PaymentStatusBadge status={s.status} size="sm" />
+                  </TouchableOpacity>
+                ))}
+            </View>
+          )}
+
+
+        </ScrollView>
       )}
 
       {/* FAB */}
@@ -178,7 +330,21 @@ export function ExpensesTab({ tripId }: Props) {
         <AddExpenseScreen tripId={tripId} onClose={() => setShowAddExpense(false)} />
       </Modal>
       <Modal visible={showSettleUp} animationType="slide" presentationStyle="fullScreen">
-        <SettleUpScreen tripId={tripId} onClose={() => setShowSettleUp(false)} />
+        <SettleUpScreen
+          tripId={tripId}
+          onClose={() => { setShowSettleUp(false); setSettleWithMember(undefined); }}
+          preSelectedMemberId={settleWithMember}
+          preSelectedAmount={settleWithMember ? simplifiedDebts.find((d) => d.from === user?.id && d.to === settleWithMember)?.amount : undefined}
+        />
+      </Modal>
+      <Modal visible={!!detailSettlementId} animationType="slide" presentationStyle="fullScreen">
+        {detailSettlementId && (
+          <SettlementDetailScreen
+            settlementId={detailSettlementId}
+            onClose={() => setDetailSettlementId(null)}
+            onSettled={() => { fetchBalances(tripId); fetchSettlements(tripId); setDetailSettlementId(null); }}
+          />
+        )}
       </Modal>
     </View>
   );
@@ -215,9 +381,22 @@ const styles = StyleSheet.create({
     width: 36, height: 36, borderRadius: 18,
     justifyContent: 'center', alignItems: 'center',
   },
-  settleBtn: {
-    height: 48, borderRadius: borderRadius.md,
-    justifyContent: 'center', alignItems: 'center', marginTop: spacing.lg,
+  settleRowBtn: {
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: borderRadius.sm,
+  },
+  balanceSection: { marginBottom: spacing.lg },
+  yourSummaryCard: {
+    flexDirection: 'row', alignItems: 'center',
+    padding: spacing.md, borderRadius: borderRadius.lg,
+    borderWidth: 1, marginBottom: spacing.lg,
+  },
+  allSettled: { alignItems: 'center', paddingVertical: spacing.xl },
+  inFlightRow: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    padding: spacing.sm, borderRadius: borderRadius.md,
+    borderWidth: 1, marginBottom: spacing.xs,
   },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyIcon: { width: 72, height: 72, borderRadius: 36, justifyContent: 'center', alignItems: 'center' },

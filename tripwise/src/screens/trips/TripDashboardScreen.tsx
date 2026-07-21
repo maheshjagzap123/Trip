@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity,
   FlatList, Animated, Dimensions, Easing, Platform, RefreshControl,
@@ -15,7 +15,7 @@ import { TripDetailScreen } from './TripDetailScreen';
 import { AddExpenseScreen } from '../expenses/AddExpenseScreen';
 import { ChatScreen } from '../chat/ChatScreen';
 import { NotificationsScreen } from '../notifications/NotificationsScreen';
-import { Plus, MapPin, Calendar, Zap, MessageCircle, Bell, Search, X } from 'lucide-react-native';
+import { Plus, MapPin, Calendar, Zap, MessageCircle, Bell, Search } from 'lucide-react-native';
 import { format } from 'date-fns';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
@@ -40,7 +40,6 @@ export function TripDashboardScreen() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [tripExpenses, setTripExpenses] = useState<Record<string, number>>({});
   const [myShares, setMyShares] = useState<Record<string, number>>({});
@@ -206,7 +205,7 @@ export function TripDashboardScreen() {
     );
   };
 
-  const ListHeader = () => (
+  const ListHeader = useMemo(() => (
     <View>
       {/* Greeting */}
       <View style={styles.greeting}>
@@ -234,7 +233,7 @@ export function TripDashboardScreen() {
 
       {/* Stats Banner */}
       <LinearGradient
-        colors={[colors.primary, '#6366F1']}
+        colors={[colors.primary, '#7B61FF']}
         style={[styles.statsBanner, shadows.brand]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -273,22 +272,21 @@ export function TripDashboardScreen() {
         <View style={{ marginTop: spacing.sm }}>
           <View style={styles.sectionHeader}>
             <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>Your Trips</Text>
-            <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
-              {showSearch ? <X size={18} color={colors.textTertiary} /> : <Search size={18} color={colors.textTertiary} />}
-            </TouchableOpacity>
           </View>
 
-          {showSearch && (
+          {/* Search */}
+          <View style={[styles.searchBox, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+            <Search size={16} color={colors.textTertiary} />
             <TextInput
-              style={[styles.searchInput, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
+              style={[styles.searchInput, { color: colors.textPrimary }]}
               placeholder="Search trips..."
               placeholderTextColor={colors.textTertiary}
               value={searchQuery}
               onChangeText={setSearchQuery}
-              autoFocus
             />
-          )}
+          </View>
 
+          {/* Filter chips */}
           <View style={styles.filterRow}>
             {['All', 'Planning', 'Active', 'Completed'].map((s) => (
               <TouchableOpacity
@@ -312,7 +310,7 @@ export function TripDashboardScreen() {
         </View>
       )}
     </View>
-  );
+  ), [colors, profile, unreadCount, trips, invitations, totalSpent, statusFilter, searchQuery]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -321,7 +319,7 @@ export function TripDashboardScreen() {
           data={filteredTrips}
           keyExtractor={(item) => item.id}
           renderItem={renderTripCard}
-          ListHeaderComponent={ListHeader}
+          ListHeaderComponent={<>{ListHeader}</>}
           ListEmptyComponent={
             <View style={styles.empty}>
               <View style={[styles.emptyIconWrap, { backgroundColor: colors.primaryLight }]}>
@@ -355,7 +353,7 @@ export function TripDashboardScreen() {
           accessibilityLabel="Create new trip"
         >
           <LinearGradient
-            colors={[colors.primary, '#6366F1']}
+            colors={[colors.primary, '#7B61FF']}
             style={styles.fabGrad}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -486,7 +484,7 @@ const styles = StyleSheet.create({
   notifBadge: {
     position: 'absolute', top: 6, right: 6,
     minWidth: 18, height: 18, borderRadius: 9,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6B7A',
     justifyContent: 'center', alignItems: 'center',
     paddingHorizontal: 4,
   },
@@ -495,7 +493,7 @@ const styles = StyleSheet.create({
   // Stats
   statsBanner: {
     borderRadius: borderRadius.xl, padding: spacing.lg,
-    flexDirection: 'row', marginBottom: spacing.lg,
+    flexDirection: 'row', marginBottom: spacing.xl,
   },
   statItem: { flex: 1, alignItems: 'center' },
   statNum: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 2 },
@@ -506,11 +504,23 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.sm },
 
   // Search & Filter
-  searchInput: {
-    height: 42, borderWidth: 1, borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md, fontSize: 14, marginBottom: spacing.sm,
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.sm + 2,
+    height: 42,
+    marginBottom: spacing.sm,
+    gap: spacing.xs,
   },
-  filterRow: { flexDirection: 'row', gap: spacing.xs, marginBottom: spacing.md, flexWrap: 'wrap' },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    height: 42,
+    paddingVertical: 0,
+  } as any,
+  filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginBottom: spacing.md, alignItems: 'center' },
   filterChip: {
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.full, borderWidth: 1,
@@ -519,7 +529,7 @@ const styles = StyleSheet.create({
   // Trip Card
   tripCard: {
     borderRadius: borderRadius.xl,
-    padding: spacing.md,
+    padding: spacing.lg,
     marginBottom: spacing.md,
     borderWidth: 1,
   },
@@ -572,7 +582,7 @@ const styles = StyleSheet.create({
 
   // FAB
   fab: {
-    position: 'absolute', right: spacing.lg, bottom: spacing.lg,
+    position: 'absolute', right: spacing.lg, bottom: 90,
     borderRadius: 30, overflow: 'hidden',
   },
   fabGrad: { width: 58, height: 58, justifyContent: 'center', alignItems: 'center' },

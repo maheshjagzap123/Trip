@@ -36,7 +36,7 @@ export function AuthStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        cardStyle: { backgroundColor: '#0A0F1E' },
+        cardStyle: { backgroundColor: '#080C16', flex: 1 },
         cardStyleInterpolator: forSlideUpFade,
         transitionSpec: { open: smoothSpec, close: smoothSpec },
         gestureEnabled: true,

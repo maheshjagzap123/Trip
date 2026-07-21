@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   SafeAreaView, FlatList, KeyboardAvoidingView, Platform,
-  Modal, Pressable, Dimensions, Alert, Clipboard,
+  Modal, Pressable, Dimensions, Alert, Clipboard, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { useChatStore } from '../../stores/chatStore';
 import { supabase } from '../../lib/supabase';
 import type { Message } from '../../stores/chatStore';
-import { ArrowLeft, Send, Pin, X, ChevronDown, Reply, Copy, Trash2, AlertTriangle } from 'lucide-react-native';
+import { ArrowLeft, Send, Pin, X, ChevronDown, Reply, Copy, Trash2, AlertTriangle, Search } from 'lucide-react-native';
 import { format, isToday, isYesterday } from 'date-fns';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -35,6 +35,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition>({ x: 0, y: 0 });
+  const [searchText, setSearchText] = useState('');
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const presenceChannelRef = useRef<any>(null);
@@ -42,6 +43,12 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
   useEffect(() => {
     fetchMessages(tripId);
     const unsub = subscribeToChatRealtime(tripId);
+
+    // Handle Android hardware back button
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
 
     // Set up typing indicator presence channel
     const presenceChannel = supabase
@@ -72,6 +79,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
 
     return () => {
       unsub();
+      backHandler.remove();
       supabase.removeChannel(presenceChannel);
     };
   }, [tripId]);
@@ -132,6 +140,11 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
   };
 
   const pinnedMessages = messages.filter((m) => m.is_pinned);
+
+  // Filter messages based on search
+  const filteredMessages = searchText.trim()
+    ? messages.filter((m) => m.content.toLowerCase().includes(searchText.toLowerCase()))
+    : messages;
 
   // --- Message Action Menu ---
   const openMessageMenu = useCallback((message: Message, event: any) => {
@@ -383,6 +396,24 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
         </View>
       </View>
 
+      {/* Search Bar - always visible */}
+      <View style={[styles.searchBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <Search size={16} color={colors.textTertiary} />
+        <TextInput
+          style={[styles.searchInput, { color: colors.textPrimary }]}
+          placeholder="Search messages..."
+          placeholderTextColor={colors.textTertiary}
+          value={searchText}
+          onChangeText={setSearchText}
+          returnKeyType="search"
+        />
+        {searchText.length > 0 && (
+          <Text style={[typography.caption, { color: colors.textTertiary }]}>
+            {filteredMessages.length} found
+          </Text>
+        )}
+      </View>
+
       {/* Pinned messages banner */}
       {pinnedMessages.length > 0 && (
         <View style={[styles.pinnedBanner, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
@@ -401,16 +432,16 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
       >
         <FlatList
           ref={flatListRef}
-          data={messages}
+          data={filteredMessages}
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messageList}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyChat}>
-              <Text style={{ fontSize: 40 }}>💬</Text>
+              <Text style={{ fontSize: 40 }}>{searchText ? '🔍' : '💬'}</Text>
               <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.sm, textAlign: 'center' }]}>
-                No messages yet. Start the conversation!
+                {searchText ? 'No messages match your search' : 'No messages yet. Start the conversation!'}
               </Text>
             </View>
           }
@@ -473,6 +504,20 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1 },
   headerBtn: { padding: spacing.xs },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderBottomWidth: 1,
+    gap: spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    height: 34,
+    fontSize: 14,
+    paddingVertical: 0,
+  },
   pinnedBanner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderBottomWidth: 1 },
   messageList: { paddingHorizontal: spacing.md, paddingVertical: spacing.md, flexGrow: 1 },
   emptyChat: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
@@ -482,9 +527,9 @@ const styles = StyleSheet.create({
   otherMessageWrap: { alignSelf: 'flex-start' },
   senderName: { fontSize: 11, fontWeight: '600', marginBottom: 2, marginLeft: spacing.xs },
   bubbleContainer: { flexDirection: 'row', alignItems: 'flex-start' },
-  bubble: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, position: 'relative', minWidth: 80 },
-  myBubble: { borderBottomRightRadius: 4 },
-  otherBubble: { borderBottomLeftRadius: 4, borderWidth: 1 },
+  bubble: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, position: 'relative', minWidth: 80 },
+  myBubble: { borderBottomRightRadius: 6 },
+  otherBubble: { borderBottomLeftRadius: 6, borderWidth: 1 },
   bubbleMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, alignSelf: 'flex-end' },
   timeText: { fontSize: 10 },
   dropdownArrow: {
@@ -504,13 +549,13 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     position: 'absolute',
-    width: 200,
-    borderRadius: 12,
-    paddingVertical: 6,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    width: 210,
+    borderRadius: 16,
+    paddingVertical: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 10,
   },
   menuItem: {
     flexDirection: 'row',
@@ -533,6 +578,6 @@ const styles = StyleSheet.create({
   replyBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: 8, borderLeftWidth: 3, marginHorizontal: spacing.sm, borderRadius: 4 },
   replyBarName: { fontSize: 12, fontWeight: '700' },
   replyBarContent: { fontSize: 13 },
-  input: { flex: 1, minHeight: 42, maxHeight: 120, borderWidth: 1, borderRadius: 22, paddingHorizontal: 16, paddingVertical: Platform.OS === 'ios' ? 10 : 8, fontSize: 15 },
-  sendBtn: { width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center' },
+  input: { flex: 1, minHeight: 44, maxHeight: 120, borderWidth: 1, borderRadius: 24, paddingHorizontal: 18, paddingVertical: Platform.OS === 'ios' ? 12 : 10, fontSize: 15 },
+  sendBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
 });

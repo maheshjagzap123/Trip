@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity, FlatList,
-  Alert, Platform, RefreshControl,
+  Alert, Platform, RefreshControl, BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -46,6 +46,15 @@ export function MemberListScreen({ tripId, tripName, onClose }: MemberListScreen
   useEffect(() => {
     fetchMembers();
   }, [tripId]);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   const fetchMembers = async () => {
     try {

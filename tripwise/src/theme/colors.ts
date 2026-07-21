@@ -1,41 +1,43 @@
 import { Platform } from 'react-native';
 
 export const palette = {
-  // Primary — Deep Travel Blue
-  blue50:  '#EFF6FF',
-  blue100: '#DBEAFE',
-  blue200: '#BFDBFE',
-  blue300: '#93C5FD',
-  blue400: '#60A5FA',
-  blue500: '#3B82F6',
-  blue600: '#2563EB',
-  blue700: '#1D4ED8',
-  blue800: '#1E40AF',
-  blue900: '#1E3A8A',
+  // Primary — Premium Blue
+  blue50:  '#EBF3FF',
+  blue100: '#D6E8FF',
+  blue200: '#B0D4FF',
+  blue300: '#7BB8FF',
+  blue400: '#5B8CFF',
+  blue500: '#4A7AFF',
+  blue600: '#3B6AEF',
+  blue700: '#2D52D9',
+  blue800: '#1E3CB0',
+  blue900: '#152D8A',
 
-  // Secondary — Violet
-  violet50:  '#F5F3FF',
-  violet100: '#EDE9FE',
-  violet400: '#A78BFA',
-  violet500: '#8B5CF6',
-  violet600: '#7C3AED',
+  // Secondary — Accent Purple
+  violet50:  '#F3EEFF',
+  violet100: '#E8DEFF',
+  violet200: '#CDB8FF',
+  violet300: '#A78BFF',
+  violet400: '#7B61FF',
+  violet500: '#6B4FEE',
+  violet600: '#5A3DD9',
 
-  // Accent — Emerald
-  emerald50:  '#ECFDF5',
-  emerald100: '#D1FAE5',
-  emerald400: '#34D399',
-  emerald500: '#10B981',
-  emerald600: '#059669',
+  // Accent — Success Emerald
+  emerald50:  '#E8FFF5',
+  emerald100: '#C4FFEA',
+  emerald400: '#35D07F',
+  emerald500: '#2AB870',
+  emerald600: '#1FA060',
 
-  // Amber
-  amber400: '#FBBF24',
-  amber500: '#F59E0B',
+  // Amber / Warning
+  amber400: '#FFB648',
+  amber500: '#F5A623',
 
-  // Rose
-  rose400: '#FB7185',
-  rose500: '#F43F5E',
+  // Rose / Error
+  rose400: '#FF6B7A',
+  rose500: '#F44C5E',
 
-  // Neutral
+  // Neutral — Rich Dark
   gray50:  '#F8FAFC',
   gray100: '#F1F5F9',
   gray150: '#EEF2F7',
@@ -46,17 +48,17 @@ export const palette = {
   gray600: '#475569',
   gray700: '#334155',
   gray800: '#1E293B',
-  gray850: '#172033',
-  gray900: '#0F172A',
-  gray950: '#080E1A',
+  gray850: '#182235',
+  gray900: '#111827',
+  gray950: '#080C16',
 
   // Base
   white: '#FFFFFF',
   black: '#000000',
 
   // Brand gradient stops
-  brandStart: '#3B82F6',
-  brandEnd:   '#8B5CF6',
+  brandStart: '#5B8CFF',
+  brandEnd:   '#7B61FF',
 } as const;
 
 export const lightColors = {
@@ -65,7 +67,7 @@ export const lightColors = {
   backgroundAlt:    palette.white,
   surface:          palette.white,
   surfaceElevated:  palette.white,
-  surfaceOverlay:   'rgba(255,255,255,0.85)',
+  surfaceOverlay:   'rgba(255,255,255,0.88)',
 
   // Text
   textPrimary:   palette.gray900,
@@ -75,15 +77,15 @@ export const lightColors = {
   textOnBrand:   palette.white,
 
   // Brand
-  primary:      palette.blue600,
-  primaryDark:  palette.blue800,
+  primary:      palette.blue500,
+  primaryDark:  palette.blue700,
   primaryLight: palette.blue50,
-  secondary:    palette.violet500,
-  accent:       palette.emerald500,
+  secondary:    palette.violet400,
+  accent:       palette.emerald400,
 
   // Gradients (stored as string tuples for LinearGradient)
-  gradientPrimary:   '#3B82F6',
-  gradientSecondary: '#8B5CF6',
+  gradientPrimary:   '#5B8CFF',
+  gradientSecondary: '#7B61FF',
 
   // Borders
   border:        palette.gray200,
@@ -91,13 +93,13 @@ export const lightColors = {
   borderFocused: palette.blue500,
 
   // Status
-  error:             palette.rose500,
-  errorBackground:   '#FFF1F2',
-  success:           palette.emerald500,
-  successBackground: '#ECFDF5',
-  warning:           palette.amber500,
-  warningBackground: '#FFFBEB',
-  info:              palette.blue500,
+  error:             palette.rose400,
+  errorBackground:   'rgba(255,107,122,0.08)',
+  success:           palette.emerald400,
+  successBackground: 'rgba(53,208,127,0.08)',
+  warning:           palette.amber400,
+  warningBackground: 'rgba(255,182,72,0.08)',
+  info:              palette.blue400,
   infoBackground:    palette.blue50,
 
   // Components
@@ -106,63 +108,63 @@ export const lightColors = {
   cardBackgroundAlt:  palette.gray50,
   skeletonBase:       palette.gray200,
   skeletonHighlight:  palette.gray100,
-  overlay:            'rgba(15,23,42,0.55)',
+  overlay:            'rgba(8,12,22,0.6)',
   tabBarBackground:   palette.white,
   tabBarBorder:       palette.gray100,
   shimmer:            'rgba(255,255,255,0.6)',
 } as const;
 
 export const darkColors = {
-  // Backgrounds
-  background:       palette.gray950,
-  backgroundAlt:    palette.gray900,
-  surface:          palette.gray900,
-  surfaceElevated:  palette.gray850,
-  surfaceOverlay:   'rgba(15,23,42,0.9)',
+  // Backgrounds — Rich dark, not flat black
+  background:       '#080C16',
+  backgroundAlt:    '#0D1320',
+  surface:          '#111827',
+  surfaceElevated:  '#182235',
+  surfaceOverlay:   'rgba(8,12,22,0.92)',
 
   // Text
   textPrimary:   '#F1F5F9',
   textSecondary: '#94A3B8',
   textTertiary:  '#64748B',
-  textInverse:   palette.gray900,
+  textInverse:   '#080C16',
   textOnBrand:   palette.white,
 
   // Brand
-  primary:      palette.blue400,
-  primaryDark:  palette.blue300,
-  primaryLight: 'rgba(59,130,246,0.15)',
-  secondary:    palette.violet400,
-  accent:       palette.emerald400,
+  primary:      '#5B8CFF',
+  primaryDark:  '#7BB8FF',
+  primaryLight: 'rgba(91,140,255,0.12)',
+  secondary:    '#7B61FF',
+  accent:       '#35D07F',
 
   // Gradients
-  gradientPrimary:   '#60A5FA',
-  gradientSecondary: '#A78BFA',
+  gradientPrimary:   '#5B8CFF',
+  gradientSecondary: '#7B61FF',
 
-  // Borders
-  border:        palette.gray800,
-  borderLight:   'rgba(255,255,255,0.06)',
-  borderFocused: palette.blue400,
+  // Borders — Subtle translucent
+  border:        'rgba(255,255,255,0.08)',
+  borderLight:   'rgba(255,255,255,0.05)',
+  borderFocused: '#5B8CFF',
 
   // Status
-  error:             '#FB7185',
-  errorBackground:   'rgba(244,63,94,0.12)',
-  success:           '#34D399',
-  successBackground: 'rgba(16,185,129,0.12)',
-  warning:           '#FBBF24',
-  warningBackground: 'rgba(245,158,11,0.12)',
-  info:              '#60A5FA',
-  infoBackground:    'rgba(59,130,246,0.12)',
+  error:             '#FF6B7A',
+  errorBackground:   'rgba(255,107,122,0.10)',
+  success:           '#35D07F',
+  successBackground: 'rgba(53,208,127,0.10)',
+  warning:           '#FFB648',
+  warningBackground: 'rgba(255,182,72,0.10)',
+  info:              '#5B8CFF',
+  infoBackground:    'rgba(91,140,255,0.10)',
 
   // Components
-  inputBackground:    palette.gray850,
-  cardBackground:     palette.gray900,
-  cardBackgroundAlt:  palette.gray850,
-  skeletonBase:       palette.gray800,
-  skeletonHighlight:  palette.gray700,
+  inputBackground:    '#111827',
+  cardBackground:     '#111827',
+  cardBackgroundAlt:  '#182235',
+  skeletonBase:       '#182235',
+  skeletonHighlight:  '#1E293B',
   overlay:            'rgba(0,0,0,0.75)',
-  tabBarBackground:   palette.gray950,
-  tabBarBorder:       'rgba(255,255,255,0.06)',
-  shimmer:            'rgba(255,255,255,0.08)',
+  tabBarBackground:   '#080C16',
+  tabBarBorder:       'rgba(255,255,255,0.05)',
+  shimmer:            'rgba(255,255,255,0.06)',
 } as const;
 
 export type Colors = typeof lightColors;

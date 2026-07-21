@@ -14,10 +14,10 @@ const { width: SCREEN_W } = Dimensions.get('window');
 
 // ─── PressableScale ──────────────────────────────────────────────────────────
 export function PressableScale({
-  children, onPress, style, disabled, activeOpacity = 0.82,
+  children, onPress, style, disabled, activeOpacity = 0.85,
 }: TouchableOpacityProps & { children: React.ReactNode }) {
   const scale = useRef(new Animated.Value(1)).current;
-  const press = () => Animated.spring(scale, { toValue: 0.96, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+  const press = () => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
   const release = () => Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 30, bounciness: 6 }).start();
   return (
     <TouchableOpacity
@@ -58,7 +58,7 @@ export function Button({
   const press = () => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
   const release = () => Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 30, bounciness: 6 }).start();
 
-  const heights = { sm: 40, md: 52, lg: 58 };
+  const heights = { sm: 42, md: 54, lg: 60 };
   const textStyles = { sm: typography.buttonSmall, md: typography.buttonMedium, lg: typography.buttonLarge };
   const h = heights[size];
   const txtStyle = textStyles[size];
@@ -75,9 +75,9 @@ export function Button({
         activeOpacity={0.88}
         style={[fullWidth && { width: '100%' }, style]}
       >
-        <Animated.View style={[{ transform: [{ scale }] }, isDisabled && { opacity: 0.55 }]}>
+        <Animated.View style={[{ transform: [{ scale }] }, isDisabled && { opacity: 0.5 }]}>
           <LinearGradient
-            colors={['#3B82F6', '#6366F1']}
+            colors={['#5B8CFF', '#7B61FF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={[btnStyles.base, { height: h, borderRadius: borderRadius.lg }, shadows.brand]}
@@ -85,7 +85,7 @@ export function Button({
             {loading
               ? <ActivityIndicator color="#fff" size="small" />
               : <>
-                  {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+                  {icon && <View style={{ marginRight: spacing.xs }}>{icon}</View>}
                   <Text style={[txtStyle, { color: '#fff' }]}>{label}</Text>
                 </>
             }
@@ -107,14 +107,20 @@ export function Button({
       >
         <Animated.View style={[
           btnStyles.base,
-          { height: h, borderRadius: borderRadius.lg, backgroundColor: colors.primaryLight, borderWidth: 1.5, borderColor: colors.primary },
-          isDisabled && { opacity: 0.55 },
+          {
+            height: h,
+            borderRadius: borderRadius.lg,
+            backgroundColor: colors.primaryLight,
+            borderWidth: 1,
+            borderColor: 'rgba(91,140,255,0.3)',
+          },
+          isDisabled && { opacity: 0.5 },
           { transform: [{ scale }] },
         ]}>
           {loading
             ? <ActivityIndicator color={colors.primary} size="small" />
             : <>
-                {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+                {icon && <View style={{ marginRight: spacing.xs }}>{icon}</View>}
                 <Text style={[txtStyle, { color: colors.primary }]}>{label}</Text>
               </>
           }
@@ -135,14 +141,20 @@ export function Button({
       >
         <Animated.View style={[
           btnStyles.base,
-          { height: h, borderRadius: borderRadius.lg, borderWidth: 1.5, borderColor: colors.error, backgroundColor: colors.errorBackground },
-          isDisabled && { opacity: 0.55 },
+          {
+            height: h,
+            borderRadius: borderRadius.lg,
+            borderWidth: 1,
+            borderColor: 'rgba(255,107,122,0.3)',
+            backgroundColor: colors.errorBackground,
+          },
+          isDisabled && { opacity: 0.5 },
           { transform: [{ scale }] },
         ]}>
           {loading
             ? <ActivityIndicator color={colors.error} size="small" />
             : <>
-                {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+                {icon && <View style={{ marginRight: spacing.xs }}>{icon}</View>}
                 <Text style={[txtStyle, { color: colors.error }]}>{label}</Text>
               </>
           }
@@ -164,10 +176,10 @@ export function Button({
       <Animated.View style={[
         btnStyles.base,
         { height: h, borderRadius: borderRadius.lg },
-        isDisabled && { opacity: 0.55 },
+        isDisabled && { opacity: 0.5 },
         { transform: [{ scale }] },
       ]}>
-        {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+        {icon && <View style={{ marginRight: spacing.xs }}>{icon}</View>}
         <Text style={[txtStyle, { color: colors.primary }]}>{label}</Text>
       </Animated.View>
     </TouchableOpacity>
@@ -220,7 +232,6 @@ export function Input({ label, error, leftIcon, rightIcon, containerStyle, style
       <Animated.View style={[
         inputStyles.wrap,
         { backgroundColor: colors.inputBackground, borderColor },
-        shadows.xs,
       ]}>
         {leftIcon && <View style={inputStyles.iconLeft}>{leftIcon}</View>}
         <TextInput
@@ -239,7 +250,7 @@ export function Input({ label, error, leftIcon, rightIcon, containerStyle, style
         {rightIcon && <View style={inputStyles.iconRight}>{rightIcon}</View>}
       </Animated.View>
       {error && (
-        <Text style={[typography.caption, { color: colors.error, marginTop: spacing.xs }]}>
+        <Text style={[typography.caption, { color: colors.error, marginTop: spacing.xxs }]}>
           {error}
         </Text>
       )}
@@ -251,9 +262,9 @@ const inputStyles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderRadius: borderRadius.md,
-    minHeight: 52,
+    minHeight: 54,
     paddingHorizontal: spacing.md,
   },
   input: {
@@ -284,12 +295,12 @@ export function Card({ children, style, onPress, variant = 'default', padding = 
   };
 
   const variantStyle: ViewStyle = variant === 'elevated'
-    ? { backgroundColor: colors.surface, ...shadows.md }
+    ? { backgroundColor: colors.surfaceElevated, ...shadows.md }
     : variant === 'outlined'
     ? { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }
     : variant === 'glass'
     ? { backgroundColor: colors.surfaceOverlay, borderWidth: 1, borderColor: colors.borderLight }
-    : { backgroundColor: colors.cardBackground, ...shadows.sm };
+    : { backgroundColor: colors.cardBackground, borderWidth: 1, borderColor: colors.borderLight, ...shadows.card };
 
   if (onPress) {
     return (
@@ -315,8 +326,8 @@ export function Badge({ label, color, bgColor, size = 'md', dot }: BadgeProps) {
   const colors = useThemeColors();
   const c = color || colors.primary;
   const bg = bgColor || colors.primaryLight;
-  const px = size === 'sm' ? 8 : 10;
-  const py = size === 'sm' ? 3 : 5;
+  const px = size === 'sm' ? 10 : 12;
+  const py = size === 'sm' ? 4 : 6;
   const fs = size === 'sm' ? 10 : 11;
 
   return (
@@ -328,8 +339,8 @@ export function Badge({ label, color, bgColor, size = 'md', dot }: BadgeProps) {
 }
 
 const badgeStyles = StyleSheet.create({
-  wrap: { flexDirection: 'row', alignItems: 'center', borderRadius: borderRadius.full, gap: 4 },
-  dot: { width: 5, height: 5, borderRadius: 3 },
+  wrap: { flexDirection: 'row', alignItems: 'center', borderRadius: borderRadius.full, gap: 5 },
+  dot: { width: 6, height: 6, borderRadius: 3 },
   txt: { fontWeight: '700', letterSpacing: 0.2 },
 });
 
@@ -341,13 +352,13 @@ interface AvatarProps {
   color?: string;
 }
 
-export function Avatar({ name, size = 40, uri, color }: AvatarProps) {
+export function Avatar({ name, size = 42, uri, color }: AvatarProps) {
   const colors = useThemeColors();
   const initials = name
     ? name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
     : '?';
   const bg = color || colors.primary;
-  const fontSize = size * 0.38;
+  const fontSize = size * 0.36;
 
   return (
     <LinearGradient
@@ -372,20 +383,20 @@ interface SkeletonProps {
   style?: ViewStyle;
 }
 
-export function Skeleton({ width = '100%', height = 16, borderRadius: br = 8, style }: SkeletonProps) {
+export function Skeleton({ width = '100%', height = 16, borderRadius: br = 10, style }: SkeletonProps) {
   const colors = useThemeColors();
   const shimmer = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(shimmer, { toValue: 1, duration: 900, useNativeDriver: true }),
-        Animated.timing(shimmer, { toValue: 0, duration: 900, useNativeDriver: true }),
+        Animated.timing(shimmer, { toValue: 1, duration: 1000, useNativeDriver: true }),
+        Animated.timing(shimmer, { toValue: 0, duration: 1000, useNativeDriver: true }),
       ])
     ).start();
   }, []);
 
-  const opacity = shimmer.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0.9] });
+  const opacity = shimmer.interpolate({ inputRange: [0, 1], outputRange: [0.3, 0.7] });
 
   return (
     <Animated.View
@@ -413,16 +424,16 @@ export function EmptyState({ emoji, title, subtitle, actionLabel, onAction }: Em
       <View style={[emptyStyles.emojiWrap, { backgroundColor: colors.primaryLight }]}>
         <Text style={emptyStyles.emoji}>{emoji}</Text>
       </View>
-      <Text style={[typography.h2, { color: colors.textPrimary, textAlign: 'center', marginTop: spacing.lg }]}>
+      <Text style={[typography.h1, { color: colors.textPrimary, textAlign: 'center', marginTop: spacing.lg }]}>
         {title}
       </Text>
       {subtitle && (
-        <Text style={[typography.bodyMedium, { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs, lineHeight: 22 }]}>
+        <Text style={[typography.bodyMedium, { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs, lineHeight: 24, maxWidth: 280 }]}>
           {subtitle}
         </Text>
       )}
       {actionLabel && onAction && (
-        <Button label={actionLabel} onPress={onAction} size="md" style={{ marginTop: spacing.xl, width: 200 }} fullWidth={false} />
+        <Button label={actionLabel} onPress={onAction} size="md" style={{ marginTop: spacing.xl, width: 220 }} fullWidth={false} />
       )}
     </View>
   );
@@ -430,8 +441,8 @@ export function EmptyState({ emoji, title, subtitle, actionLabel, onAction }: Em
 
 const emptyStyles = StyleSheet.create({
   wrap: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.xxl },
-  emojiWrap: { width: 88, height: 88, borderRadius: 44, justifyContent: 'center', alignItems: 'center' },
-  emoji: { fontSize: 40 },
+  emojiWrap: { width: 96, height: 96, borderRadius: 48, justifyContent: 'center', alignItems: 'center' },
+  emoji: { fontSize: 44 },
 });
 
 // ─── ScreenHeader ────────────────────────────────────────────────────────────
@@ -448,7 +459,7 @@ export function ScreenHeader({ title, subtitle, onBack, right, transparent }: Sc
   return (
     <View style={[
       headerStyles.wrap,
-      !transparent && { backgroundColor: colors.surface, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.borderLight, ...shadows.xs },
+      !transparent && { backgroundColor: colors.background, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.borderLight },
     ]}>
       {onBack ? (
         <TouchableOpacity
@@ -458,8 +469,8 @@ export function ScreenHeader({ title, subtitle, onBack, right, transparent }: Sc
           accessibilityLabel="Go back"
           accessibilityRole="button"
         >
-          <View style={[headerStyles.backCircle, { backgroundColor: colors.inputBackground }]}>
-            <ArrowLeft color={colors.textPrimary} size={18} />
+          <View style={[headerStyles.backCircle, { backgroundColor: colors.surfaceElevated }]}>
+            <ArrowLeft color={colors.textPrimary} size={18} strokeWidth={2.2} />
           </View>
         </TouchableOpacity>
       ) : (
@@ -500,14 +511,14 @@ interface StatCardProps {
 export function StatCard({ icon, value, label, color, style }: StatCardProps) {
   const colors = useThemeColors();
   return (
-    <View style={[statStyles.wrap, { backgroundColor: colors.cardBackground, ...shadows.sm }, style]}>
-      <View style={[statStyles.iconWrap, { backgroundColor: (color || colors.primary) + '18' }]}>
+    <View style={[statStyles.wrap, { backgroundColor: colors.cardBackground, borderWidth: 1, borderColor: colors.borderLight }, shadows.card, style]}>
+      <View style={[statStyles.iconWrap, { backgroundColor: (color || colors.primary) + '14' }]}>
         {icon}
       </View>
-      <Text style={[typography.h2, { color: colors.textPrimary, marginTop: spacing.sm }]} numberOfLines={1} adjustsFontSizeToFit>
+      <Text style={[typography.numberMedium, { color: colors.textPrimary, marginTop: spacing.sm }]} numberOfLines={1} adjustsFontSizeToFit>
         {value}
       </Text>
-      <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]}>{label}</Text>
+      <Text style={[typography.caption, { color: colors.textTertiary, marginTop: spacing.xxs }]}>{label}</Text>
     </View>
   );
 }
@@ -520,7 +531,7 @@ const statStyles = StyleSheet.create({
     alignItems: 'center',
     minWidth: (SCREEN_W - spacing.lg * 2 - spacing.sm * 3) / 2,
   },
-  iconWrap: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
+  iconWrap: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
 });
 
 // ─── Chip ────────────────────────────────────────────────────────────────────
@@ -542,7 +553,7 @@ export function Chip({ label, selected, onPress, color, style }: ChipProps) {
       style={[
         chipStyles.wrap,
         selected
-          ? { backgroundColor: c + '20', borderColor: c }
+          ? { backgroundColor: c + '18', borderColor: c + '40' }
           : { backgroundColor: colors.inputBackground, borderColor: colors.border },
         style,
       ]}
@@ -557,9 +568,9 @@ export function Chip({ label, selected, onPress, color, style }: ChipProps) {
 const chipStyles = StyleSheet.create({
   wrap: {
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
+    paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    borderWidth: 1.5,
+    borderWidth: 1,
   },
 });
 
@@ -572,7 +583,7 @@ interface FABProps {
 
 export function FAB({ onPress, icon, style }: FABProps) {
   const scale = useRef(new Animated.Value(1)).current;
-  const press = () => Animated.spring(scale, { toValue: 0.92, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
+  const press = () => Animated.spring(scale, { toValue: 0.9, useNativeDriver: true, speed: 50, bounciness: 4 }).start();
   const release = () => Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 30, bounciness: 8 }).start();
 
   return (
@@ -585,7 +596,7 @@ export function FAB({ onPress, icon, style }: FABProps) {
     >
       <Animated.View style={{ transform: [{ scale }] }}>
         <LinearGradient
-          colors={['#3B82F6', '#6366F1']}
+          colors={['#5B8CFF', '#7B61FF']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[fabStyles.inner, shadows.brand]}
@@ -598,8 +609,8 @@ export function FAB({ onPress, icon, style }: FABProps) {
 }
 
 const fabStyles = StyleSheet.create({
-  wrap: { position: 'absolute', right: spacing.md, bottom: spacing.lg },
-  inner: { width: 58, height: 58, borderRadius: 29, justifyContent: 'center', alignItems: 'center' },
+  wrap: { position: 'absolute', right: spacing.lg, bottom: spacing.xl },
+  inner: { width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center' },
 });
 
 // ─── SectionLabel ────────────────────────────────────────────────────────────
@@ -615,5 +626,5 @@ export function SectionLabel({ label, style }: { label: string; style?: TextStyl
 // ─── Divider ─────────────────────────────────────────────────────────────────
 export function Divider({ style }: { style?: ViewStyle }) {
   const colors = useThemeColors();
-  return <View style={[{ height: 1, backgroundColor: colors.borderLight }, style]} />;
+  return <View style={[{ height: StyleSheet.hairlineWidth, backgroundColor: colors.borderLight }, style]} />;
 }

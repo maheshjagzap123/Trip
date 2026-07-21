@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, BackHandler } from 'react-native';
 import { useThemeColors, typography, spacing } from '../../theme';
 import { ExpensesTab } from './ExpensesTab';
 import { ArrowLeft } from 'lucide-react-native';
@@ -12,6 +12,14 @@ interface Props {
 
 export function ExpensesScreen({ tripId, tripName, onClose }: Props) {
   const colors = useThemeColors();
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
@@ -156,14 +156,14 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '48%',
-    padding: spacing.md,
+    padding: spacing.lg,
     borderRadius: borderRadius.xl,
     borderWidth: 1,
     alignItems: 'center',
     marginBottom: spacing.sm,
   },
   statIconBg: {
-    width: 48, height: 48, borderRadius: 24,
+    width: 52, height: 52, borderRadius: 26,
     justifyContent: 'center', alignItems: 'center',
   },
   comingSoonCard: {

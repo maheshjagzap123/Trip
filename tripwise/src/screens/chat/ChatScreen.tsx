@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   // Existing styles
-  inputBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.sm, paddingTop: spacing.sm, paddingBottom: spacing.md, borderTopWidth: 1, gap: spacing.xs },
+  inputBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.sm, paddingTop: spacing.sm, paddingBottom: 80, borderTopWidth: 1, gap: spacing.xs },
   emojiToggle: { padding: 6 },
   emojiPicker: { borderTopWidth: 1, paddingHorizontal: spacing.sm, paddingVertical: spacing.sm },
   emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },

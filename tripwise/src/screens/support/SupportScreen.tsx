@@ -40,11 +40,11 @@ export function SupportScreen({ onClose }: Props) {
     setSending(true);
     try {
       await supabase.from('notifications').insert({
-        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
+        user_id: '00000000-0000-0000-0000-000000000001',
         type: 'feedback',
         title: `Feedback (${feedbackRating}★)`,
         body: feedbackText.trim(),
-        data: { rating: feedbackRating, user_email: user?.email },
+        data: { rating: feedbackRating, user_email: user?.email, from_user_id: user?.id },
       });
       showAlert('Thank you!', 'Your feedback has been submitted.');
       setFeedbackRating(0);
@@ -57,11 +57,11 @@ export function SupportScreen({ onClose }: Props) {
     setSending(true);
     try {
       await supabase.from('notifications').insert({
-        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
+        user_id: '00000000-0000-0000-0000-000000000001',
         type: 'support_request',
         title: contactSubject.trim(),
         body: contactMessage.trim(),
-        data: { user_email: user?.email },
+        data: { user_email: user?.email, from_user_id: user?.id },
       });
       showAlert('Sent!', 'We\'ll get back to you within 24 hours.');
       setContactSubject('');

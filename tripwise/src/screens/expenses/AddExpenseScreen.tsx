@@ -10,8 +10,16 @@ import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Check } from 'lucide-react-native';
 
 const CATEGORIES = [
-  'Food', 'Fuel', 'Hotel', 'Flight', 'Shopping',
-  'Transport', 'Entertainment', 'Parking', 'Medical', 'Miscellaneous',
+  { name: 'Food', emoji: '🍽️' },
+  { name: 'Fuel', emoji: '⛽' },
+  { name: 'Hotel', emoji: '🏨' },
+  { name: 'Flight', emoji: '✈️' },
+  { name: 'Shopping', emoji: '🛍️' },
+  { name: 'Transport', emoji: '🚗' },
+  { name: 'Entertainment', emoji: '🎬' },
+  { name: 'Parking', emoji: '🅿️' },
+  { name: 'Medical', emoji: '💊' },
+  { name: 'Miscellaneous', emoji: '📦' },
 ];
 
 interface Member { user_id: string; display_name: string | null; }
@@ -199,11 +207,11 @@ export function AddExpenseScreen({ tripId, onClose }: Props) {
           <View style={styles.chipRow}>
             {CATEGORIES.map((cat) => (
               <TouchableOpacity
-                key={cat}
-                style={[styles.chip, { backgroundColor: category === cat ? colors.primary : colors.inputBackground, borderColor: category === cat ? colors.primary : colors.border }]}
-                onPress={() => setCategory(cat)}
+                key={cat.name}
+                style={[styles.chip, { backgroundColor: category === cat.name ? colors.primary : colors.inputBackground, borderColor: category === cat.name ? colors.primary : colors.border }]}
+                onPress={() => setCategory(cat.name)}
               >
-                <Text style={[typography.caption, { color: category === cat ? colors.textInverse : colors.textPrimary }]}>{cat}</Text>
+                <Text style={[typography.caption, { color: category === cat.name ? colors.textInverse : colors.textPrimary }]}>{cat.emoji} {cat.name}</Text>
               </TouchableOpacity>
             ))}
           </View>

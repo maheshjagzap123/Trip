@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   SafeAreaView, FlatList, KeyboardAvoidingView, Platform,
-  Modal, Pressable, Dimensions, Alert, Clipboard, BackHandler,
+  Modal, Pressable, Dimensions, Alert, Clipboard, BackHandler, Animated, Easing,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { useChatStore } from '../../stores/chatStore';
@@ -261,39 +262,58 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
           })()}
           {/* Message bubble with dropdown arrow */}
           <View style={[styles.bubbleContainer, isMe ? { flexDirection: 'row' } : { flexDirection: 'row' }]}>
-            <View style={[
-              styles.bubble,
-              isMe
-                ? [styles.myBubble, { backgroundColor: colors.primary }]
-                : [styles.otherBubble, { backgroundColor: colors.surface, borderColor: colors.border }]
-            ]}>
-              <Text style={[
-                typography.bodyMedium,
-                { color: isMe ? '#fff' : colors.textPrimary, flexShrink: 1, flexWrap: 'wrap' }
-              ]}>
-                {item.content}
-              </Text>
-              <View style={styles.bubbleMeta}>
-                {item.is_pinned && <Pin size={10} color={isMe ? 'rgba(255,255,255,0.6)' : colors.textTertiary} />}
-                <Text style={[styles.timeText, { color: isMe ? 'rgba(255,255,255,0.6)' : colors.textTertiary }]}>
-                  {format(new Date(item.created_at), 'h:mm a')}
-                </Text>
-              </View>
-              {/* Down arrow button - positioned at top-right of bubble */}
-              <TouchableOpacity
-                style={[
-                  styles.dropdownArrow,
-                  {
-                    backgroundColor: isMe ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.05)',
-                  }
-                ]}
-                onPress={(e) => openMessageMenu(item, e)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                accessibilityLabel="Message options"
+            {isMe ? (
+              <LinearGradient
+                colors={['#5B8CFF', '#7B61FF']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.bubble, styles.myBubble]}
               >
-                <ChevronDown size={14} color={isMe ? 'rgba(255,255,255,0.7)' : colors.textTertiary} />
-              </TouchableOpacity>
-            </View>
+                <Text style={[
+                  typography.bodyMedium,
+                  { color: '#fff', flexShrink: 1, flexWrap: 'wrap' }
+                ]}>
+                  {item.content}
+                </Text>
+                <View style={styles.bubbleMeta}>
+                  {item.is_pinned && <Pin size={10} color="rgba(255,255,255,0.6)" />}
+                  <Text style={[styles.timeText, { color: 'rgba(255,255,255,0.6)' }]}>
+                    {format(new Date(item.created_at), 'h:mm a')}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={[styles.dropdownArrow, { backgroundColor: 'rgba(0,0,0,0.1)' }]}
+                  onPress={(e) => openMessageMenu(item, e)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityLabel="Message options"
+                >
+                  <ChevronDown size={14} color="rgba(255,255,255,0.7)" />
+                </TouchableOpacity>
+              </LinearGradient>
+            ) : (
+              <View style={[styles.bubble, styles.otherBubble, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[
+                  typography.bodyMedium,
+                  { color: colors.textPrimary, flexShrink: 1, flexWrap: 'wrap' }
+                ]}>
+                  {item.content}
+                </Text>
+                <View style={styles.bubbleMeta}>
+                  {item.is_pinned && <Pin size={10} color={colors.textTertiary} />}
+                  <Text style={[styles.timeText, { color: colors.textTertiary }]}>
+                    {format(new Date(item.created_at), 'h:mm a')}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={[styles.dropdownArrow, { backgroundColor: 'rgba(0,0,0,0.05)' }]}
+                  onPress={(e) => openMessageMenu(item, e)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityLabel="Message options"
+                >
+                  <ChevronDown size={14} color={colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -464,10 +484,11 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
         {/* Typing Indicator */}
         {typingUsers.length > 0 && (
           <View style={styles.typingBar}>
+            <TypingDots color={colors.textTertiary} />
             <Text style={[styles.typingText, { color: colors.textTertiary }]}>
               {typingUsers.length === 1
-                ? `${typingUsers[0]} is typing...`
-                : `${typingUsers.join(', ')} are typing...`}
+                ? `${typingUsers[0]} is typing`
+                : `${typingUsers.join(', ')} are typing`}
             </Text>
           </View>
         )}
@@ -527,6 +548,38 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
       {/* Message Actions Menu */}
       {renderMessageMenu()}
     </SafeAreaView>
+  );
+}
+
+// ─── Typing Dots Animation ───────────────────────────────────────────────────
+function TypingDots({ color }: { color: string }) {
+  const dot1 = useRef(new Animated.Value(0)).current;
+  const dot2 = useRef(new Animated.Value(0)).current;
+  const dot3 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animate = (dot: Animated.Value, delay: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(dot, { toValue: -4, duration: 300, easing: Easing.out(Easing.ease), useNativeDriver: true }),
+          Animated.timing(dot, { toValue: 0, duration: 300, easing: Easing.in(Easing.ease), useNativeDriver: true }),
+        ])
+      );
+    animate(dot1, 0).start();
+    animate(dot2, 150).start();
+    animate(dot3, 300).start();
+  }, []);
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginRight: 6 }}>
+      {[dot1, dot2, dot3].map((dot, i) => (
+        <Animated.View
+          key={i}
+          style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: color, transform: [{ translateY: dot }] }}
+        />
+      ))}
+    </View>
   );
 }
 
@@ -608,7 +661,7 @@ const styles = StyleSheet.create({
   emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   emojiBtn: { width: 40, height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
   emojiText: { fontSize: 22 },
-  typingBar: { paddingHorizontal: spacing.md, paddingVertical: 4 },
+  typingBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: 6 },
   typingText: { fontSize: 12, fontStyle: 'italic' },
   replyPreview: { borderLeftWidth: 3, paddingLeft: 8, paddingVertical: 2, marginBottom: 4, marginLeft: 4 },
   replyName: { fontSize: 11, fontWeight: '700' },

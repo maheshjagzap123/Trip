@@ -194,6 +194,30 @@ export function TripDashboardScreen() {
           </View>
         </View>
 
+        {/* Trip Progress Bar */}
+        {item.status === 'Active' && (() => {
+          const start = new Date(item.start_date).getTime();
+          const end = new Date(item.end_date).getTime();
+          const now = Date.now();
+          const progress = Math.min(1, Math.max(0, (now - start) / (end - start)));
+          const daysLeft = Math.max(0, Math.ceil((end - now) / 86400000));
+          return (
+            <View style={{ marginTop: spacing.sm }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                <Text style={[typography.caption, { color: colors.textTertiary }]}>
+                  {Math.round(progress * 100)}% complete
+                </Text>
+                <Text style={[typography.caption, { color: colors.primary }]}>
+                  {daysLeft} {daysLeft === 1 ? 'day' : 'days'} left
+                </Text>
+              </View>
+              <View style={{ height: 4, borderRadius: 2, backgroundColor: colors.borderLight }}>
+                <View style={{ height: 4, borderRadius: 2, backgroundColor: colors.primary, width: `${progress * 100}%` }} />
+              </View>
+            </View>
+          );
+        })()}
+
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity
@@ -225,7 +249,11 @@ export function TripDashboardScreen() {
       <View style={styles.greeting}>
         <View style={{ flex: 1 }}>
           <Text style={[typography.displayMedium, { color: colors.textPrimary }]} numberOfLines={1}>
-            Hey, {profile?.first_name || 'Traveler'} 👋
+            {(() => {
+              const hour = new Date().getHours();
+              const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+              return `${greeting}, ${profile?.first_name || 'Traveler'} 👋`;
+            })()}
           </Text>
           <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.xs }]}>
             Ready for your next adventure?

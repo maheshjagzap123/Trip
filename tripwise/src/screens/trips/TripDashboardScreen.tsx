@@ -248,7 +248,7 @@ export function TripDashboardScreen() {
       {/* Greeting */}
       <View style={styles.greeting}>
         <View style={{ flex: 1 }}>
-          <Text style={[typography.displayMedium, { color: colors.textPrimary }]} numberOfLines={1}>
+          <Text style={[typography.h1, { color: colors.textPrimary }]} numberOfLines={2}>
             {(() => {
               const hour = new Date().getHours();
               const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';

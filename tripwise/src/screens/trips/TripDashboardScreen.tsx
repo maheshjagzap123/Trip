@@ -42,7 +42,7 @@ export function TripDashboardScreen() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [statusFilter, setStatusFilter] = useState<string>('Active');
   const [tripExpenses, setTripExpenses] = useState<Record<string, number>>({});
   const [myShares, setMyShares] = useState<Record<string, number>>({});
   const [refreshing, setRefreshing] = useState(false);
@@ -302,7 +302,7 @@ export function TripDashboardScreen() {
 
           {/* Filter chips */}
           <View style={styles.filterRow}>
-            {['All', 'Planning', 'Active', 'Completed'].map((s) => (
+            {['Active', 'Planning', 'Completed', 'All'].map((s) => (
               <TouchableOpacity
                 key={s}
                 style={[

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
+import { Calendar } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { useTripStore } from '../../stores/tripStore';
@@ -89,7 +90,11 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
       return;
     }
     if (!startDate.trim() || !endDate.trim()) {
-      showAlert('Error', 'Please enter start and end dates.');
+      showAlert('Error', 'Please select start and end dates.');
+      return;
+    }
+    if (new Date(endDate) < new Date(startDate)) {
+      showAlert('Error', 'End date must be after start date.');
       return;
     }
     if (!user) return;
@@ -162,24 +167,22 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
         <View style={styles.row}>
           <View style={styles.halfField}>
             <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Start date *</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.textTertiary}
+            <DatePickerInput
               value={startDate}
-              onChangeText={setStartDate}
-              accessibilityLabel="Start date"
+              onChange={setStartDate}
+              placeholder="Select start date"
+              colors={colors}
+              minDate={new Date().toISOString().split('T')[0]}
             />
           </View>
           <View style={styles.halfField}>
             <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>End date *</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.textTertiary}
+            <DatePickerInput
               value={endDate}
-              onChangeText={setEndDate}
-              accessibilityLabel="End date"
+              onChange={setEndDate}
+              placeholder="Select end date"
+              colors={colors}
+              minDate={startDate || new Date().toISOString().split('T')[0]}
             />
           </View>
         </View>
@@ -298,6 +301,76 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
     </SafeAreaView>
   );
 }
+
+// ─── DatePickerInput Component ────────────────────────────────────────────────
+function DatePickerInput({ value, onChange, placeholder, colors, minDate }: {
+  value: string;
+  onChange: (date: string) => void;
+  placeholder: string;
+  colors: any;
+  minDate?: string;
+}) {
+  if (Platform.OS === 'web') {
+    return (
+      <View style={[dateStyles.wrap, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+        <Calendar size={16} color={colors.textTertiary} />
+        <input
+          type="date"
+          value={value}
+          min={minDate}
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            flex: 1,
+            height: 46,
+            border: 'none',
+            background: 'transparent',
+            color: value ? colors.textPrimary : colors.textTertiary,
+            fontSize: 15,
+            fontFamily: 'inherit',
+            marginLeft: 10,
+            outline: 'none',
+            cursor: 'pointer',
+          }}
+        />
+      </View>
+    );
+  }
+
+  // Native: use TextInput with validation hint
+  return (
+    <View style={[dateStyles.wrap, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+      <Calendar size={16} color={colors.textTertiary} />
+      <TextInput
+        style={[dateStyles.input, { color: colors.textPrimary }]}
+        placeholder={placeholder}
+        placeholderTextColor={colors.textTertiary}
+        value={value}
+        onChangeText={onChange}
+        keyboardType="numeric"
+        maxLength={10}
+        accessibilityLabel={placeholder}
+      />
+    </View>
+  );
+}
+
+const dateStyles = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    borderWidth: 1,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.xs,
+  },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    marginLeft: spacing.xs,
+    height: 46,
+  },
+});
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },

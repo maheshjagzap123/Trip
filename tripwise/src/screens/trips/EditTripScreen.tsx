@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Calendar } from 'lucide-react-native';
 
 const TRIP_TYPES = ['Friends', 'Family', 'Couple', 'Solo', 'Office', 'Adventure', 'Pilgrimage'];
 
@@ -63,6 +63,10 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
     }
     if (!startDate.trim() || !endDate.trim()) {
       showAlert('Error', 'Start and end dates are required.');
+      return;
+    }
+    if (new Date(endDate) < new Date(startDate)) {
+      showAlert('Error', 'End date must be after start date.');
       return;
     }
 
@@ -132,24 +136,19 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
         <View style={styles.row}>
           <View style={styles.halfField}>
             <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Start date *</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.textTertiary}
+            <DatePickerField
               value={startDate}
-              onChangeText={setStartDate}
-              accessibilityLabel="Start date"
+              onChange={setStartDate}
+              colors={colors}
             />
           </View>
           <View style={styles.halfField}>
             <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>End date *</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.textTertiary}
+            <DatePickerField
               value={endDate}
-              onChangeText={setEndDate}
-              accessibilityLabel="End date"
+              onChange={setEndDate}
+              colors={colors}
+              minDate={startDate}
             />
           </View>
         </View>
@@ -198,6 +197,73 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
     </SafeAreaView>
   );
 }
+
+// ─── DatePickerField Component ────────────────────────────────────────────────
+function DatePickerField({ value, onChange, colors, minDate }: {
+  value: string;
+  onChange: (date: string) => void;
+  colors: any;
+  minDate?: string;
+}) {
+  if (Platform.OS === 'web') {
+    return (
+      <View style={[dpStyles.wrap, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+        <Calendar size={16} color={colors.textTertiary} />
+        <input
+          type="date"
+          value={value}
+          min={minDate}
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            flex: 1,
+            height: 46,
+            border: 'none',
+            background: 'transparent',
+            color: value ? colors.textPrimary : colors.textTertiary,
+            fontSize: 15,
+            fontFamily: 'inherit',
+            marginLeft: 10,
+            outline: 'none',
+            cursor: 'pointer',
+          }}
+        />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[dpStyles.wrap, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+      <Calendar size={16} color={colors.textTertiary} />
+      <TextInput
+        style={[dpStyles.input, { color: colors.textPrimary }]}
+        placeholder="YYYY-MM-DD"
+        placeholderTextColor={colors.textTertiary}
+        value={value}
+        onChangeText={onChange}
+        keyboardType="numeric"
+        maxLength={10}
+      />
+    </View>
+  );
+}
+
+const dpStyles = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    borderWidth: 1,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.xs,
+  },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    marginLeft: spacing.xs,
+    height: 46,
+  },
+});
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },

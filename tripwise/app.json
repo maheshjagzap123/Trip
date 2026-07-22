@@ -33,6 +33,12 @@
         "projectId": "54c1f729-d743-4bf7-b3ee-8d1c39714170"
       }
     },
-    "owner": "tripwises-team"
+    "owner": "tripwises-team",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/54c1f729-d743-4bf7-b3ee-8d1c39714170"
+    }
   }
 }

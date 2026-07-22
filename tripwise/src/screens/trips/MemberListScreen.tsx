@@ -341,15 +341,13 @@ export function MemberListScreen({ tripId, tripName, onClose }: MemberListScreen
             {tripName}
           </Text>
         </View>
-        {isAdmin && (
-          <TouchableOpacity
-            onPress={() => setShowInvite(!showInvite)}
-            style={[styles.inviteHeaderBtn, { backgroundColor: colors.primaryLight }]}
-            accessibilityLabel="Invite member"
-          >
-            <UserPlus size={18} color={colors.primary} />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          onPress={() => setShowInvite(!showInvite)}
+          style={[styles.inviteHeaderBtn, { backgroundColor: colors.primaryLight }]}
+          accessibilityLabel="Invite member"
+        >
+          <UserPlus size={18} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {/* Stats bar */}

@@ -340,11 +340,9 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             </Text>
             <Text style={[typography.caption, { color: colors.primary, marginLeft: spacing.xs }]}>View All</Text>
           </TouchableOpacity>
-          {isAdmin && (
-            <TouchableOpacity onPress={() => setShowInvite(!showInvite)}>
-              <UserPlus color={colors.primary} size={20} />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={() => setShowInvite(!showInvite)}>
+            <UserPlus color={colors.primary} size={20} />
+          </TouchableOpacity>
         </View>
 
         {/* Invite Input */}

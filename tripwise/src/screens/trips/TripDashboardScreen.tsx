@@ -4,6 +4,7 @@ import {
   FlatList, Animated, Dimensions, Easing, Platform, RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '../../stores/authStore';
 import { useTripStore } from '../../stores/tripStore';
@@ -31,6 +32,7 @@ export function TripDashboardScreen() {
   const colors = useThemeColors();
   const { resolvedScheme } = useThemeStore();
   const isDark = resolvedScheme === 'dark';
+  const navigation = useNavigation();
 
   const [showCreate, setShowCreate] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
@@ -110,6 +112,18 @@ export function TripDashboardScreen() {
     await Promise.all([fetchTrips(), fetchInvitations(), fetchUnreadCount(), fetchExpenseTotals()]);
     setRefreshing(false);
   }, []);
+
+  // Close all overlays when Trips tab is pressed (always return to dashboard)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('tabPress', () => {
+      setShowCreate(false);
+      setSelectedTripId(null);
+      setQuickExpenseTripId(null);
+      setQuickChatTripId(null);
+      setShowNotifications(false);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const totalSpent = Object.values(myShares).reduce((a, b) => a + b, 0);
 

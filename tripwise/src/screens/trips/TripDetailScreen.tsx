@@ -5,13 +5,13 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Alert,
   Platform,
   Modal,
   BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  ScrollView, Alert, Platform, BackHandler,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { useExpenseStore } from '../../stores/expenseStore';
@@ -176,3 +176,4 @@ const styles = StyleSheet.create({
   splitRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
   splitAvatar: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
 });
+

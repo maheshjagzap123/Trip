@@ -31,7 +31,7 @@ export function MainTabs() {
   const insets = useSafeAreaInsets();
   const isDark = resolvedScheme === 'dark';
 
-  const tabBarHeight = Platform.OS === 'ios' ? 56 + insets.bottom : 64;
+  const tabBarHeight = Platform.OS === 'ios' ? 56 + insets.bottom : 64 + insets.bottom;
 
   return (
     <Tab.Navigator
@@ -61,7 +61,7 @@ export function MainTabs() {
           borderTopWidth: StyleSheet.hairlineWidth,
           height: tabBarHeight,
           paddingTop: 8,
-          paddingBottom: Platform.OS === 'ios' ? insets.bottom : 10,
+          paddingBottom: Platform.OS === 'ios' ? insets.bottom : insets.bottom + 8,
           ...shadows.glass,
         },
         tabBarLabelStyle: {

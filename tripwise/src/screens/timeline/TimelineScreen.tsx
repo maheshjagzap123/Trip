@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  FlatList, TextInput, Modal, Platform, Alert, BackHandler,
+  View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Modal, Platform, Alert, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
@@ -239,3 +239,4 @@ const styles = StyleSheet.create({
   modalTextArea: { minHeight: 120, borderWidth: 1, borderRadius: borderRadius.md, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, fontSize: 15, marginBottom: spacing.md },
   modalSaveBtn: { height: 48, borderRadius: borderRadius.md, justifyContent: 'center', alignItems: 'center' },
 });
+

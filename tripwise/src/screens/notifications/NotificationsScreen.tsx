@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, BackHandler,
+  View, Text, StyleSheet, TouchableOpacity, FlatList, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Bell, UserPlus, MessageCircle, Check, CreditCard } from 'lucide-react-native';
@@ -152,3 +153,4 @@ const styles = StyleSheet.create({
   unreadDot: { width: 8, height: 8, borderRadius: 4, marginTop: 4, marginLeft: spacing.xs },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
 });
+

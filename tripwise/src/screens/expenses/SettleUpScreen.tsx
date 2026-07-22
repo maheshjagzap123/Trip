@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  SafeAreaView, ScrollView, Alert, Platform, Linking,
+  ScrollView, Alert, Platform, Linking,
   AppState, AppStateStatus, Modal, ActivityIndicator, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { useExpenseStore } from '../../stores/expenseStore';
@@ -546,3 +547,4 @@ const styles = StyleSheet.create({
   },
   sheetHandle: { width: 40, height: 4, borderRadius: 2, alignSelf: 'center', marginBottom: spacing.lg },
 });
+

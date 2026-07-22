@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  ScrollView, TextInput, Alert, Platform, Linking, BackHandler,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert, Platform, Linking, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
@@ -178,3 +178,4 @@ const styles = StyleSheet.create({
   starRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
   submitBtn: { height: 48, borderRadius: borderRadius.md, justifyContent: 'center', alignItems: 'center' },
 });
+

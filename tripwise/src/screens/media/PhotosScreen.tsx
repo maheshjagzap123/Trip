@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  FlatList, Dimensions, Modal, Platform, Alert, ActivityIndicator,
+  View, Text, StyleSheet, TouchableOpacity, FlatList, Dimensions, Modal, Platform, Alert, ActivityIndicator,
   useWindowDimensions, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
@@ -382,3 +382,4 @@ const styles = StyleSheet.create({
   navBtn: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 20 },
   navBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
 });
+

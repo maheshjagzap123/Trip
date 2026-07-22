@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  FlatList, Modal, TextInput, Alert, Platform, ActivityIndicator, BackHandler,
+  View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput, Alert, Platform, ActivityIndicator, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
@@ -252,3 +252,4 @@ const styles = StyleSheet.create({
   catChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1 },
   uploadBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 48, borderRadius: borderRadius.md },
 });
+

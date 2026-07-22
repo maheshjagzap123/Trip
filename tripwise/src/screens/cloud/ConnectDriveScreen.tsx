@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator, Linking, BackHandler,
+  View, Text, StyleSheet, TouchableOpacity, Alert, Platform, ActivityIndicator, Linking, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
@@ -259,3 +260,4 @@ const styles = StyleSheet.create({
   disconnectBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 44, borderRadius: borderRadius.md, borderWidth: 1, marginTop: spacing.lg },
   infoCard: { borderRadius: borderRadius.lg, borderWidth: 1, padding: spacing.lg },
 });
+

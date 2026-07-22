@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  ScrollView, ActivityIndicator, Alert, Platform, BackHandler,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Platform, BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useExpenseStore, Settlement } from '../../stores/expenseStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -327,3 +327,4 @@ const styles = StyleSheet.create({
     borderWidth: 1, marginTop: spacing.sm,
   },
 });
+

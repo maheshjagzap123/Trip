@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  SafeAreaView, FlatList, KeyboardAvoidingView, Platform,
+  FlatList, KeyboardAvoidingView, Platform,
   Modal, Pressable, Dimensions, Alert, Clipboard, BackHandler, Animated, Easing,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -672,3 +673,4 @@ const styles = StyleSheet.create({
   input: { flex: 1, minHeight: 44, maxHeight: 100, borderWidth: 1, borderRadius: 24, paddingHorizontal: 18, paddingVertical: Platform.OS === 'ios' ? 12 : 10, fontSize: 15 },
   sendBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
 });
+

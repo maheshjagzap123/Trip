@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, BackHandler } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, BackHandler } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing } from '../../theme';
 import { ExpensesTab } from './ExpensesTab';
 import { ArrowLeft } from 'lucide-react-native';
@@ -46,3 +47,4 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
 });
+

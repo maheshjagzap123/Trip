@@ -9,7 +9,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useChatStore } from '../../stores/chatStore';
 import { supabase } from '../../lib/supabase';
 import type { Message } from '../../stores/chatStore';
-import { ArrowLeft, Send, Pin, X, ChevronDown, Reply, Copy, Trash2, AlertTriangle, Search } from 'lucide-react-native';
+import { ArrowLeft, Send, Pin, X, ChevronDown, Reply, Copy, Trash2, AlertTriangle, Search, Smile } from 'lucide-react-native';
 import { format, isToday, isYesterday } from 'date-fns';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -36,6 +36,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [menuPosition, setMenuPosition] = useState<MenuPosition>({ x: 0, y: 0 });
   const [searchText, setSearchText] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const presenceChannelRef = useRef<any>(null);
@@ -268,7 +269,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             ]}>
               <Text style={[
                 typography.bodyMedium,
-                { color: isMe ? '#fff' : colors.textPrimary }
+                { color: isMe ? '#fff' : colors.textPrimary, flexShrink: 1, flexWrap: 'wrap' }
               ]}>
                 {item.content}
               </Text>
@@ -471,8 +472,34 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
           </View>
         )}
 
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <View style={[styles.emojiPicker, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+            <View style={styles.emojiGrid}>
+              {['😀', '😂', '❤️', '👍', '🎉', '🔥', '😍', '🙏', '😊', '😢', '😮', '🤔', '👋', '✈️', '🏖️', '🍕', '💰', '📸', '⭐', '🎊', '😎', '🥳', '💪', '🙌', '👏', '🤩', '😋', '🌍'].map((emoji) => (
+                <TouchableOpacity
+                  key={emoji}
+                  style={styles.emojiBtn}
+                  onPress={() => {
+                    setInputText((prev) => prev + emoji);
+                    setShowEmojiPicker(false);
+                  }}
+                >
+                  <Text style={styles.emojiText}>{emoji}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Input */}
         <View style={[styles.inputBar, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+          <TouchableOpacity
+            style={styles.emojiToggle}
+            onPress={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <Smile size={22} color={showEmojiPicker ? colors.primary : colors.textTertiary} />
+          </TouchableOpacity>
           <TextInput
             style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
             placeholder="Type a message..."
@@ -480,9 +507,12 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             value={inputText}
             onChangeText={handleTextChange}
             multiline
+            blurOnSubmit={true}
             maxLength={2000}
             onSubmitEditing={handleSend}
             returnKeyType="send"
+            autoFocus={Platform.OS === 'web'}
+            onFocus={() => setShowEmojiPicker(false)}
           />
           <TouchableOpacity
             style={[styles.sendBtn, { backgroundColor: inputText.trim() ? colors.primary : colors.surface }]}
@@ -526,8 +556,11 @@ const styles = StyleSheet.create({
   myMessageWrap: { alignSelf: 'flex-end' },
   otherMessageWrap: { alignSelf: 'flex-start' },
   senderName: { fontSize: 11, fontWeight: '600', marginBottom: 2, marginLeft: spacing.xs },
-  bubbleContainer: { flexDirection: 'row', alignItems: 'flex-start' },
-  bubble: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, position: 'relative', minWidth: 80 },
+  bubbleContainer: { flexDirection: 'row', alignItems: 'flex-start', flexShrink: 1, maxWidth: '100%' },
+  bubble: {
+    paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, position: 'relative', minWidth: 80, flexShrink: 1,
+    ...(Platform.OS === 'web' ? { wordBreak: 'break-word', overflowWrap: 'break-word' } as any : {}),
+  },
   myBubble: { borderBottomRightRadius: 6 },
   otherBubble: { borderBottomLeftRadius: 6, borderWidth: 1 },
   bubbleMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, alignSelf: 'flex-end' },
@@ -569,7 +602,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   // Existing styles
-  inputBar: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: spacing.sm, paddingVertical: spacing.sm, borderTopWidth: 1, gap: spacing.xs },
+  inputBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.sm, paddingTop: spacing.sm, paddingBottom: spacing.md, borderTopWidth: 1, gap: spacing.xs },
+  emojiToggle: { padding: 6 },
+  emojiPicker: { borderTopWidth: 1, paddingHorizontal: spacing.sm, paddingVertical: spacing.sm },
+  emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  emojiBtn: { width: 40, height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
+  emojiText: { fontSize: 22 },
   typingBar: { paddingHorizontal: spacing.md, paddingVertical: 4 },
   typingText: { fontSize: 12, fontStyle: 'italic' },
   replyPreview: { borderLeftWidth: 3, paddingLeft: 8, paddingVertical: 2, marginBottom: 4, marginLeft: 4 },
@@ -578,6 +616,6 @@ const styles = StyleSheet.create({
   replyBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: 8, borderLeftWidth: 3, marginHorizontal: spacing.sm, borderRadius: 4 },
   replyBarName: { fontSize: 12, fontWeight: '700' },
   replyBarContent: { fontSize: 13 },
-  input: { flex: 1, minHeight: 44, maxHeight: 120, borderWidth: 1, borderRadius: 24, paddingHorizontal: 18, paddingVertical: Platform.OS === 'ios' ? 12 : 10, fontSize: 15 },
+  input: { flex: 1, minHeight: 44, maxHeight: 100, borderWidth: 1, borderRadius: 24, paddingHorizontal: 18, paddingVertical: Platform.OS === 'ios' ? 12 : 10, fontSize: 15 },
   sendBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
 });

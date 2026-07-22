@@ -143,7 +143,7 @@ export function AnalyticsScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 100 },
   headerSection: { alignItems: 'center', marginBottom: spacing.xl },
   headerIcon: {
     width: 56, height: 56, borderRadius: 28,

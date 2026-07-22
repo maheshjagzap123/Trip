@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1 },
   headerBtn: { padding: spacing.xs },
   notifItem: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 0.5 },
-  notifIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.04)', justifyContent: 'center', alignItems: 'center' },
+  notifIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(128,128,128,0.08)', justifyContent: 'center', alignItems: 'center' },
   unreadDot: { width: 8, height: 8, borderRadius: 4, marginTop: 4, marginLeft: spacing.xs },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
 });

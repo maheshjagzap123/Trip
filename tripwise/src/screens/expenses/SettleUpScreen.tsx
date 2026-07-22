@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   SafeAreaView, ScrollView, Alert, Platform, Linking,
-  AppState, AppStateStatus, Modal, ActivityIndicator,
+  AppState, AppStateStatus, Modal, ActivityIndicator, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -57,6 +57,15 @@ export function SettleUpScreen({ tripId, onClose, preSelectedMemberId, preSelect
     fetchMembers();
     fetchSettlements(tripId);
   }, []);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   // Pre-select member and amount if passed from balances row
   useEffect(() => {

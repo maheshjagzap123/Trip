@@ -343,7 +343,7 @@ function SettingRow({ icon, label, value, onPress, colors, last }: {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: 100 },
   avatarSection: { alignItems: 'center', marginBottom: spacing.xl },
   avatarRing: {
     width: 104, height: 104, borderRadius: 52, padding: 3,

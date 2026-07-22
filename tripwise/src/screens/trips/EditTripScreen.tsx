@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   SafeAreaView,
   Platform,
+  BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
@@ -41,6 +42,15 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
   const [tripType, setTripType] = useState(trip.trip_type || 'Friends');
   const [description, setDescription] = useState(trip.description || '');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Handle Android hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => backHandler.remove();
+  }, [onClose]);
 
   const showAlert = (title: string, message: string) => {
     Platform.OS === 'web' ? window.alert(`${title}: ${message}`) : Alert.alert(title, message);

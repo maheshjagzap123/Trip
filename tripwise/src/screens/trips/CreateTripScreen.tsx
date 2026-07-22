@@ -29,8 +29,10 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
 
   const [tripName, setTripName] = useState('');
   const [destination, setDestination] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(tomorrow);
   const [tripType, setTripType] = useState('Friends');
   const [description, setDescription] = useState('');
   const [memberEmails, setMemberEmails] = useState<string[]>([]);

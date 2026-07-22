@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, ScrollView,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView, BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
@@ -12,6 +12,11 @@ interface PrivacyPolicyScreenProps {
 
 export function PrivacyPolicyScreen({ onClose }: PrivacyPolicyScreenProps) {
   const colors = useThemeColors();
+
+  useEffect(() => {
+    const bh = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
+    return () => bh.remove();
+  }, [onClose]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>

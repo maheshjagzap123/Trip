@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  ScrollView, Alert, Platform,
+  ScrollView, Alert, Platform, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -33,6 +33,11 @@ export function ExpenseDetailScreen({ expenseId, tripId, onClose, onEdit }: Prop
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => { fetchDetail(); }, [expenseId]);
+
+  useEffect(() => {
+    const bh = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
+    return () => bh.remove();
+  }, [onClose]);
 
   const fetchDetail = async () => {
     setIsLoading(true);

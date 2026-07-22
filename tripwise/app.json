@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "TripWise",
-    "slug": "tripwise",
+    "slug": "mahesh-jagzap",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,6 +27,12 @@
     "plugins": [
       "expo-splash-screen",
       "expo-web-browser"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "54c1f729-d743-4bf7-b3ee-8d1c39714170"
+      }
+    },
+    "owner": "tripwises-team"
   }
 }

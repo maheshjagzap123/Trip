@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, SafeAreaView, Alert, Platform,
+  ScrollView, SafeAreaView, Alert, Platform, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -41,6 +41,11 @@ export function EditExpenseScreen({ expenseId, tripId, onClose }: Props) {
   const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => { loadExpense(); }, []);
+
+  useEffect(() => {
+    const bh = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
+    return () => bh.remove();
+  }, [onClose]);
 
   const loadExpense = async () => {
     const { data } = await supabase.from('expenses').select('*').eq('id', expenseId).single();

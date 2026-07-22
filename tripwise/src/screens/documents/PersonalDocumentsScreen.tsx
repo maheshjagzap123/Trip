@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  FlatList, Modal, TextInput, Alert, Platform, ActivityIndicator,
+  FlatList, Modal, TextInput, Alert, Platform, ActivityIndicator, BackHandler,
 } from 'react-native';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
@@ -38,6 +38,11 @@ export function PersonalDocumentsScreen({ onClose }: Props) {
   const [showAdd, setShowAdd] = useState(false);
 
   useEffect(() => { fetchDocs(); }, []);
+
+  useEffect(() => {
+    const bh = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
+    return () => bh.remove();
+  }, [onClose]);
 
   const fetchDocs = async () => {
     if (!user) return;

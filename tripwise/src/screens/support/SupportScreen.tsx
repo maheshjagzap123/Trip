@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  ScrollView, TextInput, Alert, Platform, Linking,
+  ScrollView, TextInput, Alert, Platform, Linking, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -24,6 +24,11 @@ const FAQ_ITEMS = [
 export function SupportScreen({ onClose }: Props) {
   const colors = useThemeColors();
   const { user } = useAuthStore();
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
+    return () => backHandler.remove();
+  }, [onClose]);
   const [activeTab, setActiveTab] = useState<'help' | 'contact' | 'feedback'>('help');
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState('');

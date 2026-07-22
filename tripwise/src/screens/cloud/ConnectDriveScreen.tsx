@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator, Linking,
+  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator, Linking, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -22,6 +22,11 @@ export function ConnectDriveScreen({ onClose }: Props) {
   const [driveEmail, setDriveEmail] = useState('');
 
   useEffect(() => { checkConnection(); }, []);
+
+  useEffect(() => {
+    const bh = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
+    return () => bh.remove();
+  }, [onClose]);
 
   const checkConnection = async () => {
     if (!user) { setIsLoading(false); return; }

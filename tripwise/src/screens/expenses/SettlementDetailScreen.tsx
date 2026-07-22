@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, SafeAreaView,
-  ScrollView, ActivityIndicator, Alert, Platform,
+  ScrollView, ActivityIndicator, Alert, Platform, BackHandler,
 } from 'react-native';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useExpenseStore, Settlement } from '../../stores/expenseStore';
@@ -40,6 +40,11 @@ export function SettlementDetailScreen({ settlementId, onClose, onSettled }: Pro
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [settlementId]);
+
+  useEffect(() => {
+    const bh = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
+    return () => bh.remove();
+  }, [onClose]);
 
   const fetchSettlement = async () => {
     const { data } = await supabase

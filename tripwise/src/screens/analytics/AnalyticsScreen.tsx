@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
@@ -21,15 +22,20 @@ export function AnalyticsScreen() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    if (user) fetchAnalytics();
-  }, [user]);
+  // Re-fetch analytics every time the tab gains focus
+  useFocusEffect(
+    useCallback(() => {
+      if (user) fetchAnalytics();
+    }, [user])
+  );
 
   const fetchAnalytics = async () => {
     if (!user) return;
     const { data } = await supabase.rpc('get_user_analytics', { p_user_id: user.id });
     if (data && Array.isArray(data) && data.length > 0) {
       setAnalytics(data[0]);
+    } else {
+      setAnalytics(null);
     }
   };
 

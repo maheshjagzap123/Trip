@@ -10,6 +10,7 @@ import {
   Platform,
   Modal,
   BackHandler,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
@@ -187,6 +188,23 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
 
     if (!confirm) return;
 
+    // Delete related data first to avoid orphaned records
+    // Get all expense IDs for this trip to delete their splits
+    const { data: expenses } = await supabase
+      .from('expenses')
+      .select('id')
+      .eq('trip_id', tripId);
+
+    if (expenses && expenses.length > 0) {
+      const expenseIds = expenses.map((e) => e.id);
+      await supabase.from('expense_splits').delete().in('expense_id', expenseIds);
+    }
+
+    await supabase.from('expenses').delete().eq('trip_id', tripId);
+    await supabase.from('settlements').delete().eq('trip_id', tripId);
+    await supabase.from('trip_members').delete().eq('trip_id', tripId);
+    // Delete all notifications related to this trip
+    await supabase.from('notifications').delete().contains('data', { trip_id: tripId });
     await supabase.from('trips').delete().eq('id', tripId);
     onClose();
   };
@@ -248,7 +266,12 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
         )}
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {/* Trip Info Card */}
         <View style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
           <Text style={[typography.h2, { color: colors.textPrimary }]}>{trip.trip_name}</Text>
@@ -414,29 +437,30 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
           )}
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Expenses Modal */}
-      <Modal visible={showExpenses} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showExpenses} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowExpenses(false)}>
         <ExpensesScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowExpenses(false)} />
       </Modal>
 
       {/* Photos Modal */}
-      <Modal visible={showPhotos} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showPhotos} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowPhotos(false)}>
         <PhotosScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowPhotos(false)} />
       </Modal>
 
       {/* Chat Modal */}
-      <Modal visible={showChat} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showChat} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowChat(false)}>
         <ChatScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowChat(false)} />
       </Modal>
 
       {/* Timeline Modal */}
-      <Modal visible={showTimeline} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showTimeline} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowTimeline(false)}>
         <TimelineScreen tripId={tripId} tripName={trip?.trip_name || ''} onClose={() => setShowTimeline(false)} />
       </Modal>
 
       {/* Edit Trip Modal */}
-      <Modal visible={showEdit} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showEdit} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowEdit(false)}>
         <EditTripScreen
           trip={trip}
           onClose={() => setShowEdit(false)}
@@ -445,7 +469,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
       </Modal>
 
       {/* Members Modal */}
-      <Modal visible={showMembers} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showMembers} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => { setShowMembers(false); fetchTripDetail(); }}>
         <MemberListScreen
           tripId={tripId}
           tripName={trip?.trip_name || ''}

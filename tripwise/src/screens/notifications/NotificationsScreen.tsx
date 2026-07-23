@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList, BackHandler,
+  Alert, Platform, Animated as RNAnimated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Bell, UserPlus, MessageCircle, Check, CreditCard } from 'lucide-react-native';
-import { format, formatDistanceToNow } from 'date-fns';
+import { ArrowLeft, Bell, UserPlus, MessageCircle, Check, CreditCard, Trash2, ChevronRight } from 'lucide-react-native';
+import { formatDistanceToNow } from 'date-fns';
+import { Swipeable } from 'react-native-gesture-handler';
 
 interface Notification {
   id: string;
@@ -20,9 +22,10 @@ interface Notification {
 
 interface Props {
   onClose: () => void;
+  onNavigateToTrip?: (tripId: string) => void;
 }
 
-export function NotificationsScreen({ onClose }: Props) {
+export function NotificationsScreen({ onClose, onNavigateToTrip }: Props) {
   const colors = useThemeColors();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,7 +44,7 @@ export function NotificationsScreen({ onClose }: Props) {
     // Subscribe to new notifications
     const channel = supabase
       .channel('my-notifications')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, () => {
         fetchNotifications();
       })
       .subscribe();
@@ -76,11 +79,50 @@ export function NotificationsScreen({ onClose }: Props) {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  const deleteNotification = async (id: string) => {
+    await supabase.from('notifications').delete().eq('id', id);
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const clearAllNotifications = async () => {
+    const doDelete = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from('notifications').delete().eq('user_id', user.id);
+      setNotifications([]);
+    };
+
+    if (Platform.OS === 'web') {
+      if (window.confirm('Clear all notifications?')) {
+        await doDelete();
+      }
+    } else {
+      Alert.alert('Clear All', 'Delete all notifications?', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Clear All', style: 'destructive', onPress: doDelete },
+      ]);
+    }
+  };
+
+  const handleNotificationPress = async (item: Notification) => {
+    // Mark as read
+    if (!item.read) {
+      await markAsRead(item.id);
+    }
+
+    // Navigate to the relevant trip if trip_id exists in data
+    const tripId = item.data?.trip_id;
+    if (tripId && onNavigateToTrip) {
+      onNavigateToTrip(tripId);
+    }
+  };
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'trip_invite': return <UserPlus size={18} color={colors.primary} />;
       case 'trip_accepted': return <Check size={18} color={colors.success} />;
       case 'new_message': return <MessageCircle size={18} color="#F59E0B" />;
+      case 'expense_added': return <CreditCard size={18} color={colors.warning} />;
       case 'settlement_confirm_request': return <CreditCard size={18} color="#D97706" />;
       case 'settlement_confirmed': return <Check size={18} color={colors.success} />;
       case 'settlement_disputed': return <CreditCard size={18} color={colors.error} />;
@@ -90,24 +132,57 @@ export function NotificationsScreen({ onClose }: Props) {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  const renderRightActions = (id: string) => (
+    progress: RNAnimated.AnimatedInterpolation<number>,
+    dragX: RNAnimated.AnimatedInterpolation<number>
+  ) => {
+    const scale = dragX.interpolate({
+      inputRange: [-80, 0],
+      outputRange: [1, 0.5],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <TouchableOpacity
+        style={[styles.deleteAction, { backgroundColor: colors.error }]}
+        onPress={() => deleteNotification(id)}
+        activeOpacity={0.8}
+      >
+        <RNAnimated.View style={{ transform: [{ scale }] }}>
+          <Trash2 size={20} color="#FFF" />
+        </RNAnimated.View>
+      </TouchableOpacity>
+    );
+  };
+
   const renderItem = ({ item }: { item: Notification }) => (
-    <TouchableOpacity
-      style={[styles.notifItem, { backgroundColor: item.read ? 'transparent' : colors.primaryLight, borderBottomColor: colors.border }]}
-      onPress={() => markAsRead(item.id)}
-      activeOpacity={0.7}
+    <Swipeable
+      renderRightActions={renderRightActions(item.id)}
+      overshootRight={false}
     >
-      <View style={styles.notifIcon}>{getIcon(item.type)}</View>
-      <View style={{ flex: 1, marginLeft: spacing.sm }}>
-        <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>{item.title}</Text>
-        <Text style={[typography.bodySmall, { color: colors.textSecondary, marginTop: 2 }]} numberOfLines={2}>
-          {item.body}
-        </Text>
-        <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 4 }]}>
-          {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-        </Text>
-      </View>
-      {!item.read && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.notifItem, { backgroundColor: item.read ? 'transparent' : colors.primaryLight, borderBottomColor: colors.border }]}
+        onPress={() => handleNotificationPress(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.notifIcon}>{getIcon(item.type)}</View>
+        <View style={{ flex: 1, marginLeft: spacing.sm }}>
+          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>{item.title}</Text>
+          <Text style={[typography.bodySmall, { color: colors.textSecondary, marginTop: 2 }]} numberOfLines={2}>
+            {item.body}
+          </Text>
+          <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 4 }]}>
+            {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+          </Text>
+        </View>
+        <View style={styles.notifRight}>
+          {!item.read && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
+          {item.data?.trip_id && onNavigateToTrip && (
+            <ChevronRight size={16} color={colors.textTertiary} style={{ marginTop: 4 }} />
+          )}
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
   );
 
   return (
@@ -119,6 +194,11 @@ export function NotificationsScreen({ onClose }: Props) {
         <Text style={[typography.h3, { color: colors.textPrimary, flex: 1, marginLeft: spacing.sm }]}>
           Notifications
         </Text>
+        {notifications.length > 0 && (
+          <TouchableOpacity onPress={clearAllNotifications} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={{ marginRight: spacing.sm }}>
+            <Trash2 size={18} color={colors.textTertiary} />
+          </TouchableOpacity>
+        )}
         {unreadCount > 0 && (
           <TouchableOpacity onPress={markAllRead} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Text style={[typography.labelSmall, { color: colors.primary }]}>Mark all read</Text>
@@ -150,7 +230,12 @@ const styles = StyleSheet.create({
   headerBtn: { padding: spacing.xs },
   notifItem: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 0.5 },
   notifIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(128,128,128,0.08)', justifyContent: 'center', alignItems: 'center' },
-  unreadDot: { width: 8, height: 8, borderRadius: 4, marginTop: 4, marginLeft: spacing.xs },
+  notifRight: { alignItems: 'center', justifyContent: 'flex-start', marginLeft: spacing.xs },
+  unreadDot: { width: 8, height: 8, borderRadius: 4 },
+  deleteAction: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 72,
+  },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
 });
-

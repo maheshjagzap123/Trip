@@ -151,12 +151,12 @@ export function LoginScreen() {
       </SafeAreaView>
 
       {/* Terms of Service Modal */}
-      <Modal visible={showTerms} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showTerms} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowTerms(false)}>
         <TermsOfServiceScreen onClose={() => setShowTerms(false)} />
       </Modal>
 
       {/* Privacy Policy Modal */}
-      <Modal visible={showPrivacy} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showPrivacy} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowPrivacy(false)}>
         <PrivacyPolicyScreen onClose={() => setShowPrivacy(false)} />
       </Modal>
     </LinearGradient>

@@ -124,7 +124,7 @@ export function PersonalDocumentsScreen({ onClose }: Props) {
         <FlatList data={docs} renderItem={renderDoc} keyExtractor={(i) => i.id} contentContainerStyle={styles.list} />
       )}
 
-      <Modal visible={showAdd} animationType="slide" transparent>
+      <Modal visible={showAdd} animationType="slide" transparent onRequestClose={() => { setShowAdd(false); fetchDocs(); }}>
         <AddDocModal onClose={() => { setShowAdd(false); fetchDocs(); }} />
       </Modal>
     </SafeAreaView>

@@ -326,10 +326,10 @@ export function ExpensesTab({ tripId }: Props) {
       </TouchableOpacity>
 
       {/* Modals */}
-      <Modal visible={showAddExpense} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showAddExpense} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowAddExpense(false)}>
         <AddExpenseScreen tripId={tripId} onClose={() => setShowAddExpense(false)} />
       </Modal>
-      <Modal visible={showSettleUp} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showSettleUp} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => { setShowSettleUp(false); setSettleWithMember(undefined); }}>
         <SettleUpScreen
           tripId={tripId}
           onClose={() => { setShowSettleUp(false); setSettleWithMember(undefined); }}
@@ -337,7 +337,7 @@ export function ExpensesTab({ tripId }: Props) {
           preSelectedAmount={settleWithMember ? simplifiedDebts.find((d) => d.from === user?.id && d.to === settleWithMember)?.amount : undefined}
         />
       </Modal>
-      <Modal visible={!!detailSettlementId} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={!!detailSettlementId} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setDetailSettlementId(null)}>
         {detailSettlementId && (
           <SettlementDetailScreen
             settlementId={detailSettlementId}

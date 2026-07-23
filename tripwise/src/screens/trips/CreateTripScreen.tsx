@@ -7,10 +7,11 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  SafeAreaView,
   Platform,
   BackHandler,
+  KeyboardAvoidingView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { Calendar } from 'lucide-react-native';
@@ -134,11 +135,16 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
         {/* Trip Name */}
         <View style={styles.field}>
           <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Trip name *</Text>
@@ -300,6 +306,7 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
           </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -312,6 +319,8 @@ function DatePickerInput({ value, onChange, placeholder, colors, minDate }: {
   colors: any;
   minDate?: string;
 }) {
+  const [showPicker, setShowPicker] = useState(false);
+
   if (Platform.OS === 'web') {
     return (
       <View style={[dateStyles.wrap, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
@@ -338,20 +347,47 @@ function DatePickerInput({ value, onChange, placeholder, colors, minDate }: {
     );
   }
 
-  // Native: use TextInput with validation hint
+  // Native: use native date picker
+  const DateTimePicker = require('@react-native-community/datetimepicker').default;
+
+  const handleDateChange = (_event: any, selectedDate?: Date) => {
+    setShowPicker(Platform.OS === 'ios'); // iOS keeps picker open, Android auto-closes
+    if (selectedDate) {
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      onChange(`${year}-${month}-${day}`);
+    }
+  };
+
+  const parseDate = (dateStr: string): Date => {
+    if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return new Date(dateStr + 'T00:00:00');
+    }
+    return new Date();
+  };
+
   return (
-    <View style={[dateStyles.wrap, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
-      <Calendar size={16} color={colors.textTertiary} />
-      <TextInput
-        style={[dateStyles.input, { color: colors.textPrimary }]}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textTertiary}
-        value={value}
-        onChangeText={onChange}
-        keyboardType="numeric"
-        maxLength={10}
-        accessibilityLabel={placeholder}
-      />
+    <View>
+      <TouchableOpacity
+        style={[dateStyles.wrap, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+        onPress={() => setShowPicker(true)}
+        activeOpacity={0.7}
+      >
+        <Calendar size={16} color={colors.textTertiary} />
+        <Text style={[dateStyles.text, { color: value ? colors.textPrimary : colors.textTertiary }]}>
+          {value || placeholder}
+        </Text>
+      </TouchableOpacity>
+      {showPicker && (
+        <DateTimePicker
+          value={parseDate(value)}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          minimumDate={minDate ? parseDate(minDate) : undefined}
+        />
+      )}
     </View>
   );
 }
@@ -371,6 +407,11 @@ const dateStyles = StyleSheet.create({
     fontSize: 15,
     marginLeft: spacing.xs,
     height: 46,
+  },
+  text: {
+    flex: 1,
+    fontSize: 15,
+    marginLeft: spacing.xs,
   },
 });
 

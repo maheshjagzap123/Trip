@@ -146,7 +146,7 @@ export function TimelineScreen({ tripId, tripName, onClose }: Props) {
       )}
 
       {/* Add Note Modal */}
-      <Modal visible={showAddNote} animationType="slide" transparent>
+      <Modal visible={showAddNote} animationType="slide" transparent onRequestClose={() => { setShowAddNote(false); fetchTimeline(); }}>
         <AddNoteModal tripId={tripId} onClose={() => { setShowAddNote(false); fetchTimeline(); }} />
       </Modal>
     </SafeAreaView>

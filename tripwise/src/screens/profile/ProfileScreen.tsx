@@ -120,7 +120,7 @@ export function ProfileScreen() {
       </ScrollView>
 
       {/* Settings Modal */}
-      <Modal visible={showSettings} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showSettings} animationType="slide" presentationStyle="fullScreen" onRequestClose={handleSettingsClose}>
         <SettingsPage onClose={handleSettingsClose} />
       </Modal>
     </SafeAreaView>
@@ -302,22 +302,22 @@ function SettingsPage({ onClose }: { onClose: () => void }) {
       </ScrollView>
 
       {/* Modals */}
-      <Modal visible={showEditProfile} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showEditProfile} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowEditProfile(false)}>
         <EditProfileScreen onClose={() => setShowEditProfile(false)} />
       </Modal>
-      <Modal visible={showDocuments} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showDocuments} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowDocuments(false)}>
         <PersonalDocumentsScreen onClose={() => setShowDocuments(false)} />
       </Modal>
-      <Modal visible={showSupport} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showSupport} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowSupport(false)}>
         <SupportScreen onClose={() => setShowSupport(false)} />
       </Modal>
-      <Modal visible={showCloud} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showCloud} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowCloud(false)}>
         <ConnectDriveScreen onClose={() => setShowCloud(false)} />
       </Modal>
-      <Modal visible={showTerms} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showTerms} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowTerms(false)}>
         <TermsOfServiceScreen onClose={() => setShowTerms(false)} />
       </Modal>
-      <Modal visible={showPrivacy} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showPrivacy} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setShowPrivacy(false)}>
         <PrivacyPolicyScreen onClose={() => setShowPrivacy(false)} />
       </Modal>
     </SafeAreaView>

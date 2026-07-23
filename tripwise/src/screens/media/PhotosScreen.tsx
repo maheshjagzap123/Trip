@@ -289,7 +289,7 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
       )}
 
       {/* Lightbox */}
-      <Modal visible={!!selectedImage} transparent animationType="fade">
+      <Modal visible={!!selectedImage} transparent animationType="fade" onRequestClose={() => setSelectedImage(null)}>
         {selectedImage && (
           <View style={styles.lightbox}>
             {/* Top bar */}
@@ -339,7 +339,7 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
       </Modal>
 
       {/* Connect Drive Modal */}
-      <Modal visible={showConnectDrive} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={showConnectDrive} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => { setShowConnectDrive(false); checkDriveConnection(); }}>
         <ConnectDriveScreen onClose={() => { setShowConnectDrive(false); checkDriveConnection(); }} />
       </Modal>
     </SafeAreaView>

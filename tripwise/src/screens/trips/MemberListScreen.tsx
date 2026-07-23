@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, StyleSheet, TouchableOpacity, FlatList,
-  Alert, Platform, RefreshControl, BackHandler,
+  Alert, Platform, RefreshControl, BackHandler, KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -350,80 +350,87 @@ export function MemberListScreen({ tripId, tripName, onClose }: MemberListScreen
         </TouchableOpacity>
       </View>
 
-      {/* Stats bar */}
-      <View style={[styles.statsBar, { backgroundColor: colors.cardBackground, borderBottomColor: colors.borderLight }]}>
-        <View style={styles.statItem}>
-          <Text style={[styles.statNum, { color: colors.textPrimary }]}>{activeCount}</Text>
-          <Text style={[typography.caption, { color: colors.textTertiary }]}>Active</Text>
-        </View>
-        {pendingCount > 0 && (
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        {/* Stats bar */}
+        <View style={[styles.statsBar, { backgroundColor: colors.cardBackground, borderBottomColor: colors.borderLight }]}>
           <View style={styles.statItem}>
-            <Text style={[styles.statNum, { color: colors.warning }]}>{pendingCount}</Text>
-            <Text style={[typography.caption, { color: colors.textTertiary }]}>Pending</Text>
+            <Text style={[styles.statNum, { color: colors.textPrimary }]}>{activeCount}</Text>
+            <Text style={[typography.caption, { color: colors.textTertiary }]}>Active</Text>
+          </View>
+          {pendingCount > 0 && (
+            <View style={styles.statItem}>
+              <Text style={[styles.statNum, { color: colors.warning }]}>{pendingCount}</Text>
+              <Text style={[typography.caption, { color: colors.textTertiary }]}>Pending</Text>
+            </View>
+          )}
+          <View style={styles.statItem}>
+            <Text style={[styles.statNum, { color: colors.textPrimary }]}>
+              {members.filter((m) => m.role === 'admin').length}
+            </Text>
+            <Text style={[typography.caption, { color: colors.textTertiary }]}>Admins</Text>
+          </View>
+        </View>
+
+        {/* Invite input */}
+        {showInvite && (
+          <View style={[styles.inviteSection, { backgroundColor: colors.cardBackground, borderBottomColor: colors.borderLight }]}>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginBottom: spacing.sm }]}>
+              Invite by email
+            </Text>
+            <View style={styles.inviteRow}>
+              <TextInput
+                style={[styles.inviteInput, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
+                placeholder="friend@email.com"
+                placeholderTextColor={colors.textTertiary}
+                value={inviteEmail}
+                onChangeText={setInviteEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoFocus
+                editable={!inviting}
+              />
+              <TouchableOpacity
+                style={[styles.inviteBtn, { backgroundColor: colors.primary, opacity: inviting ? 0.6 : 1 }]}
+                onPress={handleInvite}
+                disabled={inviting || !inviteEmail.trim()}
+              >
+                <Text style={styles.inviteBtnTxt}>{inviting ? '...' : 'Invite'}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
-        <View style={styles.statItem}>
-          <Text style={[styles.statNum, { color: colors.textPrimary }]}>
-            {members.filter((m) => m.role === 'admin').length}
-          </Text>
-          <Text style={[typography.caption, { color: colors.textTertiary }]}>Admins</Text>
-        </View>
-      </View>
 
-      {/* Invite input */}
-      {showInvite && (
-        <View style={[styles.inviteSection, { backgroundColor: colors.cardBackground, borderBottomColor: colors.borderLight }]}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary, marginBottom: spacing.sm }]}>
-            Invite by email
-          </Text>
-          <View style={styles.inviteRow}>
-            <TextInput
-              style={[styles.inviteInput, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-              placeholder="friend@email.com"
-              placeholderTextColor={colors.textTertiary}
-              value={inviteEmail}
-              onChangeText={setInviteEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoFocus
-              editable={!inviting}
+        {/* Member list */}
+        <FlatList
+          data={members}
+          keyExtractor={(item) => item.user_id}
+          renderItem={renderMember}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
             />
-            <TouchableOpacity
-              style={[styles.inviteBtn, { backgroundColor: colors.primary, opacity: inviting ? 0.6 : 1 }]}
-              onPress={handleInvite}
-              disabled={inviting || !inviteEmail.trim()}
-            >
-              <Text style={styles.inviteBtnTxt}>{inviting ? '...' : 'Invite'}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-
-      {/* Member list */}
-      <FlatList
-        data={members}
-        keyExtractor={(item) => item.user_id}
-        renderItem={renderMember}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-        ListEmptyComponent={
-          !isLoading ? (
-            <View style={styles.empty}>
-              <Text style={[typography.bodyMedium, { color: colors.textTertiary, textAlign: 'center' }]}>
-                No members found.
-              </Text>
-            </View>
-          ) : null
-        }
-      />
+          }
+          ListEmptyComponent={
+            !isLoading ? (
+              <View style={styles.empty}>
+                <Text style={[typography.bodyMedium, { color: colors.textTertiary, textAlign: 'center' }]}>
+                  No members found.
+                </Text>
+              </View>
+            ) : null
+          }
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
@@ -85,7 +85,16 @@ export function OtpVerificationScreen() {
           </View>
         </TouchableOpacity>
 
-        <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView
+            contentContainerStyle={styles.content}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <Animated.View style={[styles.innerContent, { opacity: fadeAnim }]}>
           {/* Icon */}
           <View style={styles.iconWrap}>
             <LinearGradient colors={['#5B8CFF', '#7B61FF']} style={styles.iconGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
@@ -154,7 +163,9 @@ export function OtpVerificationScreen() {
               {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
             </Text>
           </TouchableOpacity>
-        </Animated.View>
+            </Animated.View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -170,7 +181,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  content: { flex: 1, paddingHorizontal: 28, justifyContent: 'center', alignItems: 'center' },
+  content: { flexGrow: 1, paddingHorizontal: 28, justifyContent: 'center', alignItems: 'center' },
+  innerContent: { width: '100%', alignItems: 'center' },
   iconWrap: {
     marginBottom: 24,
     shadowColor: '#5B8CFF', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.45, shadowRadius: 20, elevation: 12,

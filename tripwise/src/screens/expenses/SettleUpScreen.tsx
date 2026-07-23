@@ -428,7 +428,7 @@ export function SettleUpScreen({ tripId, onClose, preSelectedMemberId, preSelect
       </ScrollView>
 
       {/* "I Have Paid" bottom sheet */}
-      <Modal visible={showIHavePaidSheet} transparent animationType="slide">
+      <Modal visible={showIHavePaidSheet} transparent animationType="slide" onRequestClose={handleCancelUpi}>
         <View style={styles.sheetOverlay}>
           <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={handleCancelUpi} />
           <View style={[styles.sheet, { backgroundColor: colors.cardBackground }]}>
@@ -476,7 +476,7 @@ export function SettleUpScreen({ tripId, onClose, preSelectedMemberId, preSelect
       </Modal>
 
       {/* Settlement detail modal */}
-      <Modal visible={!!detailSettlementId} animationType="slide" presentationStyle="fullScreen">
+      <Modal visible={!!detailSettlementId} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setDetailSettlementId(null)}>
         {detailSettlementId && (
           <SettlementDetailScreen
             settlementId={detailSettlementId}

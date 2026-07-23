@@ -403,30 +403,37 @@ export function TripDashboardScreen() {
             <Plus color="#fff" size={26} />
           </LinearGradient>
         </TouchableOpacity>
-
-        {/* Overlay screens */}
-        <OverlayScreen visible={showCreate}>
-          <CreateTripScreen onClose={() => { setShowCreate(false); fetchTrips(); }} />
-        </OverlayScreen>
-        <OverlayScreen visible={!!selectedTripId}>
-          {selectedTripId && (
-            <TripDetailScreen tripId={selectedTripId} onClose={() => { setSelectedTripId(null); fetchTrips(); fetchExpenseTotals(); }} />
-          )}
-        </OverlayScreen>
-        <OverlayScreen visible={!!quickExpenseTripId}>
-          {quickExpenseTripId && (
-            <AddExpenseScreen tripId={quickExpenseTripId} onClose={() => { setQuickExpenseTripId(null); fetchExpenseTotals(); }} />
-          )}
-        </OverlayScreen>
-        <OverlayScreen visible={!!quickChatTripId}>
-          {quickChatTripId && (
-            <ChatScreen tripId={quickChatTripId} tripName={quickChatTripName} onClose={() => { setQuickChatTripId(null); }} />
-          )}
-        </OverlayScreen>
-        <OverlayScreen visible={showNotifications}>
-          <NotificationsScreen onClose={() => { setShowNotifications(false); fetchUnreadCount(); }} />
-        </OverlayScreen>
       </SafeAreaView>
+
+      {/* Overlay screens — outside SafeAreaView so they fill entire screen */}
+      <OverlayScreen visible={showCreate}>
+        <CreateTripScreen onClose={() => { setShowCreate(false); fetchTrips(); }} />
+      </OverlayScreen>
+      <OverlayScreen visible={!!selectedTripId}>
+        {selectedTripId && (
+          <TripDetailScreen tripId={selectedTripId} onClose={() => { setSelectedTripId(null); fetchTrips(); fetchExpenseTotals(); }} />
+        )}
+      </OverlayScreen>
+      <OverlayScreen visible={!!quickExpenseTripId}>
+        {quickExpenseTripId && (
+          <AddExpenseScreen tripId={quickExpenseTripId} onClose={() => { setQuickExpenseTripId(null); fetchExpenseTotals(); }} />
+        )}
+      </OverlayScreen>
+      <OverlayScreen visible={!!quickChatTripId}>
+        {quickChatTripId && (
+          <ChatScreen tripId={quickChatTripId} tripName={quickChatTripName} onClose={() => { setQuickChatTripId(null); }} />
+        )}
+      </OverlayScreen>
+      <OverlayScreen visible={showNotifications}>
+        <NotificationsScreen
+          onClose={() => { setShowNotifications(false); fetchUnreadCount(); }}
+          onNavigateToTrip={(tripId) => {
+            setShowNotifications(false);
+            fetchUnreadCount();
+            setSelectedTripId(tripId);
+          }}
+        />
+      </OverlayScreen>
     </View>
   );
 }

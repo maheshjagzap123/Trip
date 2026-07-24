@@ -2,7 +2,7 @@
   "expo": {
     "name": "ExpenseX",
     "slug": "mahesh-jagzap",
-    "version": "26.07.0",
+    "version": "26.07.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "expensex",

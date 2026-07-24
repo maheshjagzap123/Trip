@@ -40,6 +40,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
   const [searchText, setSearchText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const inputRef = useRef<TextInput>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const presenceChannelRef = useRef<any>(null);
 
@@ -101,6 +102,8 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
     sendMessage(tripId, inputText, replyingTo?.id);
     setInputText('');
     setReplyingTo(null);
+    // Keep focus on input so user can type again immediately
+    setTimeout(() => inputRef.current?.focus(), 50);
     // Stop typing indicator
     if (presenceChannelRef.current) {
       presenceChannelRef.current.track({ user_id: user?.id, display_name: profile?.display_name || 'Member', is_typing: false });
@@ -523,17 +526,16 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             <Smile size={22} color={showEmojiPicker ? colors.primary : colors.textTertiary} />
           </TouchableOpacity>
           <TextInput
+            ref={inputRef}
             style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
             placeholder="Type a message..."
             placeholderTextColor={colors.textTertiary}
             value={inputText}
             onChangeText={handleTextChange}
             multiline
-            blurOnSubmit={true}
+            blurOnSubmit={false}
             maxLength={2000}
-            onSubmitEditing={handleSend}
             returnKeyType="send"
-            autoFocus={Platform.OS === 'web'}
             onFocus={() => setShowEmojiPicker(false)}
           />
           <TouchableOpacity

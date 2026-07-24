@@ -85,18 +85,19 @@ export function ExpensesTab({ tripId }: Props) {
   const myBalance = balances.find((b) => b.user_id === user?.id);
   const myNet = myBalance?.net_balance || 0;
 
-  const handleDelete = (expenseId: string) => {
+  const handleDelete = (expense: Expense) => {
+    const msg = `Delete "${expense.title}" (₹${expense.amount.toLocaleString()})?\nThis will update balances for all group members.`;
     if (Platform.OS === 'web') {
-      if (window.confirm('Delete this expense? This cannot be undone.')) {
-        deleteExpense(expenseId, tripId);
+      if (window.confirm(msg)) {
+        deleteExpense(expense.id, tripId);
       }
     } else {
       Alert.alert(
         'Delete Expense',
-        'Are you sure you want to delete this expense? This cannot be undone.',
+        `Delete "${expense.title}" (₹${expense.amount.toLocaleString()})?\n\nThis will update balances for all group members.`,
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Delete', style: 'destructive', onPress: () => deleteExpense(expenseId, tripId) },
+          { text: 'Delete', style: 'destructive', onPress: () => deleteExpense(expense.id, tripId) },
         ]
       );
     }
@@ -131,7 +132,7 @@ export function ExpensesTab({ tripId }: Props) {
           <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]}>{item.category}</Text>
         </View>
         {(item.created_by === user?.id || item.paid_by === user?.id) && (
-          <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <TouchableOpacity onPress={() => handleDelete(item)} style={styles.deleteBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Trash2 color={colors.textTertiary} size={14} />
           </TouchableOpacity>
         )}

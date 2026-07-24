@@ -532,9 +532,10 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             placeholderTextColor={colors.textTertiary}
             value={inputText}
             onChangeText={handleTextChange}
-            multiline
+            multiline={false}
             blurOnSubmit={false}
             maxLength={2000}
+            onSubmitEditing={handleSend}
             returnKeyType="send"
             onFocus={() => setShowEmojiPicker(false)}
           />

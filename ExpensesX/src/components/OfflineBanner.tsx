@@ -1,102 +1,99 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { WifiOff, RefreshCw } from 'lucide-react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
+import { WifiOff, Check } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNetworkStore } from '../stores/networkStore';
-import { useThemeColors, spacing, borderRadius } from '../theme';
+import { spacing } from '../theme';
 
 /**
- * Shows a banner at the top when device is offline or has pending syncs.
- * Place this in App.tsx after the AppNavigator.
+ * Shows a simple banner:
+ * - Offline: "No internet connection"
+ * - Back online after being offline: "Back online! Syncing..." then auto-hides
  */
 export function OfflineBanner() {
-  const { isOnline, pendingCount, isSyncing, syncNow } = useNetworkStore();
-  const colors = useThemeColors();
+  const { isOnline, isSyncing } = useNetworkStore();
   const insets = useSafeAreaInsets();
+  const slideAnim = useRef(new Animated.Value(-80)).current;
+  const wasOffline = useRef(false);
+  const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Don't show anything if online and no pending items
-  if (isOnline && pendingCount === 0) return null;
+  useEffect(() => {
+    if (!isOnline) {
+      // Show offline banner
+      wasOffline.current = true;
+      Animated.spring(slideAnim, { toValue: 0, useNativeDriver: true, damping: 20, stiffness: 300 }).start();
+    } else if (wasOffline.current) {
+      // Came back online — show "synced" briefly then hide
+      hideTimeout.current = setTimeout(() => {
+        Animated.timing(slideAnim, { toValue: -80, duration: 300, useNativeDriver: true }).start(() => {
+          wasOffline.current = false;
+        });
+      }, 2500);
+    } else {
+      // Already online, hide
+      slideAnim.setValue(-80);
+    }
 
-  const isOffline = !isOnline;
+    return () => {
+      if (hideTimeout.current) clearTimeout(hideTimeout.current);
+    };
+  }, [isOnline]);
+
+  const backgroundColor = !isOnline
+    ? '#FF6B7A'
+    : isSyncing
+    ? '#FFB648'
+    : '#35D07F';
+
+  const message = !isOnline
+    ? 'No internet connection'
+    : isSyncing
+    ? 'Back online! Syncing your changes...'
+    : 'All changes synced ✓';
 
   return (
-    <View style={[
-      styles.container,
-      {
-        top: insets.top,
-        backgroundColor: isOffline ? 'rgba(255, 107, 122, 0.95)' : 'rgba(255, 182, 72, 0.95)',
-      },
-    ]}>
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top + 8,
+          backgroundColor,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
+      pointerEvents="none"
+    >
       <View style={styles.content}>
-        {isOffline ? (
-          <>
-            <WifiOff size={16} color="#fff" />
-            <Text style={styles.text}>
-              You're offline. Changes will sync when you reconnect.
-            </Text>
-          </>
+        {!isOnline ? (
+          <WifiOff size={16} color="#fff" />
         ) : (
-          <>
-            {isSyncing ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <RefreshCw size={16} color="#fff" />
-            )}
-            <Text style={styles.text}>
-              {isSyncing ? 'Syncing...' : `${pendingCount} pending ${pendingCount === 1 ? 'change' : 'changes'}`}
-            </Text>
-            {!isSyncing && (
-              <TouchableOpacity onPress={syncNow} style={styles.syncBtn}>
-                <Text style={styles.syncBtnText}>Sync Now</Text>
-              </TouchableOpacity>
-            )}
-          </>
+          <Check size={16} color="#fff" />
         )}
+        <Text style={styles.text}>{message}</Text>
       </View>
-      {pendingCount > 0 && isOffline && (
-        <Text style={styles.subtext}>
-          {pendingCount} {pendingCount === 1 ? 'action' : 'actions'} queued
-        </Text>
-      )}
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
+    top: 0,
     left: 0,
     right: 0,
     zIndex: 9999,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingBottom: spacing.sm,
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'center',
+    gap: 8,
   },
   text: {
-    flex: 1,
     color: '#fff',
     fontSize: 13,
     fontWeight: '600',
-  },
-  subtext: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 11,
-    marginTop: 4,
-    marginLeft: 26,
-  },
-  syncBtn: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  syncBtnText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '700',
   },
 });

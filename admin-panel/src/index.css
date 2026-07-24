@@ -15,11 +15,22 @@
   --primary: #5B8CFF;
   --primary-light: rgba(91, 140, 255, 0.12);
   --secondary: #7B61FF;
+  --secondary-light: rgba(123, 97, 255, 0.12);
   --success: #35D07F;
+  --success-light: rgba(53, 208, 127, 0.12);
   --warning: #FFB648;
+  --warning-light: rgba(255, 182, 72, 0.12);
   --error: #FF6B7A;
+  --error-light: rgba(255, 107, 122, 0.12);
   --border: rgba(255, 255, 255, 0.08);
   --border-light: rgba(255, 255, 255, 0.05);
+  --gradient-start: #5B8CFF;
+  --gradient-end: #7B61FF;
+  --shadow-brand: 0 8px 32px rgba(91, 140, 255, 0.15);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -28,6 +39,7 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 a {
@@ -45,4 +57,98 @@ button {
 input {
   font-family: inherit;
   outline: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease forwards;
+}
+
+.animate-slide-in {
+  animation: slideInLeft 0.4s ease forwards;
 }

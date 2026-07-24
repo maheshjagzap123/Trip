@@ -70,6 +70,15 @@ export function Dashboard() {
         <p>Overview of your ExpenseX platform</p>
       </div>
 
+      {/* Welcome Banner */}
+      <div className="welcome-banner">
+        <div className="welcome-content">
+          <h2>Welcome back, Admin 👋</h2>
+          <p>{stats.totalUsers} users • {stats.totalGroups} groups • ₹{stats.totalAmount.toLocaleString()} volume</p>
+        </div>
+        <div className="welcome-glow" />
+      </div>
+
       {/* Stats Grid */}
       <div className="stats-grid">
         <StatCard icon={Users} label="Total Users" value={stats.totalUsers} change={`+${stats.newUsersThisWeek} this week`} color="var(--primary)" />

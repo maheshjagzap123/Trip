@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Layers, BarChart3, MessageSquare, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, Layers, BarChart3, MessageSquare, Menu, X, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import './Layout.css';
 
@@ -11,7 +11,12 @@ const NAV_ITEMS = [
   { path: '/feedback', icon: MessageSquare, label: 'Feedback' },
 ];
 
-export function Layout() {
+interface LayoutProps {
+  admin: { id: string; email: string; name: string; role: string };
+  onLogout: () => void;
+}
+
+export function Layout({ admin, onLogout }: LayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -48,7 +53,17 @@ export function Layout() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <div className="sidebar-version">v1.0.0</div>
+          <div className="sidebar-admin">
+            <div className="admin-avatar">{(admin.name || admin.email)[0].toUpperCase()}</div>
+            <div className="admin-info">
+              <span className="admin-name">{admin.name || 'Admin'}</span>
+              <span className="admin-email">{admin.email}</span>
+            </div>
+          </div>
+          <button className="logout-btn" onClick={onLogout}>
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
         </div>
       </aside>
 

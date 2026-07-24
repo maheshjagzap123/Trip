@@ -98,7 +98,7 @@ export function SplashScreen() {
       </View>
 
       {/* Version */}
-      <Text style={styles.version}>v1.0.0</Text>
+      <Text style={styles.version}>v26.07.0</Text>
     </LinearGradient>
   );
 }

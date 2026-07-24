@@ -118,12 +118,12 @@ export function MemberListScreen({ tripId, tripName, onClose }: MemberListScreen
       const foundUser = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
 
       if (!foundUser?.id) {
-        showAlertMsg('Not Found', 'This user is not on TripWise yet.');
+        showAlertMsg('Not Found', 'This user is not on ExpenseX yet.');
         return;
       }
 
       if (members.some((m) => m.user_id === foundUser.id)) {
-        showAlertMsg('Already Added', 'This user is already a member of this trip.');
+        showAlertMsg('Already Added', 'This user is already a member of this group.');
         return;
       }
 
@@ -151,7 +151,7 @@ export function MemberListScreen({ tripId, tripName, onClose }: MemberListScreen
   const handlePromoteToAdmin = async (memberId: string) => {
     const confirmed = await confirmAction(
       'Promote to Admin',
-      'This member will be able to edit the trip, manage members, and delete the trip.'
+      'This member will be able to edit the group, manage members, and delete the group.'
     );
     if (!confirmed) return;
 
@@ -193,7 +193,7 @@ export function MemberListScreen({ tripId, tripName, onClose }: MemberListScreen
   const handleRemoveMember = async (memberId: string, name: string) => {
     const confirmed = await confirmAction(
       'Remove Member',
-      `Remove ${name || 'this member'} from the trip? They will lose access to all trip data.`
+      `Remove ${name || 'this member'} from the group? They will lose access to all group data.`
     );
     if (!confirmed) return;
 

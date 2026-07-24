@@ -44,13 +44,13 @@ export function TermsOfServiceScreen({ onClose }: TermsOfServiceScreenProps) {
         </Text>
 
         <Section title="1. Acceptance of Terms" colors={colors}>
-          By accessing or using TripWise ("the App"), you agree to be bound by these Terms of
+          By accessing or using ExpenseX ("the App"), you agree to be bound by these Terms of
           Service. If you do not agree to these terms, please do not use the App.
         </Section>
 
         <Section title="2. Description of Service" colors={colors}>
-          TripWise is a collaborative travel planning platform that allows users to create trips,
-          manage shared expenses, communicate with trip members, and store travel-related media
+          ExpenseX is a collaborative expense management platform that allows users to create groups,
+          manage shared expenses, communicate with group members, and store receipts, media,
           and documents.
         </Section>
 
@@ -61,23 +61,23 @@ export function TermsOfServiceScreen({ onClose }: TermsOfServiceScreenProps) {
         </Section>
 
         <Section title="4. User Content" colors={colors}>
-          You retain ownership of content you upload to TripWise (photos, documents, messages).
-          By uploading content, you grant TripWise a limited license to store, process, and
-          display that content to authorized trip members. You must not upload content that
+          You retain ownership of content you upload to ExpenseX (photos, documents, messages).
+          By uploading content, you grant ExpenseX a limited license to store, process, and
+          display that content to authorized group members. You must not upload content that
           violates any laws or infringes on the rights of others.
         </Section>
 
         <Section title="5. Shared Expenses" colors={colors}>
-          TripWise facilitates expense tracking and splitting calculations between trip members.
-          TripWise does not process payments directly. Settlement of debts is the responsibility
-          of the users involved. TripWise makes no guarantees about the accuracy of calculations
+          ExpenseX facilitates expense tracking and splitting calculations between group members.
+          ExpenseX does not process payments directly. Settlement of debts is the responsibility
+          of the users involved. ExpenseX makes no guarantees about the accuracy of calculations
           beyond what is displayed in the app.
         </Section>
 
         <Section title="6. Privacy & Data" colors={colors}>
           Your use of the App is also governed by our Privacy Policy. We collect and process
-          personal data as described therein. Trip data is shared only with members you invite
-          or accept into your trips.
+          personal data as described therein. Group data is shared only with members you invite
+          or accept into your groups.
         </Section>
 
         <Section title="7. Prohibited Conduct" colors={colors}>
@@ -96,7 +96,7 @@ export function TermsOfServiceScreen({ onClose }: TermsOfServiceScreenProps) {
         </Section>
 
         <Section title="9. Limitation of Liability" colors={colors}>
-          TripWise is provided "as is" without warranties of any kind. We shall not be liable
+          ExpenseX is provided "as is" without warranties of any kind. We shall not be liable
           for any indirect, incidental, or consequential damages arising from your use of the
           App. Our total liability shall not exceed the amount you have paid us in the 12 months
           preceding the claim.
@@ -109,7 +109,7 @@ export function TermsOfServiceScreen({ onClose }: TermsOfServiceScreenProps) {
         </Section>
 
         <Section title="11. Contact" colors={colors}>
-          If you have questions about these Terms, please contact us at support@tripwise.app.
+          If you have questions about these Terms, please contact us at support@expensex.app.
         </Section>
 
         <View style={{ height: spacing.xxl }} />

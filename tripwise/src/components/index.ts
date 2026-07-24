@@ -1,4 +1,4 @@
-// Premium UI Component Library for TripWise
+// Premium UI Component Library for ExpenseX
 export {
   PressableScale,
   Button,

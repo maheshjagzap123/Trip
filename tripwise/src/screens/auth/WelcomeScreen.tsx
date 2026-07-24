@@ -9,9 +9,9 @@ type Nav = StackNavigationProp<AuthStackParamList, 'Welcome'>;
 const { width: W, height: H } = Dimensions.get('window');
 
 const FEATURES = [
-  { icon: '✈️', label: 'Plan Trips',      desc: 'Organize every detail effortlessly' },
-  { icon: '💸', label: 'Split Expenses',  desc: 'Fair, transparent & instant' },
-  { icon: '👥', label: 'Travel Together', desc: 'Collaborate in real-time' },
+  { icon: '💰', label: 'Split Expenses',  desc: 'Fair, transparent & instant' },
+  { icon: '👥', label: 'Manage Groups',   desc: 'For any shared spending' },
+  { icon: '📊', label: 'Track Spending',  desc: 'Insights across all groups' },
 ];
 
 export function WelcomeScreen() {
@@ -73,10 +73,10 @@ export function WelcomeScreen() {
       {/* Hero */}
       <Animated.View style={[styles.hero, { opacity: heroOpacity, transform: [{ translateY: heroY }] }]}>
         <LinearGradient colors={['#5B8CFF', '#7B61FF']} style={styles.logoGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-          <Text style={styles.logoEmoji}>✈️</Text>
+          <Text style={styles.logoEmoji}>💸</Text>
         </LinearGradient>
-        <Text style={styles.appName}>TripWise</Text>
-        <Text style={styles.tagline}>Your premium travel companion</Text>
+        <Text style={styles.appName}>ExpenseX</Text>
+        <Text style={styles.tagline}>Split smarter, together</Text>
       </Animated.View>
 
       {/* Feature cards */}

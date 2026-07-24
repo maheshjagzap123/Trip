@@ -128,7 +128,7 @@ export function SettleUpScreen({ tripId, onClose, preSelectedMemberId, preSelect
 
     setIsLoading(true);
     try {
-      const upiUrl = `upi://pay?pa=${selectedMember.upi_id}&pn=${encodeURIComponent(selectedMember.upi_display_name || selectedMember.display_name || '')}&am=${parsedAmount.toFixed(2)}&cu=INR&tn=TripWise+Settlement`;
+      const upiUrl = `upi://pay?pa=${selectedMember.upi_id}&pn=${encodeURIComponent(selectedMember.upi_display_name || selectedMember.display_name || '')}&am=${parsedAmount.toFixed(2)}&cu=INR&tn=ExpenseX+Settlement`;
 
       const canOpen = await Linking.canOpenURL(upiUrl);
       if (!canOpen) {
@@ -270,7 +270,7 @@ export function SettleUpScreen({ tripId, onClose, preSelectedMemberId, preSelect
             <AlertTriangle size={18} color={colors.warning} style={{ marginTop: 2 }} />
             <View style={{ flex: 1, marginLeft: spacing.sm }}>
               <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>
-                {selectedMember?.display_name} hasn't added their UPI ID on TripWise
+                {selectedMember?.display_name} hasn't added their UPI ID on ExpenseX
               </Text>
               <Text style={[typography.bodySmall, { color: colors.textSecondary, marginTop: 4 }]}>
                 They need to add it in their profile before you can pay via UPI. You can still record this as a manual settlement below.

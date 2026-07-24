@@ -6,7 +6,7 @@ import type { MainTabsParamList } from './types';
 import { TripDashboardScreen } from '../screens/trips/TripDashboardScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { AnalyticsScreen } from '../screens/analytics/AnalyticsScreen';
-import { Map, User, BarChart3 } from 'lucide-react-native';
+import { LayoutGrid, User, BarChart3 } from 'lucide-react-native';
 import { useThemeColors, spacing, borderRadius, shadows } from '../theme';
 import { useThemeStore } from '../stores/themeStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -76,12 +76,12 @@ export function MainTabs() {
       }}
     >
       <Tab.Screen
-        name="TripsTab"
+        name="GroupsTab"
         component={TripDashboardScreen}
         options={{
-          tabBarLabel: 'Trips',
+          tabBarLabel: 'Groups',
           tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon icon={<Map color={color} size={22} strokeWidth={focused ? 2.2 : 1.8} />} focused={focused} activeColor={colors.primary} />
+            <TabIcon icon={<LayoutGrid color={color} size={22} strokeWidth={focused ? 2.2 : 1.8} />} focused={focused} activeColor={colors.primary} />
           ),
         }}
       />

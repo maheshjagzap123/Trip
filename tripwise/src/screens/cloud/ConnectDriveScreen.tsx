@@ -55,7 +55,7 @@ export function ConnectDriveScreen({ onClose }: Props) {
       // Build OAuth URL manually (works on web and native)
       const redirectUri = Platform.OS === 'web' 
         ? window.location.origin 
-        : 'tripwise://oauth-callback';
+        : 'expensex://oauth-callback';
 
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${GOOGLE_CLIENT_ID}` +
@@ -123,8 +123,8 @@ export function ConnectDriveScreen({ onClose }: Props) {
         expires_at: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
       }, { onConflict: 'user_id,provider' });
 
-      // Create TripWise folder
-      await createTripWiseFolder(accessToken);
+      // Create ExpenseX folder
+      await createExpenseXFolder(accessToken);
 
       setIsConnected(true);
       setDriveEmail(userInfo.email || '');
@@ -136,10 +136,10 @@ export function ConnectDriveScreen({ onClose }: Props) {
     }
   };
 
-  const createTripWiseFolder = async (accessToken: string) => {
+  const createExpenseXFolder = async (accessToken: string) => {
     // Check if folder exists
     const searchRes = await fetch(
-      "https://www.googleapis.com/drive/v3/files?q=name='TripWise' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+      "https://www.googleapis.com/drive/v3/files?q=name='ExpenseX' and mimeType='application/vnd.google-apps.folder' and trashed=false",
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
     const searchData = await searchRes.json();
@@ -154,7 +154,7 @@ export function ConnectDriveScreen({ onClose }: Props) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: 'TripWise',
+        name: 'ExpenseX',
         mimeType: 'application/vnd.google-apps.folder',
       }),
     });
@@ -205,8 +205,8 @@ export function ConnectDriveScreen({ onClose }: Props) {
 
               <Text style={[typography.bodySmall, { color: colors.textSecondary, marginTop: spacing.md }]}>
                 {isConnected
-                  ? 'Your trip photos can be saved to the TripWise folder in your Google Drive. This saves storage on our servers and gives you full control over your files.'
-                  : 'Connect your Google Drive to save trip photos directly to your own cloud storage. Free up server space and keep your memories safe.'}
+                  ? 'Your group photos can be saved to the ExpenseX folder in your Google Drive. This saves storage on our servers and gives you full control over your files.'
+                  : 'Connect your Google Drive to save group photos directly to your own cloud storage. Free up server space and keep your memories safe.'}
               </Text>
 
               {isConnected ? (
@@ -235,8 +235,8 @@ export function ConnectDriveScreen({ onClose }: Props) {
             <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Text style={[typography.labelSmall, { color: colors.textTertiary }]}>HOW IT WORKS</Text>
               <Text style={[typography.bodySmall, { color: colors.textSecondary, marginTop: spacing.sm }]}>
-                • Photos upload to a "TripWise" folder in your Drive{'\n'}
-                • Each trip gets its own sub-folder{'\n'}
+                • Photos upload to an "ExpenseX" folder in your Drive{'\n'}
+                • Each group gets its own sub-folder{'\n'}
                 • We only store the file link, not the file itself{'\n'}
                 • You can disconnect anytime — files stay in your Drive{'\n'}
                 • 15GB free with every Google account

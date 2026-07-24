@@ -1,8 +1,13 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import * as FileSystem from 'expo-file-system';
 import { Platform } from 'react-native';
 import { decode } from 'base64-arraybuffer';
+
+// Helper to read a local file URI as ArrayBuffer (works on all platforms)
+async function readFileAsArrayBuffer(uri: string): Promise<ArrayBuffer> {
+  const response = await fetch(uri);
+  return await response.arrayBuffer();
+}
 
 export interface MediaItem {
   id: string;
@@ -75,11 +80,11 @@ async function isTokenValid(accessToken: string): Promise<boolean> {
   }
 }
 
-/** Find or create the TripWise folder in Google Drive */
-async function getOrCreateTripWiseFolder(accessToken: string): Promise<string> {
-  // Search for existing TripWise folder
+/** Find or create the ExpenseX folder in Google Drive */
+async function getOrCreateExpenseXFolder(accessToken: string): Promise<string> {
+  // Search for existing ExpenseX folder
   const searchRes = await fetch(
-    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='TripWise' and mimeType='application/vnd.google-apps.folder' and trashed=false")}`,
+    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='ExpenseX' and mimeType='application/vnd.google-apps.folder' and trashed=false")}`,
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
   const searchData = await searchRes.json();
@@ -88,7 +93,7 @@ async function getOrCreateTripWiseFolder(accessToken: string): Promise<string> {
     return searchData.files[0].id;
   }
 
-  // Create TripWise folder
+  // Create ExpenseX folder
   const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
     method: 'POST',
     headers: {
@@ -96,7 +101,7 @@ async function getOrCreateTripWiseFolder(accessToken: string): Promise<string> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      name: 'TripWise',
+      name: 'ExpenseX',
       mimeType: 'application/vnd.google-apps.folder',
     }),
   });
@@ -104,7 +109,7 @@ async function getOrCreateTripWiseFolder(accessToken: string): Promise<string> {
   return folder.id;
 }
 
-/** Find or create a trip-specific subfolder inside TripWise folder */
+/** Find or create a group-specific subfolder inside ExpenseX folder */
 async function getOrCreateTripFolder(accessToken: string, parentFolderId: string, tripId: string, tripName?: string): Promise<string> {
   const folderName = tripName || tripId;
 
@@ -150,7 +155,7 @@ async function uploadToDrive(
     parents: [folderId],
   };
 
-  const boundary = 'tripwise_upload_boundary';
+  const boundary = 'expensex_upload_boundary';
   const metadataStr = JSON.stringify(metadata);
 
   // Build multipart body
@@ -290,15 +295,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
 
       // Read file data
       let fileData: ArrayBuffer;
-      if (Platform.OS === 'web') {
-        const response = await fetch(uri);
-        fileData = await response.arrayBuffer();
-      } else {
-        const base64 = await FileSystem.readAsStringAsync(uri, {
-          encoding: 'base64',
-        });
-        fileData = decode(base64);
-      }
+      fileData = await readFileAsArrayBuffer(uri);
 
       set({ uploadProgress: 30 });
 
@@ -315,8 +312,8 @@ export const useMediaStore = create<MediaState>((set, get) => ({
         // ─── Upload to Google Drive ─────────────────────────────────────
         set({ uploadProgress: 40 });
 
-        // Get or create TripWise folder
-        const tripWiseFolderId = await getOrCreateTripWiseFolder(accessToken);
+        // Get or create ExpenseX folder
+        const expenseXFolderId = await getOrCreateExpenseXFolder(accessToken);
 
         set({ uploadProgress: 50 });
 
@@ -330,7 +327,7 @@ export const useMediaStore = create<MediaState>((set, get) => ({
         // Get or create trip-specific subfolder
         const tripFolderId = await getOrCreateTripFolder(
           accessToken,
-          tripWiseFolderId,
+          expenseXFolderId,
           tripId,
           tripData?.trip_name || tripId,
         );

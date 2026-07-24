@@ -112,7 +112,7 @@ export function TimelineScreen({ tripId, tripName, onClose }: Props) {
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={onClose}><ArrowLeft color={colors.textPrimary} size={22} /></TouchableOpacity>
         <View style={{ flex: 1, marginLeft: spacing.sm }}>
-          <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>Timeline</Text>
+          <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>Activity</Text>
           <Text style={[typography.caption, { color: colors.textTertiary }]}>{tripName}</Text>
         </View>
         <TouchableOpacity onPress={() => setShowAddNote(true)} style={[styles.addBtn, { backgroundColor: colors.primary }]}>
@@ -126,7 +126,7 @@ export function TimelineScreen({ tripId, tripName, onClose }: Props) {
         <View style={styles.empty}>
           <Text style={{ fontSize: 40 }}>📖</Text>
           <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.md, textAlign: 'center' }]}>
-            Your trip story will appear here as you add expenses, photos, and notes.
+            Your group activity will appear here as you add expenses, photos, and notes.
           </Text>
         </View>
       ) : (

@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "TripWise",
+    "name": "ExpenseX",
     "slug": "mahesh-jagzap",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "tripwise",
+    "scheme": "expensex",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tripwise.app"
+      "bundleIdentifier": "com.expensex.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.tripwise.app",
+      "package": "com.expensex.app",
       "softwareKeyboardLayoutMode": "pan",
       "enableProguardInReleaseBuilds": true,
       "enableShrinkResourcesInReleaseBuilds": true

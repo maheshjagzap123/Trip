@@ -13,7 +13,7 @@ interface ThemeState {
   setTheme: (mode: ThemeMode) => Promise<void>;
 }
 
-const STORAGE_KEY = 'tripwise_theme';
+const STORAGE_KEY = 'expensex_theme';
 
 function getResolvedScheme(mode: ThemeMode): 'light' | 'dark' {
   if (mode === 'system') {

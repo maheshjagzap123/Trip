@@ -12,15 +12,23 @@ import { ArrowLeft, Check } from 'lucide-react-native';
 
 const CATEGORIES = [
   { name: 'Food', emoji: '🍽️' },
+  { name: 'Grocery', emoji: '🛒' },
+  { name: 'Rent', emoji: '🏠' },
+  { name: 'Internet', emoji: '🌐' },
+  { name: 'Electricity', emoji: '⚡' },
+  { name: 'Water', emoji: '💧' },
   { name: 'Fuel', emoji: '⛽' },
-  { name: 'Hotel', emoji: '🏨' },
-  { name: 'Flight', emoji: '✈️' },
-  { name: 'Shopping', emoji: '🛍️' },
-  { name: 'Transport', emoji: '🚗' },
   { name: 'Entertainment', emoji: '🎬' },
-  { name: 'Parking', emoji: '🅿️' },
+  { name: 'Shopping', emoji: '🛍️' },
   { name: 'Medical', emoji: '💊' },
-  { name: 'Miscellaneous', emoji: '📦' },
+  { name: 'Travel', emoji: '✈️' },
+  { name: 'Hotel', emoji: '🏨' },
+  { name: 'Flight', emoji: '🛫' },
+  { name: 'Subscription', emoji: '📱' },
+  { name: 'Salary', emoji: '💼' },
+  { name: 'Business', emoji: '🏢' },
+  { name: 'Transport', emoji: '🚗' },
+  { name: 'Other', emoji: '📦' },
 ];
 
 interface Member { user_id: string; display_name: string | null; }

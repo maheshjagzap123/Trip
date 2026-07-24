@@ -202,7 +202,7 @@ export const useTripStore = create<TripState>((set, get) => ({
       const foundUser = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
 
       if (foundUser && foundUser.id) {
-        // User exists on TripWise — add as pending member
+        // User exists on ExpenseX — add as pending member
         const { error: inviteError } = await supabase.from('trip_members').insert({
           trip_id: trip.id,
           user_id: foundUser.id,
@@ -229,7 +229,7 @@ export const useTripStore = create<TripState>((set, get) => ({
           }).catch(() => {});
         }
       } else {
-        console.warn(`User ${email} not found on TripWise`, { foundUser });
+        console.warn(`User ${email} not found on ExpenseX`, { foundUser });
       }
     }
 

@@ -5,7 +5,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { useAuthStore } from '../../stores/authStore';
@@ -13,7 +12,7 @@ import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Plus, FileText, Trash2, X, Upload } from 'lucide-react-native';
 import { format } from 'date-fns';
 
-const DOC_CATEGORIES = ['Passport', 'Driving License', 'PAN Card', 'Aadhaar Card', 'Visa', 'Insurance', 'Other'];
+const DOC_CATEGORIES = ['Receipt', 'Bill', 'Warranty', 'Invoice', 'Agreement', 'Proof of Payment', 'ID Document', 'Other'];
 
 interface Document {
   id: string;
@@ -113,7 +112,7 @@ export function PersonalDocumentsScreen({ onClose }: Props) {
         <View style={styles.center}>
           <FileText size={48} color={colors.textTertiary} />
           <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.md, textAlign: 'center' }]}>
-            Store your important documents here{'\n'}(License, PAN, Aadhaar, Passport)
+            Store your receipts, bills, and important documents here
           </Text>
           <TouchableOpacity style={[styles.emptyBtn, { backgroundColor: colors.primary }]} onPress={() => setShowAdd(true)}>
             <Upload size={16} color="#fff" />
@@ -159,12 +158,8 @@ function AddDocModal({ onClose }: { onClose: () => void }) {
       const path = `personal/${user.id}/${Date.now()}.${ext}`;
 
       let fileData: ArrayBuffer;
-      if (Platform.OS === 'web') {
-        fileData = await (await fetch(asset.uri)).arrayBuffer();
-      } else {
-        const b64 = await FileSystem.readAsStringAsync(asset.uri, { encoding: 'base64' });
-        fileData = decode(b64);
-      }
+      const fetchRes = await fetch(asset.uri);
+      fileData = await fetchRes.arrayBuffer();
 
       const { error: upErr } = await supabase.storage.from('documents').upload(path, fileData, { contentType: asset.mimeType || 'image/jpeg' });
       if (upErr) { showAlert('Error', upErr.message); return; }

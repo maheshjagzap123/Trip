@@ -139,7 +139,7 @@ export function SupportScreen({ onClose }: Props) {
         {activeTab === 'feedback' && (
           <View>
             <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginBottom: spacing.lg }]}>
-              How's your TripWise experience? We'd love to hear from you.
+              How's your ExpenseX experience? We'd love to hear from you.
             </Text>
             <Text style={[typography.labelMedium, { color: colors.textPrimary, marginBottom: spacing.sm }]}>Rating</Text>
             <View style={styles.starRow}>

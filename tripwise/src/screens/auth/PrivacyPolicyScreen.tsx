@@ -57,9 +57,9 @@ export function PrivacyPolicyScreen({ onClose }: PrivacyPolicyScreenProps) {
 
         <Section title="2. How We Use Your Information" colors={colors}>
           We use your information to:{'\n'}
-          • Provide and maintain the TripWise service{'\n'}
-          • Enable collaborative features (shared trips, expenses, chat){'\n'}
-          • Send notifications about trip activity and invitations{'\n'}
+          • Provide and maintain the ExpenseX service{'\n'}
+          • Enable collaborative features (shared groups, expenses, chat){'\n'}
+          • Send notifications about group activity and invitations{'\n'}
           • Improve the app experience and fix issues{'\n'}
           • Communicate important service updates{'\n'}
           • Generate anonymized analytics for product improvement
@@ -97,17 +97,17 @@ export function PrivacyPolicyScreen({ onClose }: PrivacyPolicyScreenProps) {
           • Export your data{'\n'}
           • Withdraw consent for optional data processing{'\n\n'}
           To exercise these rights, go to Settings → Account → Privacy or contact us at
-          privacy@tripwise.app.
+          privacy@expensex.app.
         </Section>
 
         <Section title="7. Children's Privacy" colors={colors}>
-          TripWise is not intended for users under 16 years of age. We do not knowingly collect
+          ExpenseX is not intended for users under 16 years of age. We do not knowingly collect
           personal information from children. If we become aware that a child has provided us
           with personal data, we will delete it promptly.
         </Section>
 
         <Section title="8. Cookies & Tracking" colors={colors}>
-          The TripWise mobile app does not use cookies. The web version uses essential cookies
+          The ExpenseX mobile app does not use cookies. The web version uses essential cookies
           for authentication only. We do not use advertising trackers or sell data to ad networks.
         </Section>
 
@@ -119,7 +119,7 @@ export function PrivacyPolicyScreen({ onClose }: PrivacyPolicyScreenProps) {
 
         <Section title="10. Contact Us" colors={colors}>
           For privacy-related inquiries:{'\n\n'}
-          Email: privacy@tripwise.app{'\n'}
+          Email: privacy@expensex.app{'\n'}
           Support: In-app Help Center → Contact Support
         </Section>
 

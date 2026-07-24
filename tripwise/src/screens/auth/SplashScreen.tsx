@@ -75,19 +75,19 @@ export function SplashScreen() {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <Text style={styles.logoEmoji}>✈️</Text>
+          <Text style={styles.logoEmoji}>💸</Text>
         </LinearGradient>
         <View style={styles.glowRing} />
       </Animated.View>
 
       {/* App Name */}
       <Animated.Text style={[styles.appName, { opacity: textOpacity, transform: [{ translateY: textY }] }]}>
-        TripWise
+        ExpenseX
       </Animated.Text>
 
       {/* Tagline */}
       <Animated.Text style={[styles.tagline, { opacity: tagOpacity }]}>
-        Travel smarter, together
+        Split smarter, together
       </Animated.Text>
 
       {/* Pulsing loading dot */}

@@ -91,7 +91,7 @@ export function ProfileScreen() {
         {(profile?.travel_interests?.length ?? 0) > 0 && (
           <View style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }, shadows.card]}>
             <Text style={[typography.overline, { color: colors.textTertiary, marginBottom: spacing.sm }]}>
-              TRAVEL INTERESTS
+              PREFERRED CATEGORIES
             </Text>
             <View style={styles.chipRow}>
               {(profile?.travel_interests || []).map((i: string) => (

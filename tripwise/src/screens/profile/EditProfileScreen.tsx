@@ -11,11 +11,11 @@ import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { ArrowLeft, Camera, Smartphone, CreditCard } from 'lucide-react-native';
 import { decode } from 'base64-arraybuffer';
-import * as FileSystem from 'expo-file-system';
 
 const TRAVEL_INTERESTS = [
-  'Adventure', 'Beach', 'Mountains', 'Food', 'Culture',
-  'Wildlife', 'Roadtrip', 'Pilgrimage', 'Shopping', 'Nightlife',
+  'Food', 'Business', 'Family', 'Travel',
+  'Shopping', 'Bills', 'Entertainment', 'Rent',
+  'Fuel', 'Medical',
 ];
 
 interface Props { onClose: () => void; }
@@ -82,13 +82,8 @@ export function EditProfileScreen({ onClose }: Props) {
       const ext = asset.uri.split('.').pop() || 'jpg';
       const path = `${user.id}/avatar.${ext}`;
       let fileData: ArrayBuffer;
-      if (Platform.OS === 'web') {
-        const response = await fetch(asset.uri);
-        fileData = await response.arrayBuffer();
-      } else {
-        const base64 = await FileSystem.readAsStringAsync(asset.uri, { encoding: 'base64' });
-        fileData = decode(base64);
-      }
+      const response = await fetch(asset.uri);
+      fileData = await response.arrayBuffer();
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(path, fileData, { contentType: asset.mimeType || 'image/jpeg', upsert: true });
@@ -280,7 +275,7 @@ export function EditProfileScreen({ onClose }: Props) {
 
         {/* Interests */}
         <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Travel interests</Text>
+          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Preferred categories</Text>
           <View style={styles.chipRow}>
             {TRAVEL_INTERESTS.map((interest) => {
               const selected = selectedInterests.includes(interest);

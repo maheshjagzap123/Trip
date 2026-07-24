@@ -52,18 +52,18 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'TripWise <notifications@tripwise.app>',
+        from: 'ExpenseX <notifications@expensex.app>',
         to: [to_email],
-        subject: `You're invited to "${trip_name}" on TripWise!`,
+        subject: `You're invited to "${trip_name}" on ExpenseX!`,
         html: `
           <div style="font-family: -apple-system, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px;">
-            <h2 style="color: #00C896;">You're invited! ✈️</h2>
-            <p><strong>${inviter_name || 'Someone'}</strong> has invited you to join the trip:</p>
+            <h2 style="color: #5B8CFF;">You're invited! 💸</h2>
+            <p><strong>${inviter_name || 'Someone'}</strong> has invited you to join the group:</p>
             <div style="background: #f3f4f6; border-radius: 12px; padding: 16px; margin: 16px 0;">
               <h3 style="margin: 0; color: #111827;">${trip_name}</h3>
             </div>
-            <p>Open the TripWise app to accept the invitation and start planning together!</p>
-            <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">Happy travels,<br/>Team TripWise</p>
+            <p>Open the ExpenseX app to accept the invitation and start splitting expenses together!</p>
+            <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">Happy splitting,<br/>Team ExpenseX</p>
           </div>
         `,
       }),

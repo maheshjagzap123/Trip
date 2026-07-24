@@ -131,12 +131,12 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
       const foundUser = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
 
       if (!foundUser?.id) {
-        showAlert('Not Found', 'This user is not on TripWise yet.');
+        showAlert('Not Found', 'This user is not on ExpenseX yet.');
         return;
       }
 
       if (members.some((m) => m.user_id === foundUser.id)) {
-        showAlert('Already Added', 'This user is already a member of this trip.');
+        showAlert('Already Added', 'This user is already a member of this group.');
         return;
       }
 
@@ -162,9 +162,9 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
 
   const handleLeaveTrip = async () => {
     const confirm = Platform.OS === 'web'
-      ? window.confirm('Are you sure you want to leave this trip?')
+      ? window.confirm('Are you sure you want to leave this group?')
       : await new Promise((resolve) => {
-          Alert.alert('Leave Trip', 'Are you sure?', [
+          Alert.alert('Leave Group', 'Are you sure?', [
             { text: 'Cancel', onPress: () => resolve(false) },
             { text: 'Leave', style: 'destructive', onPress: () => resolve(true) },
           ]);
@@ -178,9 +178,9 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
 
   const handleDeleteTrip = async () => {
     const confirm = Platform.OS === 'web'
-      ? window.confirm('Delete this trip permanently? This cannot be undone.')
+      ? window.confirm('Delete this group permanently? This cannot be undone.')
       : await new Promise((resolve) => {
-          Alert.alert('Delete Trip', 'This cannot be undone.', [
+          Alert.alert('Delete Group', 'This cannot be undone.', [
             { text: 'Cancel', onPress: () => resolve(false) },
             { text: 'Delete', style: 'destructive', onPress: () => resolve(true) },
           ]);
@@ -329,7 +329,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(123,97,255,0.12)' }]}>
               <CameraIcon color="#7B61FF" size={22} />
             </View>
-            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Photos</Text>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Media</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -351,7 +351,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
             <View style={[styles.actionIconWrap, { backgroundColor: 'rgba(123,97,255,0.12)' }]}>
               <Clock color="#7B61FF" size={22} />
             </View>
-            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Timeline</Text>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary, marginTop: spacing.sm }]}>Activity</Text>
           </TouchableOpacity>
         </View>
 
@@ -423,7 +423,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
               onPress={handleLeaveTrip}
             >
               <LogOut color={colors.error} size={16} />
-              <Text style={[typography.labelMedium, { color: colors.error, marginLeft: spacing.xs }]}>Leave Trip</Text>
+              <Text style={[typography.labelMedium, { color: colors.error, marginLeft: spacing.xs }]}>Leave Group</Text>
             </TouchableOpacity>
           )}
           {isAdmin && (
@@ -432,7 +432,7 @@ export function TripDetailScreen({ tripId, onClose }: TripDetailProps) {
               onPress={handleDeleteTrip}
             >
               <Trash2 color={colors.error} size={16} />
-              <Text style={[typography.labelMedium, { color: colors.error, marginLeft: spacing.xs }]}>Delete Trip</Text>
+              <Text style={[typography.labelMedium, { color: colors.error, marginLeft: spacing.xs }]}>Delete Group</Text>
             </TouchableOpacity>
           )}
         </View>

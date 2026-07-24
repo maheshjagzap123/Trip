@@ -413,7 +413,7 @@ export function ChatScreen({ tripId, tripName, onClose }: Props) {
             {tripName}
           </Text>
           <Text style={[typography.caption, { color: colors.textTertiary }]}>
-            Trip Chat • {messages.length} messages
+            Group Chat • {messages.length} messages
           </Text>
         </View>
       </View>

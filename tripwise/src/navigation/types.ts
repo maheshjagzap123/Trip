@@ -9,7 +9,7 @@ export type AuthStackParamList = {
 };
 
 export type MainTabsParamList = {
-  TripsTab: undefined;
+  GroupsTab: undefined;
   AnalyticsTab: undefined;
   ProfileTab: undefined;
 };

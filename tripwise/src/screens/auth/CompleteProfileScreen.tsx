@@ -9,9 +9,9 @@ import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 
 const INTERESTS = [
-  '🏔️ Adventure', '🏖️ Beach', '⛰️ Mountains', '🍜 Food',
-  '🎭 Culture', '🦁 Wildlife', '🚗 Roadtrip', '🛕 Pilgrimage',
-  '🛍️ Shopping', '🎉 Nightlife',
+  '🍽️ Food', '💼 Business', '👨‍👩‍👧 Family', '✈️ Travel',
+  '🛍️ Shopping', '💡 Bills', '🎬 Entertainment', '🏠 Rent',
+  '⛽ Fuel', '💊 Medical',
 ];
 const GENDERS = ['Male', 'Female', 'Other'];
 const { width: W } = Dimensions.get('window');
@@ -95,7 +95,7 @@ export function CompleteProfileScreen() {
                 <Text style={{ fontSize: 30 }}>👤</Text>
               </LinearGradient>
               <Text style={styles.title}>Tell us about you</Text>
-              <Text style={styles.subtitle}>Personalize your TripWise experience</Text>
+              <Text style={styles.subtitle}>Personalize your ExpenseX experience</Text>
             </View>
 
             {/* Name */}
@@ -181,8 +181,8 @@ export function CompleteProfileScreen() {
 
             {/* Interests */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>TRAVEL INTERESTS</Text>
-              <Text style={styles.sectionHint}>Pick what excites you</Text>
+              <Text style={styles.sectionLabel}>PREFERRED CATEGORIES</Text>
+              <Text style={styles.sectionHint}>Pick what you spend on most</Text>
               <View style={styles.chipRow}>
                 {INTERESTS.map((i) => {
                   const sel = selectedInterests.includes(i);

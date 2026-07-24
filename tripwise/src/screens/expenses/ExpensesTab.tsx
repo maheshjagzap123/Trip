@@ -13,9 +13,11 @@ import { format } from 'date-fns';
 import type { Expense } from '../../stores/expenseStore';
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  Food: '🍽️', Fuel: '⛽', Hotel: '🏨', Flight: '✈️',
-  Shopping: '🛍️', Transport: '🚗', Entertainment: '🎬',
-  Parking: '🅿️', Medical: '💊', Miscellaneous: '📦',
+  Food: '🍽️', Grocery: '🛒', Rent: '🏠', Internet: '🌐',
+  Electricity: '⚡', Water: '💧', Fuel: '⛽', Entertainment: '🎬',
+  Shopping: '🛍️', Medical: '💊', Travel: '✈️', Hotel: '🏨',
+  Flight: '🛫', Subscription: '📱', Salary: '💼', Business: '🏢',
+  Transport: '🚗', Other: '📦', Parking: '🅿️', Miscellaneous: '📦',
 };
 
 interface Props {
@@ -279,7 +281,7 @@ export function ExpensesTab({ tripId }: Props) {
               <Text style={{ fontSize: 32 }}>🎉</Text>
               <Text style={[typography.labelLarge, { color: colors.success, marginTop: spacing.sm }]}>All settled up!</Text>
               <Text style={[typography.bodySmall, { color: colors.textSecondary, marginTop: spacing.xs, textAlign: 'center' }]}>
-                No pending balances in this trip.
+                No pending balances in this group.
               </Text>
             </View>
           )}

@@ -15,7 +15,7 @@ import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Calendar } from 'lucide-react-native';
 
-const TRIP_TYPES = ['Friends', 'Family', 'Couple', 'Solo', 'Office', 'Adventure', 'Pilgrimage'];
+const TRIP_TYPES = ['Trip', 'Flatmates', 'Family', 'Friends', 'Couple', 'Office', 'Business', 'College', 'Event', 'Wedding', 'Sports Team', 'Monthly Household', 'Custom'];
 
 interface EditTripProps {
   trip: {
@@ -105,14 +105,14 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
         <TouchableOpacity onPress={onClose} accessibilityLabel="Cancel">
           <ArrowLeft color={colors.textPrimary} size={24} />
         </TouchableOpacity>
-        <Text style={[typography.h3, { color: colors.textPrimary }]}>Edit Trip</Text>
+        <Text style={[typography.h3, { color: colors.textPrimary }]}>Edit Group</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {/* Trip Name */}
         <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Trip name *</Text>
+          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Group name *</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
             value={tripName}
@@ -155,7 +155,7 @@ export function EditTripScreen({ trip, onClose, onSaved }: EditTripProps) {
 
         {/* Trip Type */}
         <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Trip type</Text>
+          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Group type</Text>
           <View style={styles.chipRow}>
             {TRIP_TYPES.map((type) => (
               <TouchableOpacity

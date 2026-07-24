@@ -4,7 +4,6 @@ import {
   Modal, KeyboardAvoidingView, Platform, Alert, ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';
 import { useThemeColors, typography, spacing, borderRadius } from '../theme';
 import { supabase } from '../lib/supabase';
@@ -50,13 +49,8 @@ export function DisputeBottomSheet({ visible, settlementId, amount, payerName, o
       const ext = screenshotUri.split('.').pop() || 'jpg';
       const path = `disputes/${settlementId}.${ext}`;
       let fileData: ArrayBuffer;
-      if (Platform.OS === 'web') {
-        const res = await fetch(screenshotUri);
-        fileData = await res.arrayBuffer();
-      } else {
-        const base64 = await FileSystem.readAsStringAsync(screenshotUri, { encoding: 'base64' });
-        fileData = decode(base64);
-      }
+      const res = await fetch(screenshotUri);
+      fileData = await res.arrayBuffer();
       const { error } = await supabase.storage
         .from('dispute-screenshots')
         .upload(path, fileData, { contentType: 'image/jpeg', upsert: true });

@@ -24,6 +24,9 @@ const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const TRIP_TYPE_EMOJI: Record<string, string> = {
   Friends: '👫', Family: '👨‍👩‍👧', Couple: '💑', Solo: '🧳',
   Office: '💼', Adventure: '🏔️', Pilgrimage: '🛕',
+  Trip: '✈️', Flatmates: '🏠', Business: '💼',
+  College: '🎓', Event: '🎉', Wedding: '💒',
+  'Sports Team': '⚽', 'Monthly Household': '🏡', Custom: '📌',
 };
 
 export function TripDashboardScreen() {
@@ -256,7 +259,7 @@ export function TripDashboardScreen() {
             })()}
           </Text>
           <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-            Ready for your next adventure?
+            Manage your shared expenses
           </Text>
         </View>
         <TouchableOpacity
@@ -282,12 +285,12 @@ export function TripDashboardScreen() {
       >
         <View style={styles.statItem}>
           <Text style={styles.statNum}>{trips.length}</Text>
-          <Text style={styles.statLbl}>Trips</Text>
+          <Text style={styles.statLbl}>Groups</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={styles.statNum}>{trips.filter((t) => t.status === 'Planning').length}</Text>
-          <Text style={styles.statLbl}>Upcoming</Text>
+          <Text style={styles.statNum}>₹{totalSpent > 999 ? `${(totalSpent / 1000).toFixed(1)}k` : totalSpent.toFixed(0)}</Text>
+          <Text style={styles.statLbl}>Monthly</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
@@ -302,7 +305,7 @@ export function TripDashboardScreen() {
           <View style={styles.sectionHeader}>
             <Zap size={16} color={colors.warning} />
             <Text style={[typography.labelLarge, { color: colors.textPrimary, marginLeft: spacing.xs }]}>
-              Trip Invitations
+              Group Invitations
             </Text>
           </View>
           {invitations.map((item) => <InvitationCard key={item.id} item={item} />)}
@@ -313,7 +316,7 @@ export function TripDashboardScreen() {
       {trips.length > 0 && (
         <View style={{ marginTop: spacing.sm }}>
           <View style={styles.sectionHeader}>
-            <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>Your Trips</Text>
+            <Text style={[typography.labelLarge, { color: colors.textPrimary }]}>Your Groups</Text>
           </View>
 
           {/* Search */}
@@ -321,7 +324,7 @@ export function TripDashboardScreen() {
             <Search size={16} color={colors.textTertiary} />
             <TextInput
               style={[styles.searchInput, { color: colors.textPrimary }]}
-              placeholder="Search trips..."
+              placeholder="Search groups..."
               placeholderTextColor={colors.textTertiary}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -365,13 +368,13 @@ export function TripDashboardScreen() {
           ListEmptyComponent={
             <View style={styles.empty}>
               <View style={[styles.emptyIconWrap, { backgroundColor: colors.primaryLight }]}>
-                <Text style={{ fontSize: 48 }}>🗺️</Text>
+                <Text style={{ fontSize: 48 }}>💰</Text>
               </View>
               <Text style={[typography.h1, { color: colors.textPrimary, marginTop: spacing.lg }]}>
-                No trips yet
+                No groups yet
               </Text>
               <Text style={[typography.bodyMedium, { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs, maxWidth: 280 }]}>
-                Tap + to create your first trip and invite your friends!
+                Tap + to create your first group and invite your friends!
               </Text>
             </View>
           }
@@ -392,7 +395,7 @@ export function TripDashboardScreen() {
           style={[styles.fab, shadows.brand]}
           onPress={() => setShowCreate(true)}
           activeOpacity={0.88}
-          accessibilityLabel="Create new trip"
+          accessibilityLabel="Create new group"
         >
           <LinearGradient
             colors={[colors.primary, '#7B61FF']}

@@ -196,7 +196,7 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
         </TouchableOpacity>
         <View style={{ flex: 1, marginLeft: spacing.sm }}>
           <Text style={[typography.labelLarge, { color: colors.textPrimary }]} numberOfLines={1}>
-            Trip Photos
+            Media & Receipts
           </Text>
           <Text style={[typography.caption, { color: colors.textTertiary }]}>
             {media.length} {media.length === 1 ? 'photo' : 'photos'} • {tripName}
@@ -231,8 +231,8 @@ export function PhotosScreen({ tripId, tripName, onClose }: Props) {
           <Text style={[typography.h3, { color: colors.textPrimary, marginTop: spacing.lg }]}>No photos yet</Text>
           <Text style={[typography.bodyMedium, { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs, paddingHorizontal: spacing.xl }]}>
             {driveConnected
-              ? 'Capture your trip memories! Upload photos and everyone in the trip can see them.'
-              : 'Connect Google Drive to upload and store your trip photos safely in your own cloud.'}
+              ? 'Capture your memories! Upload photos and everyone in the group can see them.'
+              : 'Connect Google Drive to upload and store your group photos safely in your own cloud.'}
           </Text>
           <TouchableOpacity
             style={[styles.emptyUploadBtn, { backgroundColor: colors.primary }]}

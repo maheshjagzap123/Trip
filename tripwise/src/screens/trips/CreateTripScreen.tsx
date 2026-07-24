@@ -21,7 +21,7 @@ import { useTripStore } from '../../stores/tripStore';
 import { ArrowLeft, Plus, X, UserPlus } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const TRIP_TYPES = ['Friends', 'Family', 'Couple', 'Solo', 'Office', 'Adventure', 'Pilgrimage'];
+const GROUP_TYPES = ['Trip', 'Flatmates', 'Family', 'Friends', 'Couple', 'Office', 'Business', 'College', 'Event', 'Wedding', 'Sports Team', 'Monthly Household', 'Custom'];
 
 export function CreateTripScreen({ onClose }: { onClose: () => void }) {
   const colors = useThemeColors();
@@ -39,6 +39,8 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
   const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const [emailInput, setEmailInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const isTripType = tripType === 'Trip';
 
   // Handle Android back button
   useEffect(() => {
@@ -89,14 +91,14 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
 
   const handleCreate = async () => {
     if (!tripName.trim()) {
-      showAlert('Error', 'Please enter a trip name.');
+      showAlert('Error', 'Please enter a group name.');
       return;
     }
-    if (!startDate.trim() || !endDate.trim()) {
+    if (isTripType && (!startDate.trim() || !endDate.trim())) {
       showAlert('Error', 'Please select start and end dates.');
       return;
     }
-    if (new Date(endDate) < new Date(startDate)) {
+    if (isTripType && new Date(endDate) < new Date(startDate)) {
       showAlert('Error', 'End date must be after start date.');
       return;
     }
@@ -131,7 +133,7 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
         <TouchableOpacity onPress={onClose} accessibilityLabel="Close" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <ArrowLeft color={colors.textPrimary} size={22} />
         </TouchableOpacity>
-        <Text style={[typography.h3, { color: colors.textPrimary }]}>Create Trip</Text>
+        <Text style={[typography.h3, { color: colors.textPrimary }]}>Create Group</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -145,61 +147,24 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-        {/* Trip Name */}
+        {/* Group Name */}
         <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Trip name *</Text>
+          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Group name *</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-            placeholder="e.g. Goa with friends"
+            placeholder="e.g. Flatmates, Goa Trip, Office lunch"
             placeholderTextColor={colors.textTertiary}
             value={tripName}
             onChangeText={setTripName}
-            accessibilityLabel="Trip name"
+            accessibilityLabel="Group name"
           />
         </View>
 
-        {/* Destination */}
+        {/* Group Type */}
         <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Destination</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
-            placeholder="e.g. Goa, India"
-            placeholderTextColor={colors.textTertiary}
-            value={destination}
-            onChangeText={setDestination}
-            accessibilityLabel="Destination"
-          />
-        </View>
-
-        {/* Dates Row */}
-        <View style={styles.row}>
-          <View style={styles.halfField}>
-            <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Start date *</Text>
-            <DatePickerInput
-              value={startDate}
-              onChange={setStartDate}
-              placeholder="Select start date"
-              colors={colors}
-              minDate={new Date().toISOString().split('T')[0]}
-            />
-          </View>
-          <View style={styles.halfField}>
-            <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>End date *</Text>
-            <DatePickerInput
-              value={endDate}
-              onChange={setEndDate}
-              placeholder="Select end date"
-              colors={colors}
-              minDate={startDate || new Date().toISOString().split('T')[0]}
-            />
-          </View>
-        </View>
-
-        {/* Trip Type */}
-        <View style={styles.field}>
-          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Trip type</Text>
+          <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Group type</Text>
           <View style={styles.chipRow}>
-            {TRIP_TYPES.map((type) => (
+            {GROUP_TYPES.map((type) => (
               <TouchableOpacity
                 key={type}
                 style={[
@@ -218,6 +183,47 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
             ))}
           </View>
         </View>
+
+        {/* Destination — only for Trip type */}
+        {isTripType && (
+          <View style={styles.field}>
+            <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Destination</Text>
+            <TextInput
+              style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
+              placeholder="e.g. Goa, India"
+              placeholderTextColor={colors.textTertiary}
+              value={destination}
+              onChangeText={setDestination}
+              accessibilityLabel="Destination"
+            />
+          </View>
+        )}
+
+        {/* Dates Row — only for Trip type */}
+        {isTripType && (
+          <View style={styles.row}>
+            <View style={styles.halfField}>
+              <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>Start date *</Text>
+              <DatePickerInput
+                value={startDate}
+                onChange={setStartDate}
+                placeholder="Select start date"
+                colors={colors}
+                minDate={new Date().toISOString().split('T')[0]}
+              />
+            </View>
+            <View style={styles.halfField}>
+              <Text style={[typography.labelMedium, { color: colors.textPrimary }]}>End date *</Text>
+              <DatePickerInput
+                value={endDate}
+                onChange={setEndDate}
+                placeholder="Select end date"
+                colors={colors}
+                minDate={startDate || new Date().toISOString().split('T')[0]}
+              />
+            </View>
+          </View>
+        )}
 
         {/* Description */}
         <View style={styles.field}>
@@ -243,7 +249,7 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
             </Text>
           </View>
           <Text style={[typography.bodySmall, { color: colors.textTertiary, marginBottom: spacing.sm }]}>
-            They'll receive an invitation to join this trip
+            They'll receive an invitation to join this group
           </Text>
 
           {/* Email Input Row */}
@@ -301,7 +307,7 @@ export function CreateTripScreen({ onClose }: { onClose: () => void }) {
             style={styles.createButtonGradient}
           >
             <Text style={[typography.buttonLarge, { color: '#fff' }]}>
-              {isLoading ? 'Creating...' : 'Create Trip →'}
+              {isLoading ? 'Creating...' : 'Create Group →'}
             </Text>
           </LinearGradient>
         </TouchableOpacity>

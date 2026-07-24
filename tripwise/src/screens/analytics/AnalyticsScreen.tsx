@@ -49,7 +49,7 @@ export function AnalyticsScreen() {
     {
       icon: <Map size={22} color={colors.success} />,
       value: String(analytics?.total_trips || 0),
-      label: 'Total Trips',
+      label: 'Total Groups',
       gradient: [colors.success + '20', colors.success + '08'] as [string, string],
     },
     {
@@ -87,10 +87,10 @@ export function AnalyticsScreen() {
             <BarChart3 size={24} color={colors.primary} />
           </View>
           <Text style={[typography.h1, { color: colors.textPrimary, marginTop: spacing.md }]}>
-            Your Travel Stats
+            Spending Analytics
           </Text>
           <Text style={[typography.bodyMedium, { color: colors.textSecondary, marginTop: spacing.xs }]}>
-            Insights from all your trips
+            Insights from all your groups
           </Text>
         </View>
 

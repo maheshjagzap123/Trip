@@ -289,8 +289,8 @@ export function TripDashboardScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={styles.statNum}>₹{totalSpent > 999 ? `${(totalSpent / 1000).toFixed(1)}k` : totalSpent.toFixed(0)}</Text>
-          <Text style={styles.statLbl}>Monthly</Text>
+          <Text style={styles.statNum}>{trips.filter((t) => t.status === 'Active').length}</Text>
+          <Text style={styles.statLbl}>Active</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>

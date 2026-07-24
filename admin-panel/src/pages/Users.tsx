@@ -20,6 +20,13 @@ export function Users() {
 
   useEffect(() => {
     fetchUsers();
+
+    const channel = supabase
+      .channel('users-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchUsers())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const fetchUsers = async () => {

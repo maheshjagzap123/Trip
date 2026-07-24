@@ -27,6 +27,14 @@ export function Groups() {
 
   useEffect(() => {
     fetchGroups();
+
+    const channel = supabase
+      .channel('groups-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, () => fetchGroups())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'trip_members' }, () => fetchGroups())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const fetchGroups = async () => {

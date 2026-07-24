@@ -27,6 +27,17 @@ export function Dashboard() {
 
   useEffect(() => {
     fetchStats();
+
+    // Realtime subscriptions for live dashboard updates
+    const channel = supabase
+      .channel('dashboard-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchStats())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'trips' }, () => fetchStats())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => fetchStats())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'settlements' }, () => fetchStats())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const fetchStats = async () => {

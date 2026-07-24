@@ -72,6 +72,9 @@ export function TripDashboardScreen() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'settlements' }, () => {
         fetchExpenseTotals();
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, () => {
+        fetchUnreadCount();
+      })
       .subscribe();
 
     return () => { unsub(); supabase.removeChannel(expenseChannel); };
@@ -430,11 +433,7 @@ export function TripDashboardScreen() {
       <OverlayScreen visible={showNotifications}>
         <NotificationsScreen
           onClose={() => { setShowNotifications(false); fetchUnreadCount(); }}
-          onNavigateToTrip={(tripId) => {
-            setShowNotifications(false);
-            fetchUnreadCount();
-            setSelectedTripId(tripId);
-          }}
+        />
         />
       </OverlayScreen>
     </View>

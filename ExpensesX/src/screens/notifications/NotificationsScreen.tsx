@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList, BackHandler,
-  Alert, Platform, Animated as RNAnimated,
+  Alert, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors, typography, spacing, borderRadius } from '../../theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Bell, UserPlus, MessageCircle, Check, CreditCard, Trash2, ChevronRight } from 'lucide-react-native';
+import { ArrowLeft, Bell, UserPlus, MessageCircle, Check, CreditCard, Trash2 } from 'lucide-react-native';
 import { formatDistanceToNow } from 'date-fns';
-import { Swipeable } from 'react-native-gesture-handler';
 
 interface Notification {
   id: string;
@@ -105,15 +104,9 @@ export function NotificationsScreen({ onClose, onNavigateToTrip }: Props) {
   };
 
   const handleNotificationPress = async (item: Notification) => {
-    // Mark as read
+    // Just mark as read — no navigation
     if (!item.read) {
       await markAsRead(item.id);
-    }
-
-    // Navigate to the relevant trip if trip_id exists in data
-    const tripId = item.data?.trip_id;
-    if (tripId && onNavigateToTrip) {
-      onNavigateToTrip(tripId);
     }
   };
 
@@ -132,36 +125,12 @@ export function NotificationsScreen({ onClose, onNavigateToTrip }: Props) {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const renderRightActions = (id: string) => (
-    progress: RNAnimated.AnimatedInterpolation<number>,
-    dragX: RNAnimated.AnimatedInterpolation<number>
-  ) => {
-    const scale = dragX.interpolate({
-      inputRange: [-80, 0],
-      outputRange: [1, 0.5],
-      extrapolate: 'clamp',
-    });
-
-    return (
-      <TouchableOpacity
-        style={[styles.deleteAction, { backgroundColor: colors.error }]}
-        onPress={() => deleteNotification(id)}
-        activeOpacity={0.8}
-      >
-        <RNAnimated.View style={{ transform: [{ scale }] }}>
-          <Trash2 size={20} color="#FFF" />
-        </RNAnimated.View>
-      </TouchableOpacity>
-    );
-  };
-
   const renderItem = ({ item }: { item: Notification }) => (
-    <Swipeable
-      renderRightActions={renderRightActions(item.id)}
-      overshootRight={false}
+    <View
+      style={[styles.notifItem, { backgroundColor: item.read ? 'transparent' : colors.primaryLight, borderBottomColor: colors.border }]}
     >
       <TouchableOpacity
-        style={[styles.notifItem, { backgroundColor: item.read ? 'transparent' : colors.primaryLight, borderBottomColor: colors.border }]}
+        style={{ flexDirection: 'row', flex: 1, alignItems: 'flex-start' }}
         onPress={() => handleNotificationPress(item)}
         activeOpacity={0.7}
       >
@@ -175,14 +144,18 @@ export function NotificationsScreen({ onClose, onNavigateToTrip }: Props) {
             {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
           </Text>
         </View>
-        <View style={styles.notifRight}>
-          {!item.read && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
-          {item.data?.trip_id && onNavigateToTrip && (
-            <ChevronRight size={16} color={colors.textTertiary} style={{ marginTop: 4 }} />
-          )}
-        </View>
       </TouchableOpacity>
-    </Swipeable>
+      <View style={styles.notifRight}>
+        {!item.read && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
+        <TouchableOpacity
+          onPress={() => deleteNotification(item.id)}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          style={styles.deleteBtn}
+        >
+          <Trash2 size={15} color={colors.textTertiary} />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 
   return (
@@ -230,12 +203,8 @@ const styles = StyleSheet.create({
   headerBtn: { padding: spacing.xs },
   notifItem: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 0.5 },
   notifIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(128,128,128,0.08)', justifyContent: 'center', alignItems: 'center' },
-  notifRight: { alignItems: 'center', justifyContent: 'flex-start', marginLeft: spacing.xs },
+  notifRight: { alignItems: 'center', justifyContent: 'center', marginLeft: spacing.xs, gap: 8 },
   unreadDot: { width: 8, height: 8, borderRadius: 4 },
-  deleteAction: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 72,
-  },
+  deleteBtn: { padding: 6 },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
 });

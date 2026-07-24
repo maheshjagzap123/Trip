@@ -182,13 +182,26 @@
 
 @media (max-width: 768px) {
   .user-card {
-    padding: 14px 16px;
-    gap: 12px;
+    padding: 14px 14px;
+    gap: 10px;
   }
 
   .user-avatar-lg {
-    width: 42px;
-    height: 42px;
-    font-size: 15px;
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  .user-name {
+    font-size: 13px;
+  }
+
+  .user-email {
+    font-size: 11px;
+  }
+
+  .search-bar {
+    padding: 11px 14px;
   }
 }

@@ -6,18 +6,30 @@ import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { useThemeStore } from './src/stores/themeStore';
 import { useNetworkStore } from './src/stores/networkStore';
+import { useAuthStore } from './src/stores/authStore';
 import { ToastContainer } from './src/components/Toast';
 import { OfflineBanner } from './src/components/OfflineBanner';
+import { registerForPushNotifications, addNotificationListeners } from './src/lib/notifications';
 
 export default function App() {
   const { initialize: initTheme, resolvedScheme } = useThemeStore();
   const { initialize: initNetwork } = useNetworkStore();
+  const { session } = useAuthStore();
 
   useEffect(() => {
     initTheme();
     const unsubNetwork = initNetwork();
     return () => { unsubNetwork(); };
   }, []);
+
+  // Register push notifications when user is logged in
+  useEffect(() => {
+    if (!session) return;
+
+    registerForPushNotifications();
+    const cleanup = addNotificationListeners();
+    return cleanup;
+  }, [session]);
 
   return (
     <SafeAreaProvider>

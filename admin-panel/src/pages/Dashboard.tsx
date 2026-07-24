@@ -13,6 +13,13 @@ interface DashboardStats {
   newUsersThisWeek: number;
 }
 
+function formatAmount(amount: number): string {
+  if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
+  if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
+  if (amount >= 1000) return `₹${(amount / 1000).toFixed(1)}K`;
+  return `₹${amount.toFixed(0)}`;
+}
+
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
@@ -98,11 +105,11 @@ export function Dashboard() {
 
       {/* Stats Grid */}
       <div className="stats-grid">
-        <StatCard icon={Users} label="Total Users" value={stats.totalUsers} change={`+${stats.newUsersThisWeek} this week`} color="var(--primary)" />
+        <StatCard icon={Users} label="Total Users" value={stats.totalUsers} change={stats.newUsersThisWeek > 0 ? `+${stats.newUsersThisWeek}` : undefined} color="var(--primary)" />
         <StatCard icon={Layers} label="Total Groups" value={stats.totalGroups} color="var(--secondary)" />
         <StatCard icon={Receipt} label="Total Expenses" value={stats.totalExpenses} color="var(--warning)" />
         <StatCard icon={CreditCard} label="Settlements" value={stats.totalSettlements} color="var(--success)" />
-        <StatCard icon={TrendingUp} label="Total Volume" value={`₹${stats.totalAmount.toLocaleString()}`} color="#EC4899" />
+        <StatCard icon={TrendingUp} label="Total Volume" value={formatAmount(stats.totalAmount)} color="#EC4899" />
         <StatCard icon={Activity} label="New This Week" value={stats.newUsersThisWeek} color="var(--primary)" />
       </div>
 

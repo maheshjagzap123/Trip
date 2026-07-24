@@ -34,7 +34,13 @@ export function Groups() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'trip_members' }, () => fetchGroups())
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Polling fallback every 10 seconds
+    const interval = setInterval(fetchGroups, 10000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   const fetchGroups = async () => {

@@ -37,7 +37,13 @@ export function Dashboard() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'settlements' }, () => fetchStats())
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Polling fallback every 10 seconds (in case realtime misses events)
+    const interval = setInterval(fetchStats, 10000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   const fetchStats = async () => {

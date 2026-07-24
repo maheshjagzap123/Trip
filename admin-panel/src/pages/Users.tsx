@@ -26,7 +26,13 @@ export function Users() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchUsers())
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Polling fallback every 10 seconds
+    const interval = setInterval(fetchUsers, 10000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   const fetchUsers = async () => {

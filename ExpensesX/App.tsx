@@ -5,13 +5,18 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { useThemeStore } from './src/stores/themeStore';
+import { useNetworkStore } from './src/stores/networkStore';
 import { ToastContainer } from './src/components/Toast';
+import { OfflineBanner } from './src/components/OfflineBanner';
 
 export default function App() {
-  const { initialize, resolvedScheme } = useThemeStore();
+  const { initialize: initTheme, resolvedScheme } = useThemeStore();
+  const { initialize: initNetwork } = useNetworkStore();
 
   useEffect(() => {
-    initialize();
+    initTheme();
+    const unsubNetwork = initNetwork();
+    return () => { unsubNetwork(); };
   }, []);
 
   return (
@@ -23,6 +28,7 @@ export default function App() {
         >
           <StatusBar style={resolvedScheme === 'dark' ? 'light' : 'dark'} />
           <AppNavigator />
+          <OfflineBanner />
           <ToastContainer />
         </KeyboardAvoidingView>
       </GestureHandlerRootView>

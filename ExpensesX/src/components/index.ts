@@ -22,3 +22,5 @@ export { ToastContainer, useToastStore, toast } from './Toast';
 export { BottomSheet } from './BottomSheet';
 export { PaymentStatusBadge } from './PaymentStatusBadge';
 export { DisputeBottomSheet } from './DisputeBottomSheet';
+
+export { OfflineBanner } from './OfflineBanner';

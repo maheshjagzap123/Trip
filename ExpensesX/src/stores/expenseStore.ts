@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
+import { executeOrQueue } from '../lib/offlineQueue';
+import { useNetworkStore } from './networkStore';
 
 export interface Expense {
   id: string;
@@ -188,31 +190,41 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
 
   addExpense: async (input) => {
     const { splits, ...expenseData } = input;
-    const { data: expense, error } = await supabase
-      .from('expenses')
-      .insert({
-        trip_id: expenseData.trip_id,
-        title: expenseData.title,
-        amount: expenseData.amount,
-        category: expenseData.category,
-        paid_by: expenseData.paid_by,
-        notes: expenseData.notes || null,
-        split_method: expenseData.split_method,
-        created_by: expenseData.created_by,
-      })
-      .select('id')
-      .single();
 
-    if (error) throw new Error(error.message);
-    if (!expense) throw new Error('Failed to add expense');
+    const onlineExecutor = async () => {
+      const { data: expense, error } = await supabase
+        .from('expenses')
+        .insert({
+          trip_id: expenseData.trip_id,
+          title: expenseData.title,
+          amount: expenseData.amount,
+          category: expenseData.category,
+          paid_by: expenseData.paid_by,
+          notes: expenseData.notes || null,
+          split_method: expenseData.split_method,
+          created_by: expenseData.created_by,
+        })
+        .select('id')
+        .single();
 
-    const { error: splitError } = await supabase.from('expense_splits').insert(
-      splits.map((s) => ({ expense_id: expense.id, user_id: s.user_id, amount: s.amount }))
-    );
-    if (splitError) throw new Error(splitError.message);
+      if (error) throw new Error(error.message);
+      if (!expense) throw new Error('Failed to add expense');
 
-    await get().fetchExpenses(input.trip_id);
-    await get().fetchBalances(input.trip_id);
+      const { error: splitError } = await supabase.from('expense_splits').insert(
+        splits.map((s) => ({ expense_id: expense.id, user_id: s.user_id, amount: s.amount }))
+      );
+      if (splitError) throw new Error(splitError.message);
+    };
+
+    const { queued } = await executeOrQueue('add_expense', input, onlineExecutor);
+
+    if (queued) {
+      // Update pending count in network store
+      useNetworkStore.getState().refreshPendingCount();
+    } else {
+      await get().fetchExpenses(input.trip_id);
+      await get().fetchBalances(input.trip_id);
+    }
   },
 
   deleteExpense: async (expenseId, tripId) => {

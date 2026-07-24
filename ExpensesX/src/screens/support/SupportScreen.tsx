@@ -23,7 +23,7 @@ const FAQ_ITEMS = [
 
 export function SupportScreen({ onClose }: Props) {
   const colors = useThemeColors();
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => { onClose(); return true; });
@@ -42,14 +42,17 @@ export function SupportScreen({ onClose }: Props) {
   const handleSendFeedback = async () => {
     if (feedbackRating === 0) { showAlert('Error', 'Please select a rating'); return; }
     if (!feedbackText.trim()) { showAlert('Error', 'Please write your feedback'); return; }
+    if (!user) return;
     setSending(true);
     try {
-      await supabase.from('notifications').insert({
-        user_id: '00000000-0000-0000-0000-000000000001',
+      await supabase.from('feedback').insert({
+        user_id: user.id,
         type: 'feedback',
-        title: `Feedback (${feedbackRating}★)`,
-        body: feedbackText.trim(),
-        data: { rating: feedbackRating, user_email: user?.email, from_user_id: user?.id },
+        rating: feedbackRating,
+        message: feedbackText.trim(),
+        user_email: user.email || null,
+        user_name: profile?.display_name || null,
+        platform: Platform.OS,
       });
       showAlert('Thank you!', 'Your feedback has been submitted.');
       setFeedbackRating(0);
@@ -59,14 +62,17 @@ export function SupportScreen({ onClose }: Props) {
 
   const handleSendContact = async () => {
     if (!contactSubject.trim() || !contactMessage.trim()) { showAlert('Error', 'Please fill all fields'); return; }
+    if (!user) return;
     setSending(true);
     try {
-      await supabase.from('notifications').insert({
-        user_id: '00000000-0000-0000-0000-000000000001',
-        type: 'support_request',
-        title: contactSubject.trim(),
-        body: contactMessage.trim(),
-        data: { user_email: user?.email, from_user_id: user?.id },
+      await supabase.from('feedback').insert({
+        user_id: user.id,
+        type: 'contact',
+        subject: contactSubject.trim(),
+        message: contactMessage.trim(),
+        user_email: user.email || null,
+        user_name: profile?.display_name || null,
+        platform: Platform.OS,
       });
       showAlert('Sent!', 'We\'ll get back to you within 24 hours.');
       setContactSubject('');

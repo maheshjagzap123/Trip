@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors, typography, spacing, borderRadius, shadows } from '../../theme';
 import { useExpenseStore } from '../../stores/expenseStore';
@@ -86,7 +86,20 @@ export function ExpensesTab({ tripId }: Props) {
   const myNet = myBalance?.net_balance || 0;
 
   const handleDelete = (expenseId: string) => {
-    deleteExpense(expenseId, tripId);
+    if (Platform.OS === 'web') {
+      if (window.confirm('Delete this expense? This cannot be undone.')) {
+        deleteExpense(expenseId, tripId);
+      }
+    } else {
+      Alert.alert(
+        'Delete Expense',
+        'Are you sure you want to delete this expense? This cannot be undone.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Delete', style: 'destructive', onPress: () => deleteExpense(expenseId, tripId) },
+        ]
+      );
+    }
   };
 
   const renderExpense = ({ item }: { item: Expense }) => {

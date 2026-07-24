@@ -29,41 +29,41 @@ Notifications.setNotificationHandler({
  * Call this once after user logs in.
  */
 export async function registerForPushNotifications(): Promise<string | null> {
-  // Push notifications only work on physical devices
-  if (!Device.isDevice) {
-    console.log('[Notifications] Must use physical device for push notifications');
-    return null;
-  }
-
-  // Check/request permission
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    console.log('[Notifications] Permission not granted');
-    return null;
-  }
-
-  // Android: set notification channel
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'ExpenseX',
-      importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#5B8CFF',
-      sound: 'default',
-    });
-  }
-
-  // Get Expo push token
   try {
+    // Push notifications only work on physical devices
+    if (!Device.isDevice) {
+      console.log('[Notifications] Must use physical device for push notifications');
+      return null;
+    }
+
+    // Check/request permission
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== 'granted') {
+      console.log('[Notifications] Permission not granted');
+      return null;
+    }
+
+    // Android: set notification channel
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'ExpenseX',
+        importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#5B8CFF',
+        sound: 'default',
+      });
+    }
+
+    // Get Expo push token
     const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: '54c1f729-d743-4bf7-b3ee-8d1c39714170', // from app.json
+      projectId: '54c1f729-d743-4bf7-b3ee-8d1c39714170',
     });
     const token = tokenData.data;
     console.log('[Notifications] Push token:', token);
@@ -73,7 +73,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
 
     return token;
   } catch (err) {
-    console.error('[Notifications] Failed to get push token:', err);
+    console.warn('[Notifications] Setup failed:', err);
     return null;
   }
 }

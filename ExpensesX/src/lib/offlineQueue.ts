@@ -1,6 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
 import { supabase } from './supabase';
+
+let NetInfo: any = null;
+try {
+  NetInfo = require('@react-native-community/netinfo').default;
+} catch (e) {
+  console.warn('[OfflineQueue] NetInfo not available');
+}
 
 const QUEUE_KEY = 'expensex_offline_queue';
 
@@ -62,7 +68,13 @@ export function getIsOnline(): boolean {
 
 /** Initialize network listener — call once on app startup */
 export function initNetworkListener(onStatusChange?: (online: boolean) => void): () => void {
-  const unsubscribe = NetInfo.addEventListener((state) => {
+  if (!NetInfo) {
+    // NetInfo not available — assume online
+    isOnline = true;
+    return () => {};
+  }
+
+  const unsubscribe = NetInfo.addEventListener((state: any) => {
     const wasOffline = !isOnline;
     isOnline = !!(state.isConnected && state.isInternetReachable !== false);
 

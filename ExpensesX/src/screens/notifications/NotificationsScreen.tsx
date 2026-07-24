@@ -79,7 +79,11 @@ export function NotificationsScreen({ onClose, onNavigateToTrip }: Props) {
   };
 
   const deleteNotification = async (id: string) => {
-    await supabase.from('notifications').delete().eq('id', id);
+    const { error } = await supabase.from('notifications').delete().eq('id', id);
+    if (error) {
+      console.warn('Delete notification failed:', error.message);
+      return;
+    }
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
